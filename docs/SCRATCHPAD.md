@@ -169,3 +169,131 @@ Tavily, o fluxo completo `AgentThinkUseCase`, e o ciclo de produção de artefat
 depois disso implementar as 9 personas, os adapters e os casos de uso, com testes unitários cada
 passo, seguindo exatamente o mesmo padrão de qualidade da Rodada 1 (`make check` limpo antes de
 cada commit, commits atômicos sem coautoria, `SCRATCHPAD.md` atualizado a cada commit).
+
+### Rodada 3 — Fase 2 (MQTT) + Fase 3 (Personas) + Fase 4 (Artefatos) do plano de migração,
+### decisão de frontend (Svelte) e organização dos assets de pixel-art (2026-10-30)
+
+**Escopo entregue (backend, seguindo exatamente as decisões fechadas na Rodada 2):**
+
+- **ADR-011** (`docs/adr/011-tavily-como-provedor-de-busca-web.md`): decisão de usar a API da
+  Tavily para a ferramenta `web_search`, com `IWebSearchAdapter` no domínio,
+  `TavilySearchAdapter` (infraestrutura, via `httpx`) e `MockSearchAdapter` para testes. A chave
+  `TAVILY_API_KEY` é pessoal/paga — documentada em `.env.example` sem valor real, exigida apenas na
+  primeira chamada de `search()` (nunca na construção do adaptador, para não quebrar fluxos que não
+  usam busca web).
+- **RFC-001, RFC-002 e RFC-003** atualizadas de "Proposto" para "Aceito (parcialmente implementado)",
+  com seções "Atualização — Rodada 3" descrevendo o estado final de cada contrato nesta rodada.
+- **Fase 2 — `AgentThinkUseCase`** (`application/agents/agent_think_use_case.py`): liga
+  `ILlmAdapter` + `IMessageBus` + `IPromptProvider` + `ToolRegistry`. Publica, em sequência,
+  `office/agents/{id}/status` (retain=true), `office/agents/{id}/thought` (QoS 0) e
+  `office/agents/{id}/action` (QoS 1), e delega `tool_call` ao `ToolRegistry` quando presente.
+- **Fase 3 — Personas**:
+  - `application/tools/tool_permissions.py`: enum `ToolName` com as 11 ferramentas da tabela de
+    referência e `ROLE_TOOL_PERMISSIONS` transcrita literalmente dessa tabela para os 9 papéis.
+  - `infrastructure/prompts/{role}.md`: os 9 system prompts em português, copiados fielmente do
+    texto de referência já redigido na Fase 3 (um ajuste pontual: "TypeScript (React)" trocado para
+    "TypeScript (Svelte)" no prompt do Tech Lead, para refletir a decisão de frontend desta mesma
+    rodada — ver abaixo).
+  - `domain/interfaces/prompt_provider.py` + `infrastructure/prompts/file_prompt_provider.py`:
+    `IPromptProvider`/`FilePromptProvider`, lê e cacheia os templates Markdown por papel.
+  - `application/tools/tool_registry.py`: `ToolRegistry` valida `Role` × `ToolName` antes de
+    delegar a `write_artifact`/`review_artifact`/`approve_artifact`/`web_search`. As demais
+    ferramentas da tabela (`create_task`, `assign_task`, `complete_task`, `send_message`,
+    `hire_agent`, `start_ceremony`, `read_artifact`) já constam em `ToolName` e na tabela de
+    permissões, mas levantam `ToolNotImplementedError` — não têm caso de uso próprio ainda
+    (YAGNI: nenhum caso de uso desta rodada as produz).
+  - **Nota de alcance:** o Big Five (`Personality`) já existe desde a Fase 1 na entidade `Agent` —
+    esta rodada não precisou adicionar um `ROLE_PERSONALITIES` separado porque nenhum caso de uso
+    desta rodada consome personalidade por papel; mantido como ponto de atenção para quando essa
+    necessidade surgir.
+- **Fase 4 — Artefatos**:
+  - `domain/interfaces/artifact_repository.py`: `IArtifactRepository` (save/find_by_id/list_all).
+  - `application/artifacts/write_artifact_use_case.py`,
+    `application/artifacts/review_artifact_use_case.py`,
+    `application/artifacts/approve_artifact_use_case.py`: os três casos de uso do ciclo de vida do
+    artefato, cada um publicando `office/artifacts/created` ou `office/artifacts/updated` via
+    `IMessageBus` (envelope padrão extraído para `application/common/message_envelope.py`, usado
+    também pelo `AgentThinkUseCase` — DRY).
+  - `infrastructure/filesystem/markdown_artifact_writer.py`: escreve o `.md` real em
+    `workspace/projects/{sprint}/{arquivo}.md` com frontmatter YAML.
+  - `infrastructure/persistence/in_memory_artifact_repository.py`: metadados em memória + delega a
+    escrita em disco ao `MarkdownArtifactWriter` — `PostgresArtifactRepository` concreto permanece
+    pendente para quando houver um consumidor real de persistência relacional (YAGNI, ver ADR-006).
+- **Injeção de dependência** (`presentation/dependencies.py`): todas as novas peças conectadas —
+  `get_message_bus` (`InMemoryMessageBus` ainda é o padrão deste processo; `MqttMessageBus` real
+  exige bootstrap de conexão, fora do escopo desta injeção síncrona), `get_llm_adapter`
+  (`OllamaAdapter`), `get_artifact_repository`, `get_prompt_provider`, `get_web_search_adapter`
+  (`TavilySearchAdapter`), `get_tool_registry` e `get_agent_think_use_case`.
+- **Configuração**: `tavily_api_key` adicionado a `Settings` (padrão `""`, nunca obrigatório na
+  inicialização do processo) e documentado em `backend/.env.example`/`backend/.env` com
+  placeholder vazio.
+- **Testes**: 20 novos testes unitários cobrindo `TavilySearchAdapter` (sucesso, erro HTTP e chave
+  ausente — HTTP mockado via `pytest-mock`, sem rede real), `MockSearchAdapter`,
+  `MarkdownArtifactWriter`, `InMemoryArtifactRepository`, os três casos de uso de artefato,
+  `tool_permissions` (cobertura dos 9 papéis), `ToolRegistry` (permissão concedida/negada/ferramenta
+  não implementada), `FilePromptProvider`, `build_message_envelope` e `AgentThinkUseCase`
+  (status/thought/action publicados, erro em agente `OFFLINE`, execução de `tool_call` ponta a
+  ponta gerando um `.md` real). Total: **81 testes passando** (80 unitários + 1 de integração MQTT
+  real, validado com `make up` ativo).
+- **Qualidade de código**: `make check` (format + lint + type-check + test) limpo — `ruff
+  format`/`ruff check` sem apontamentos, `mypy --strict` sem erros em 59 arquivos-fonte.
+- **Validação ponta a ponta conforme decisão da Rodada 2:** nenhum endpoint HTTP novo foi
+  exposto para o fluxo comando → pensamento → pesquisa → artefato; a validação é inteiramente por
+  testes automatizados chamando os casos de uso diretamente (`AgentThinkUseCase` com `tool_call` de
+  `write_artifact` gerando um arquivo `.md` real em disco, dentro do teste).
+
+**Decisões de arquitetura fechadas nesta sessão (fora do código Python, registradas para quando a
+Fase 8/frontend chegarem):**
+
+1. **Frontend definido: Svelte + TypeScript** (não mais uma lista de candidatos em aberto — decisão
+   final do Cristian). Critério de escolha: reatividade granular com runes, melhor equilíbrio para
+   interface dinâmica, personagens e painéis. Documento `docs/design/arquitetura-geral.md`
+   atualizado pelo próprio Cristian com o novo diagrama de componentes (Interface Web Svelte →
+   Gateway Go → MQTT → Backend Python / Serviços Go). `docs/migration-plan/README.md` (tabela
+   "Stack Final" e árvore de pastas) atualizado de React/Zustand para Svelte/runes. O prompt do
+   Tech Lead (`infrastructure/prompts/tech_lead.md`) e o texto de referência da Fase 3
+   (`docs/migration-plan/fase-3-personas/README.md`) também corrigidos para citar Svelte em vez de
+   React na "stack disponível".
+   **Pendente:** as árvores de arquivo detalhadas (`.tsx`, `Zustand`) em
+   `docs/migration-plan/fase-0-fundacao/README.md`, `fase-1-arquitetura/README.md`,
+   `fase-7-deploy/README.md` e `fase-8-microservicos/README.md` ainda não foram reescritas para
+   Svelte — são documentos de fases futuras de frontend, fora do escopo desta rodada de backend;
+   reescrever quando a implementação do frontend realmente começar.
+2. **Gateway Go SEM autenticação/autorização** — decisão explícita do Cristian: o projeto é open
+   source, mantido por doações, sem contas de usuário nem dados sensíveis de terceiros a proteger.
+   `docs/design/arquitetura-geral.md` atualizado: removida a linha "Autenticação e autorização" do
+   bloco do Gateway de Comunicação no diagrama, e adicionada a seção "Decisão: sem
+   autenticação/autorização no Gateway Go" explicando o motivo e deixando explícito que qualquer
+   necessidade futura de controle de acesso deve ser resolvida fora do código deste gateway (proxy
+   reverso, rede privada), nunca adicionando autenticação sem uma nova decisão explícita do dono do
+   produto.
+3. **Assets de pixel-art comprados e organizados em `offices/`** (pasta na raiz do repositório
+   `agent-office-edicao-brasileira`, fora de `agent-office-microservice/` — mesmo repositório Git
+   do monorepo, já versionada): `Character Generator 2.0 Linux Build/`, `Modern_Interiors_RPG_Maker_Version/`
+   (zipado), `Modern_Office_Revamped_v1.2/`, `moderninteriors-win/`, `PixelOffice/`. São 3 pacotes
+   comprados (não apenas 1), o que dá liberdade para compor o escritório final combinando tiles de
+   fontes diferentes quando o frontend (Fase 1 do plano, após Svelte estar configurado) começar a
+   consumi-los via Phaser.js. Nenhuma integração de código com esses assets foi feita nesta rodada —
+   é só o registro de que já estão disponíveis e onde estão.
+4. **Identidade visual sugerida por papel** (registrada para quando o frontend mapear sprites de
+   `offices/` a cada persona — nenhuma implementação ainda):
+
+   | Papel (`Role`) | Identidade visual sugerida |
+   |----------------|------------------------------|
+   | `PRODUCT_OWNER` | Profissional com prancheta ou documentos |
+   | `SCRUM_MASTER` | Facilitador com quadro de tarefas |
+   | `TECH_LEAD` | Profissional diante de um computador com diagramas |
+   | `DEV_SENIOR` | Desenvolvedor experiente em uma estação de trabalho |
+   | `DEV_JUNIOR` | Desenvolvedor em uma estação de aprendizado |
+   | `QA_ENGINEER` | Profissional com checklist de testes |
+   | `DATA_ANALYST` | Analista com gráficos e indicadores |
+   | `HR_MANAGER` | Profissional com documentos de equipe |
+   | `PRODUCT_CONSULTANT` | Consultor com relatórios e gráficos de mercado |
+
+**Pendente para a próxima rodada** (conforme `docs/migration-plan/`): Fase 5 (múltiplos modelos de
+LLM por agente via `.env`, já parcialmente coberta pelo `OllamaAdapter`/ADR-005, falta a *factory*
+que resolve o modelo por papel), `PostgresArtifactRepository`/`PostgresAgentRepository` concretos,
+endpoint(s) HTTP ou outro ponto de entrada para o Cristian de fato disparar um objetivo de produto
+para o time pensar (hoje só é possível via teste automatizado ou código Python direto), e o início
+do frontend Svelte (Fase 1 do plano) consumindo os assets já organizados em `offices/`, aplicando a
+identidade visual sugerida por papel listada acima.
