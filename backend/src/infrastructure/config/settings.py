@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     ollama_model: str = "nemotron-3.5-bolt:latest"
     ollama_embedding_model: str = "nomic-embed-text:latest"
 
+    # Busca web (Tavily) — chave pessoal/paga, sem valor padrão de fábrica
+    # (ver ADR-011). Ausente por padrão: só é exigida quando a ferramenta
+    # `web_search` é efetivamente usada.
+    tavily_api_key: str = ""
+
     # HTTP da API do backend
     api_host: str = "0.0.0.0"
     api_port: int = 8000
