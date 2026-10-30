@@ -18,16 +18,16 @@ services:
     container_name: agent-office-microservice-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: agentoffice
-      POSTGRES_USER: agentoffice
-      POSTGRES_PASSWORD: agentoffice
+      POSTGRES_DB: agm
+      POSTGRES_USER: agm
+      POSTGRES_PASSWORD: agm
     ports:
       - "7034:5432"
     volumes:
       - ./.docker/pgdata:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U agentoffice -d agentoffice"]
+      test: ["CMD-SHELL", "pg_isready -U agm -d agm"]
       interval: 5s
       timeout: 5s
       retries: 10
