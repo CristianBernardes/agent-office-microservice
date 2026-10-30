@@ -29,9 +29,13 @@ backend se conecta a ele exclusivamente via HTTP, usando a URL configurada pela 
   `http://localhost:11434`.
 
 No `docker-compose.yml` deste projeto, o serviço `backend` sobrescreve explicitamente
-`OLLAMA_BASE_URL=http://172.17.0.1:11434` na seção `environment`, garantindo que, mesmo que o
-`.env` local do desenvolvedor contenha `localhost` (valor correto apenas para execução fora de
-container), o container sempre aponte para o host corretamente — nunca para si mesmo.
+`OLLAMA_BASE_URL=http://172.17.0.1:11434` na seção `environment`. Como o fluxo de trabalho padrão
+deste projeto é sempre via Docker Compose (`make up`), o `.env.example` também usa
+`http://172.17.0.1:11434` como valor padrão — o mesmo valor em ambos os lugares evita a confusão de
+ter dois padrões diferentes dependendo do contexto de execução. Caso o backend seja executado fora
+de container na mesma máquina (via `poetry run`) e o Ollama não responda nesse endereço, o
+desenvolvedor pode trocar para `http://localhost:11434` no seu `.env` local — essa é uma exceção
+pontual de ambiente, não o padrão documentado do projeto.
 
 ## Consequências
 
