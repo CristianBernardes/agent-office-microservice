@@ -15,7 +15,7 @@ POETRY      := poetry
 .PHONY: help install run up down restart logs ps \
         test test-unit test-integration coverage \
         lint format type-check check \
-        clean
+        clean check-poetry
 
 ## help: Lista todos os comandos disponíveis deste Makefile.
 help:
@@ -70,26 +70,35 @@ ps:
 
 # ─── Backend (Python / Poetry) ─────────────────────────────────────────────
 
+## check-poetry: Verifica se o Poetry está instalado antes de qualquer comando que dependa dele.
+check-poetry:
+	@command -v $(POETRY) >/dev/null 2>&1 || { \
+		echo "Erro: 'poetry' não foi encontrado no PATH."; \
+		echo "Instale com: curl -sSL https://install.python-poetry.org | python3 -"; \
+		echo "Documentação: https://python-poetry.org/docs/#installation"; \
+		exit 1; \
+	}
+
 ## install: Instala as dependências do backend (produção, testes e lint) via Poetry.
-install:
+install: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) install --with test,lint
 
 ## run: Executa o backend localmente com recarregamento automático (requer 'make install').
-run:
+run: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run uvicorn src.presentation.main:app --reload --host 0.0.0.0 --port 8000
 
 # ─── Qualidade de código ────────────────────────────────────────────────────
 
 ## format: Formata todo o código do backend com ruff format.
-format:
+format: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run ruff format src/ tests/
 
 ## lint: Executa o lint (ruff check) sobre todo o código do backend.
-lint:
+lint: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run ruff check src/ tests/
 
 ## type-check: Executa a verificação de tipos estática (mypy --strict) sobre o código de produção.
-type-check:
+type-check: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run mypy src/
 
 ## check: Roda a sequência completa de validação — formatação, lint, tipos e testes.
@@ -98,19 +107,19 @@ check: format lint type-check test
 # ─── Testes ─────────────────────────────────────────────────────────────────
 
 ## test: Roda todos os testes (unitários e de integração).
-test:
+test: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run pytest
 
 ## test-unit: Roda apenas os testes unitários — rápidos, sem dependências externas.
-test-unit:
+test-unit: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run pytest -m unit -v
 
 ## test-integration: Roda os testes de integração — requer 'make up' previamente.
-test-integration:
+test-integration: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run pytest -m integration -v
 
 ## coverage: Roda os testes unitários com relatório de cobertura no terminal.
-coverage:
+coverage: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run pytest -m unit --cov=src --cov-report=term-missing
 
 # ─── Limpeza ────────────────────────────────────────────────────────────────
