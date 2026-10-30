@@ -25,3 +25,4 @@
 | [008](./008-poetry-como-gerenciador-de-dependencias.md) | Poetry como gerenciador de dependências Python | Aceito |
 | [009](./009-ollama-externo-ao-docker-compose.md) | Ollama externo ao Docker Compose | Aceito |
 | [010](./010-portas-de-container-com-prefixo-70.md) | Convenção de portas de container com prefixo `70` | Aceito |
+| [011](./011-tavily-como-provedor-de-busca-web.md) | Tavily como provedor de busca web | Aceito |
