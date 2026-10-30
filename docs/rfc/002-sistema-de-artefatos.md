@@ -1,6 +1,6 @@
 # RFC-002 — Sistema de Artefatos
 
-**Status:** Proposto
+**Status:** Aceito (parcialmente implementado — ver "Escopo desta rodada de implementação")
 **Data:** 2026-10-30
 **Autor:** Cristian Bernardes
 
@@ -52,3 +52,15 @@ enum `ArtifactType`/`ArtifactStatus` e a interface `IArtifactRepository` são de
 implementação dos casos de uso (`WriteArtifactUseCase`, `ReviewArtifactUseCase`,
 `ApproveArtifactUseCase`) e dos adaptadores concretos (`MarkdownArtifactWriter`,
 `PostgresArtifactRepository`) é entregue na Fase 4, conforme o plano de migração.
+
+**Atualização — Rodada 3 (Fase 4):** `WriteArtifactUseCase`, `ReviewArtifactUseCase` e
+`ApproveArtifactUseCase` estão implementados nesta rodada, publicando `office/artifacts/created` e
+`office/artifacts/updated` (QoS 1) via `IMessageBus`, conforme a RFC-001. `MarkdownArtifactWriter`
+persiste o conteúdo em `workspace/projects/{sprint}/{path}` com frontmatter YAML, e
+`InMemoryArtifactRepository` (testes) delega essa escrita em disco, mantendo os metadados também em
+memória. A permissão de qual papel pode usar `write_artifact`/`review_artifact`/`approve_artifact`
+é validada pelo `ToolRegistry` (ver Fase 3), não pelo caso de uso em si — o caso de uso permanece
+agnóstico a `Role`, apenas orquestra a entidade `Artifact` e a persistência. A
+`PostgresArtifactRepository` concreta permanece pendente para uma rodada futura (ADR-006), já que
+nenhum caso de uso desta rodada exige persistência relacional real — `workspace/` em disco e o
+repositório em memória são suficientes para validar o ciclo ponta a ponta via testes automatizados.

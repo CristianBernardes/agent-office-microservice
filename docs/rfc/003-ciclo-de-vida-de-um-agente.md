@@ -1,6 +1,6 @@
 # RFC-003 — Ciclo de Vida de um Agente
 
-**Status:** Proposto
+**Status:** Aceito (parcialmente implementado — ver "Escopo desta rodada de implementação")
 **Data:** 2026-10-30
 **Autor:** Cristian Bernardes
 
@@ -49,3 +49,10 @@ Esta RFC define o contrato alvo do ciclo de vida de um agente. Na Fase 1, a enti
 implementa as transições de estado e suas invariantes (validadas por testes unitários). A publicação
 de eventos de status via MQTT acompanha a implementação do caso de uso `AgentThinkUseCase` em uma
 rodada futura.
+
+**Atualização — Rodada 3 (Fase 2):** `AgentThinkUseCase` está implementado nesta rodada. Ele chama
+`agent.start_thinking()`, publica `office/agents/{agentId}/status` com `retain=true`, consulta o
+`ILlmAdapter` configurado para o agente e publica `thought`/`action` conforme a RFC-001. Quando a
+ação retornada pelo LLM é `write_artifact`, o `AgentThinkUseCase` delega ao `ToolRegistry` (ver Fase
+3), que valida a permissão do `Role` antes de executar a ferramenta correspondente — o caso de uso
+em si não contém nenhuma regra de "quem pode fazer o quê", apenas orquestra pensamento → ação.

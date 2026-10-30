@@ -1,6 +1,6 @@
 # RFC-001 — Protocolo de Comunicação entre Agentes
 
-**Status:** Proposto
+**Status:** Aceito (parcialmente implementado — ver "Escopo desta rodada de implementação")
 **Data:** 2026-10-30
 **Autor:** Cristian Bernardes
 
@@ -72,6 +72,12 @@ Toda mensagem publicada em qualquer tópico segue o mesmo envelope JSON:
 
 Esta RFC define o contrato alvo completo do sistema de mensageria. Na Fase 1 (esqueleto de Clean
 Architecture), apenas a interface `IMessageBus` e as implementações `MqttMessageBus` e
-`InMemoryMessageBus` são entregues, validando o contrato com testes unitários e de integração. A
-publicação efetiva de todos os tópicos listados acima acompanha a implementação dos casos de uso nas
-fases seguintes (pensamento do agente, tarefas, artefatos, sprint).
+`InMemoryMessageBus` são entregues, validando o contrato com testes unitários e de integração.
+
+**Atualização — Rodada 3 (Fase 2):** o `AgentThinkUseCase` passa a publicar, em sequência, os
+tópicos `office/agents/{agentId}/status` (`thinking`, QoS 1, `retain=true`),
+`office/agents/{agentId}/thought` (QoS 0) e `office/agents/{agentId}/action` (QoS 1), usando o
+envelope definido acima. A publicação dos tópicos de `tasks/`, `artifacts/` e `sprint/` continua
+acompanhando a implementação dos respectivos casos de uso — `artifacts/created` é coberto nesta
+mesma rodada pelo `WriteArtifactUseCase` (ver RFC-002); `tasks/` e `sprint/` permanecem para fases
+futuras, pois nenhum caso de uso desta rodada os produz.
