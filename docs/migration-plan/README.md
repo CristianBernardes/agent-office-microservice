@@ -74,8 +74,8 @@ Semana 10 ████████████████████  Polish, 
 | Broker MQTT | Mosquitto | Pub/Sub leve, WebSocket para o frontend |
 | Idempotência | **Redis** | SET NX atômico, TTL automático |
 | Banco | PostgreSQL 16 + pgvector | Memória semântica com embeddings reais |
-| Frontend | React + Vite + Zustand | Reativo, leve, sem overhead desnecessário |
-| Canvas | Phaser.js | Pixel-art validado |
+| Frontend | **Svelte** + TypeScript | Reatividade granular com runes — melhor equilíbrio para interface dinâmica, personagens e painéis (ver decisão registrada no `docs/SCRATCHPAD.md`) |
+| Canvas | Phaser.js | Pixel-art validado — assets prontos em `offices/` (não versionados, ver `.gitignore`) |
 | Testes | pytest + Go test | Padrão de cada linguagem |
 | CI/CD | GitHub Actions | Integração com o repositório |
 | Containers | Docker + Docker Compose | Deploy reproduzível |
@@ -105,10 +105,12 @@ agent-office-pro/
 │   │   └── presentation/       # FastAPI routes
 │   └── tests/
 │
-├── frontend/                   # React + Vite
+├── frontend/                   # Svelte + TypeScript
 │   └── src/
-│       ├── core/               # MQTT client, Zustand stores
-│       └── features/           # office, agents, tasks, artifacts
+│       ├── lib/
+│       │   ├── mqtt/           # MQTT client, stores reativas (runes)
+│       │   └── phaser/         # Canvas pixel-art (escritório, agentes)
+│       └── routes/             # office, agents, tasks, artifacts
 │
 ├── workspace/                  # Artefatos .md gerados pelos agentes
 │   └── projects/

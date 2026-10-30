@@ -6,26 +6,43 @@
 ## Visão de Componentes (estado final do plano de migração)
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         FRONTEND (React)                         │
-│                  (fica para uma rodada futura)                   │
-└───────────────────────────────────┬───────────────────────────────┘
-                                    │ MQTT sobre WebSocket
-┌───────────────────────────────────▼───────────────────────────────┐
-│                      MQTT BROKER (Mosquitto)                       │
-│          office/agents/# · office/tasks/# · office/artifacts/#     │
-└───────────────────────────────────┬───────────────────────────────┘
-                                    │
-┌───────────────────────────────────▼───────────────────────────────┐
-│                      BACKEND (FastAPI, Python 3.12)                │
-│                                                                     │
-│  presentation/  →  application/  →  domain/  ←  infrastructure/    │
-│                                                                     │
-│  - Agent Think Loop (use cases)                                    │
-│  - MQTT Publisher/Subscriber (aiomqtt)                              │
-│  - LLM Adapters (Ollama externo / OpenAI-compatible)                 │
-│  - PostgreSQL + pgvector (metadados, memória semântica futura)       │
-└─────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────┐
+│             INTERFACE WEB                 │
+│                                           │
+│  Svelte + TypeScript                      │
+│  ├── Painel de controle                   │
+│  ├── Lista e estado dos agentes           │
+│  ├── Logs e notificações                  │
+│  └── Phaser: escritório em Pixel Art      │
+└───────────────────┬───────────────────────┘
+                    │
+             WebSocket / HTTP
+                    │
+┌───────────────────▼───────────────────────┐
+│          GATEWAY DE COMUNICAÇÃO           │
+│                                           │
+│  Go                                        │
+│  ├── Distribuição de eventos               │
+│  └── API e conexões em tempo real          │
+└───────────────────┬───────────────────────┘
+                    │
+┌───────────────────▼───────────────────────┐
+│                  MQTT                     │
+│                                           │
+│  Broker MQTT                              │
+│  ├── Eventos dos agentes                  │
+│  ├── Mudanças de estado                   │
+│  └── Notificações de tarefas               │
+└──────────────┬──────────────┬─────────────┘
+               │              │
+┌──────────────▼──────┐ ┌─────▼─────────────┐
+│ BACKEND PYTHON      │ │ SERVIÇOS GO       │
+│                     │ │                   │
+│ Execução de IA      │ │ Coordenação       │
+│ Orquestração        │ │ Concorrência      │
+│ Ferramentas         │ │ Serviços de apoio │
+│ Processamento       │ │ Integrações       │
+└─────────────────────┘ └───────────────────┘
 ```
 
 ## Fluxo de Dependência (Clean Architecture)
@@ -46,6 +63,16 @@ importa nada de `infrastructure/`, `application/` ou `presentation/`.
 | Mosquitto (MQTT) | Container Docker deste projeto | Portas externas `7083` (TCP) e `7000` (WebSocket). |
 | Backend (FastAPI) | Container Docker deste projeto | Porta externa `7001`. |
 | **Ollama** | **Host do desenvolvedor, fora do Docker Compose** | Ver ADR-009 — nunca em container deste projeto. |
+
+## Decisão: sem autenticação/autorização no Gateway Go
+
+O AgentOffice Pro é um projeto **open source**, mantido por doações — não há usuários pagantes,
+contas, nem dados sensíveis de terceiros a proteger. Por isso, o Gateway de Comunicação (Go, Fase 8)
+**não implementa autenticação nem autorização**: toda API e conexão em tempo real (WebSocket) é
+aberta por padrão. Qualquer necessidade futura de controle de acesso (ex.: múltiplos usuários
+hospedando sua própria instância) deve ser resolvida fora deste gateway (proxy reverso, rede privada,
+etc.), nunca adicionando complexidade de autenticação ao código deste projeto sem uma nova decisão
+explícita do dono do produto.
 
 ## Escopo entregue nesta rodada
 
