@@ -1,0 +1,90 @@
+[tool.poetry]
+name = "agent-office-backend"
+version = "0.1.0"
+description = "AgentOffice Pro backend — Clean Architecture Python/FastAPI service orchestrating AI agents."
+authors = ["Cristian Bernardes"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+uvicorn = { extras = ["standard"], version = "^0.32.0" }
+pydantic = "^2.9.0"
+pydantic-settings = "^2.5.0"
+aiomqtt = "^2.3.0"
+httpx = "^0.27.0"
+asyncpg = "^0.29.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.0"
+pytest-asyncio = "^0.24.0"
+pytest-cov = "^5.0.0"
+pytest-mock = "^3.14.0"
+
+[tool.poetry.group.lint.dependencies]
+ruff = "^0.7.0"
+mypy = "^1.12.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# ─────────────────────────────────────────────────────────────────────────
+# Pytest — configuração de execução e marcadores de teste
+# ─────────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "unit: testes unitários — rápidos, sem dependências externas (banco, broker, rede)",
+    "integration: testes de integração — requerem MQTT e/ou PostgreSQL em execução",
+]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+
+# ─────────────────────────────────────────────────────────────────────────
+# Ruff — lint e formatação (substitui black + flake8 + isort em uma única
+# ferramenta, reduzindo a quantidade de dependências de desenvolvimento)
+# ─────────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "N"]
+# B008: FastAPI usa Depends(...) como valor padrão de parâmetro por design —
+# é o padrão idiomático do framework para injeção de dependência em rotas,
+# não uma chamada de função acidental em um valor padrão mutável.
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ─────────────────────────────────────────────────────────────────────────
+# MyPy — verificação de tipos estática em modo estrito
+# ─────────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+exclude = ["tests/"]
+
+# asyncpg não publica stubs de tipos (py.typed) — limitação conhecida da
+# biblioteca, não um problema do nosso código. Desativamos apenas o alerta de
+# import não tipado para este módulo específico.
+[[tool.mypy.overrides]]
+module = "asyncpg"
+ignore_missing_imports = true
