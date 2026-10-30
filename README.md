@@ -1,36 +1,161 @@
 # AgentOffice Microservice
 
 > Um escritório de TI simulado por agentes de IA — cada um com um papel, personalidade e modelo de
-> linguagem próprios, colaborando em tempo real via MQTT para planejar, implementar e documentar
-> software, exatamente como um time humano faria.
+> linguagem próprios, colaborando em tempo real via MQTT para pesquisar, debater, decidir e
+> documentar, exatamente como um time humano de produto/tecnologia faria.
 
-Este repositório é a reconstrução, do zero, do backend do **AgentOffice Pro** seguindo
-**Clean Architecture**, princípios **SOLID**, **Clean Code**, **DRY**, **YAGNI**, injeção de
-dependência, testes automatizados e documentação arquitetural rigorosa (ADRs, RFCs, Design Docs).
+Dê ao time um objetivo de produto (ex.: *"criem um SaaS de nicho para vender 5 unidades/dia a
+R$39,90"*) e observe os agentes pensarem, pesquisarem o mercado, debaterem entre si e produzirem
+artefatos reais — ADRs, backlogs, planos de teste, análises de mercado — em arquivos Markdown
+versionáveis, não apenas em logs efêmeros.
 
-Projeto **open source** — contribuições são bem-vindas. Ver [`docs/SCRATCHPAD.md`](docs/SCRATCHPAD.md)
-para os padrões de qualidade obrigatórios antes de abrir um PR.
+Projeto **open source**, construído do zero seguindo **Clean Architecture**, princípios **SOLID**,
+**Clean Code**, **DRY**, **YAGNI**, injeção de dependência, testes automatizados e documentação
+arquitetural rigorosa (ADRs, RFCs, Design Docs).
 
-## Visão da Arquitetura
+## O Time
+
+Nove papéis, cada um com um system prompt próprio, personalidade (Big Five) e conjunto de
+ferramentas permitidas:
+
+| Papel | Responsabilidade principal |
+|-------|------------------------------|
+| **Product Owner** | Backlog, user stories, priorização |
+| **Scrum Master** | Cerimônias, impedimentos, retrospectivas |
+| **Tech Lead** | Arquitetura, ADRs, decisões técnicas |
+| **Dev Sênior** | Implementação, code review, mentoria |
+| **Dev Júnior** | Tarefas simples, aprendizado |
+| **QA Engineer** | Planos de teste, bug reports |
+| **Analista de Dados** | Métricas, KPIs, análises |
+| **Gerente de RH** | Onboarding, cultura, contratações |
+| **Consultor de Produto** | Validação de mercado, pesquisa |
+
+Cada papel só pode usar as ferramentas que lhe foram atribuídas (ex.: só Tech Lead e Product Owner
+podem `approve_artifact`; só Scrum Master pode `start_ceremony`) — a validação de permissão é
+centralizada e nunca delegada ao LLM.
+
+## Como os Agentes Trabalham
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      MQTT BROKER (Mosquitto)                       │
-│          office/agents/# · office/tasks/# · office/artifacts/#     │
-└───────────────────────────────────┬───────────────────────────────┘
-                                    │
-┌───────────────────────────────────▼───────────────────────────────┐
-│                 BACKEND (FastAPI, Python 3.12, Clean Architecture)  │
-│   presentation/ → application/ → domain/ ← infrastructure/         │
-└─────────────────────────────────────────────────────────────────┘
-                                    │
-                    PostgreSQL + pgvector  ·  Ollama (externo ao Compose)
+Comando do usuário
+        │
+        ▼
+ Agente entra em "pensamento" (status publicado via MQTT)
+        │
+        ▼
+ LLM (Ollama local, ou qualquer API OpenAI-compatible) recebe o
+ system prompt do papel + contexto, e decide: pensamento, ação e,
+ opcionalmente, uma ferramenta a executar
+        │
+        ▼
+ Ferramenta validada contra as permissões do papel e executada
+ (ex.: pesquisar na web, escrever/revisar/aprovar um artefato)
+        │
+        ▼
+ Resultado publicado via MQTT para qualquer consumidor (outros
+ agentes, frontend, observabilidade)
 ```
 
-Decisões arquiteturais completas em [`docs/adr/`](docs/adr/), contratos de protocolo em
-[`docs/rfc/`](docs/rfc/) e visões de design em [`docs/design/`](docs/design/). O plano de migração
-completo (todas as fases, inclusive as ainda não implementadas) está em
+Todo o fluxo é orientado a eventos MQTT com um envelope de mensagem padrão (`event_id`, `timestamp`,
+`agent_id`, `agent_role`, `payload`) — ver
+[RFC-001](docs/rfc/001-protocolo-de-comunicacao-entre-agentes.md).
+
+## Arquitetura
+
+### Backend (Clean Architecture)
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                      MQTT BROKER (Mosquitto)                          │
+│       office/agents/#  ·  office/artifacts/#  ·  office/tasks/#       │
+└──────────────────────────────┬────────────────────────────────────────┘
+                                │
+┌───────────────────────────────▼────────────────────────────────────────┐
+│                BACKEND (FastAPI, Python 3.12)                          │
+│                                                                        │
+│   presentation/  →  application/  →  domain/  ←  infrastructure/      │
+│                                                                        │
+│   domain/         entidades puras (Agent, Artifact, Task), interfaces │
+│   application/    casos de uso (AgentThinkUseCase, WriteArtifact...)  │
+│   infrastructure/ MQTT, Ollama, Tavily, PostgreSQL, filesystem        │
+│   presentation/   rotas HTTP e injeção de dependência                 │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+       PostgreSQL + pgvector  ·  Ollama (host, fora do Compose)  ·  Tavily
+```
+
+A regra de ouro do Clean Architecture: as setas de dependência de código sempre apontam para
+dentro. O `domain/` nunca importa nada de `infrastructure/`, `application/` ou `presentation/` —
+toda dependência externa (LLM, banco, mensageria, busca web, filesystem) fica atrás de uma
+interface de domínio, permitindo troca de implementação sem alterar regra de negócio.
+
+### Visão completa do produto (estado final planejado)
+
+```
+┌───────────────────────────────────────────┐
+│             INTERFACE WEB                  │
+│  Svelte + TypeScript                       │
+│  ├── Painel de controle                    │
+│  ├── Lista e estado dos agentes            │
+│  ├── Logs e notificações                   │
+│  └── Phaser: escritório em Pixel Art       │
+└───────────────────┬─────────────────────────┘
+                    │ WebSocket / HTTP
+┌───────────────────▼─────────────────────────┐
+│          GATEWAY DE COMUNICAÇÃO (Go)        │
+│  ├── Distribuição de eventos                │
+│  └── API e conexões em tempo real           │
+│  (sem autenticação — projeto open source,    │
+│   mantido por doações, sem dados sensíveis)  │
+└───────────────────┬─────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│                MQTT (Mosquitto)             │
+└──────────────┬──────────────┬────────────────┘
+               │              │
+┌──────────────▼──────┐ ┌─────▼─────────────┐
+│ BACKEND PYTHON       │ │ SERVIÇOS GO       │
+│ Execução de IA        │ │ Coordenação       │
+│ Orquestração          │ │ Concorrência      │
+│ Ferramentas           │ │ Serviços de apoio │
+└───────────────────────┘ └───────────────────┘
+```
+
+O frontend (Svelte + Phaser.js, pixel-art) e o gateway Go fazem parte da visão completa do produto
+e ainda não foram implementados neste repositório — ver detalhes em
+[`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md) e no plano de migração em
 [`docs/migration-plan/`](docs/migration-plan/).
+
+### Artefatos como cidadãos de primeira classe
+
+Agentes não apenas "conversam" — eles produzem documentos reais, versionáveis, com um ciclo de vida
+explícito:
+
+```
+DRAFT → IN_REVIEW → APPROVED → ARCHIVED
+```
+
+Cada artefato é persistido como um arquivo `.md` real em `workspace/projects/{sprint}/`, com
+frontmatter YAML (autor, tipo, status, datas), e cada transição de estado publica um evento MQTT —
+ver [RFC-002](docs/rfc/002-sistema-de-artefatos.md).
+
+### Busca web
+
+Alguns papéis (Product Owner, Tech Lead, Devs, Analista de Dados, Consultor de Produto) têm acesso à
+ferramenta `web_search`, resolvida via [Tavily](https://tavily.com) — uma API de busca pensada para
+agentes de IA — ver [ADR-011](docs/adr/011-tavily-como-provedor-de-busca-web.md).
+
+## Decisões Arquiteturais
+
+Toda decisão arquitetural relevante é documentada antes de ser implementada:
+
+- **ADRs** (`docs/adr/`) — decisões técnicas pontuais (MQTT, FastAPI, Clean Architecture, Ollama
+  externo ao Compose, Tavily, portas de container, etc.)
+- **RFCs** (`docs/rfc/`) — contratos que atravessam múltiplos componentes (protocolo de mensagens,
+  ciclo de vida de artefatos, ciclo de vida de agentes)
+- **Design Docs** (`docs/design/`) — visões de arquitetura geral do produto
+- **Plano de Migração** (`docs/migration-plan/`) — todas as fases do roadmap técnico, incluindo as
+  ainda não implementadas
 
 ## Requisitos
 
@@ -38,6 +163,7 @@ completo (todas as fases, inclusive as ainda não implementadas) está em
 - [Poetry](https://python-poetry.org/docs/#installation) 2.x (para desenvolvimento local do backend)
 - [Ollama](https://ollama.com) instalado e em execução **no seu host** — este projeto nunca sobe um
   container de Ollama (ver [ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md))
+- (Opcional) Uma chave gratuita da [Tavily](https://app.tavily.com) para a ferramenta `web_search`
 
 ## Início Rápido
 
@@ -48,6 +174,7 @@ cd agent-office-edicao-brasileira/agent-office-microservice
 
 # 2. Configure o backend
 cp backend/.env.example backend/.env
+# (opcional) edite TAVILY_API_KEY em backend/.env para habilitar busca web
 
 # 3. Garanta que o Ollama está rodando no seu host
 ollama pull nemotron-3.5-bolt:latest
@@ -80,7 +207,7 @@ Todos os comandos de desenvolvimento, teste e qualidade estão centralizados no
 [`Makefile`](Makefile):
 
 ```bash
-make help             # lista todos os comandos disponíveis
+make help              # lista todos os comandos disponíveis
 make install           # instala as dependências do backend
 make test-unit         # testes unitários (rápidos, sem dependências externas)
 make test-integration  # testes de integração (requer 'make up')
@@ -92,21 +219,9 @@ make check             # roda format + lint + type-check + test
 
 Mais detalhes sobre a estrutura do backend em [`backend/README.md`](backend/README.md).
 
-## Status de Implementação
-
-Este projeto é construído incrementalmente, fase por fase, seguindo o plano de migração em
-[`docs/migration-plan/`](docs/migration-plan/):
-
-- [x] **Fase 0** — Fundação documental (ADRs, RFCs, Design Docs)
-- [x] **Fase 1** — Esqueleto Clean Architecture do backend, com injeção de dependência e testes
-- [ ] **Fase 2** — Integração MQTT completa nos casos de uso de negócio
-- [ ] **Fase 3** — Personas (9 papéis, prompts, ferramentas)
-- [ ] **Fase 4** — Sistema de artefatos Markdown
-- [ ] **Fase 5** — Múltiplos modelos de LLM por agente
-- [ ] Frontend (pixel-art) — fica para uma rodada futura, com sprites comprados separadamente
-
 ## Contribuindo
 
 Este projeto é open source e aceita contribuições. Antes de abrir um PR, leia
 [`docs/SCRATCHPAD.md`](docs/SCRATCHPAD.md) — ele define os padrões de qualidade obrigatórios
-(SOLID, Clean Code, testes, ADRs) que toda contribuição deve seguir.
+(SOLID, Clean Code, testes, ADRs) que toda contribuição deve seguir, além do histórico detalhado de
+decisões e do estado atual de implementação de cada fase do projeto.
