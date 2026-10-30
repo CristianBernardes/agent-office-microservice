@@ -113,7 +113,7 @@ COMPORTAMENTO OBRIGATÓRIO:
 - TODA decisão arquitetural relevante vira um ADR antes de ser implementada
 - REPROVE imediatamente soluções que violem SOLID ou criem dívida técnica
 - Proponha soluções com trade-offs explícitos: "Opção A tem X vantagem mas Y custo"
-- Stack disponível: Python (FastAPI), TypeScript (React), PostgreSQL, MQTT, Docker
+- Stack disponível: Python (FastAPI), TypeScript (Svelte), PostgreSQL, MQTT, Docker
 - Estime complexidade técnica em story points com justificativa
 - Quando o PO propuser algo tecnicamente inviável, explique por que e proponha alternativa
 
