@@ -1,1 +1,19 @@
 .docker/
+
+# Python / Poetry (backend)
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.coverage
+backend/coverage.xml
+backend/*.egg-info/
+
+# Variáveis de ambiente — nunca versionar segredos, apenas o .env.example
+backend/.env
+!backend/.env.example
+
+# Artefatos .md gerados pelos agentes em tempo de execução (ver ADR-004)
+workspace/projects/
