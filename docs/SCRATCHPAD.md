@@ -98,3 +98,74 @@ Não ignore falhas de testes, não desabilite verificações para fazer o pipeli
 uso de pensamento de agente), Fase 3 (personas, prompts, ferramentas por papel), Fase 4 (sistema de
 artefatos completo), Fase 5 (múltiplos modelos por papel via `.env`), repositórios PostgreSQL
 concretos, frontend (aguardando pacote de sprites).
+
+### Rodada 2 — Correções pontuais + decisões fechadas para a próxima rodada (2026-10-30)
+
+**Correções aplicadas e já commitadas/enviadas para `origin/develop`:**
+
+- Poetry não estava instalado na máquina do Cristian (`make install` falhava com
+  `poetry: not found`). Instalado oficialmente via `curl -sSL https://install.python-poetry.org |
+  python3 -` em `~/.local/bin/poetry`. Adicionado alvo `check-poetry` no `Makefile` (commit
+  `d86ba17`) que valida a presença do Poetry antes de qualquer comando que dependa dele, com
+  mensagem de erro clara (comando de instalação + link da doc) em vez de falha crua do shell.
+- `OLLAMA_BASE_URL` padronizado para `http://172.17.0.1:11434` em `backend/.env.example`,
+  `backend/src/infrastructure/config/settings.py` (valor de fallback) e no ADR-009 (commit
+  `b99b2b5`). Antes havia inconsistência entre o valor do `.env.example` (`localhost`) e o valor
+  real usado no `docker-compose.yml` (`172.17.0.1`), o que gerava confusão. Agora os dois lugares
+  usam o mesmo valor por padrão, já que o fluxo de trabalho padrão do projeto é sempre via
+  `make up` (Docker Compose). `localhost:11434` continua documentado como alternativa válida
+  apenas para quem executa o backend fora de container, na mesma máquina.
+
+**⚠️ IMPORTANTE PARA RETOMAR O TRABALHO:** o Cristian editou manualmente o arquivo
+`backend/.env` (não versionado, está no `.gitignore`) durante a sessão anterior, ajustando
+`OLLAMA_BASE_URL` para `172.17.0.1:11434` antes mesmo da correção acima ser proposta. Esse `.env`
+local já está correto — não precisa de nenhuma ação adicional nele.
+
+**Decisões fechadas para a PRÓXIMA rodada de implementação (ainda não iniciada — nenhum código
+desta rodada foi escrito, apenas decidido via perguntas ao Cristian):**
+
+A próxima rodada vai ligar o "escritório vivo": o Cristian descreve um objetivo de produto (ex.:
+"Time, crie um produto SaaS de nicho específico para vender 5 unidades/dia a R$39,90...") e os
+agentes devem pesquisar, debater e gerar documentos de decisão reais em disco.
+
+1. **Escopo da próxima rodada:** Fase 2 + Fase 3 + Fase 4 do plano de migração, todas juntas:
+   - Fase 2 — `AgentThinkUseCase` real, ligado ao `MqttMessageBus` (publicação de `thought`,
+     `action`, `status` nos tópicos já definidos na RFC-001).
+   - Fase 3 — as 9 personas (Product Owner, Scrum Master, Tech Lead, Dev Sênior, Dev Júnior, QA
+     Engineer, Analista de Dados, RH, Consultor de Produto), cada uma com system prompt próprio
+     (ver `docs/migration-plan/fase-3-personas/README.md` para os prompts de referência já
+     redigidos em português) e ferramentas específicas por papel (tabela de permissões já existe
+     no plano de migração — `write_artifact`, `review_artifact`, `approve_artifact`, `create_task`,
+     `assign_task`, `complete_task`, `send_message`, `web_search`, `hire_agent`,
+     `start_ceremony`).
+   - Fase 4 — sistema completo de artefatos: ciclo de vida DRAFT→IN_REVIEW→APPROVED→ARCHIVED
+     (já implementado na entidade `Artifact` da Fase 1) ligado a um `WriteArtifactUseCase` real que
+     persiste tanto metadados no Postgres quanto o arquivo `.md` físico em
+     `workspace/projects/{sprint}/`, notificando via MQTT.
+
+2. **Ferramenta de pesquisa web (`web_search`):** usar a API da **Tavily** (feita especificamente
+   para agentes de IA/LLM, camada gratuita de 1000 buscas/mês). Precisa de `TavilySearchAdapter`
+   implementando uma nova interface de domínio (ex.: `IWebSearchAdapter`), configurado via
+   `TAVILY_API_KEY` no `.env` — como é uma chave paga/pessoal, o `.env.example` NÃO pode ter uma
+   chave real funcional (diferente do Ollama); deve documentar a variável e instruções de onde
+   obter a chave gratuita. Para testes automatizados sem chave real, criar um `MockSearchAdapter`
+   seguindo o mesmo padrão já usado pelo `MockLlmAdapter`.
+
+3. **Ponto de entrada do comando do Cristian para o time:** NENHUM endpoint HTTP novo nesta
+   próxima rodada. O frontend fica para quando chegarmos nessa fase (fora de escopo agora, o
+   Cristian vai comprar um pacote de sprites prontos antes). A validação ponta a ponta
+   (comando → pensamento → pesquisa → artefato em disco) deve ser feita **apenas por testes
+   automatizados** (unitários + integração), chamando os casos de uso diretamente no código —
+   sem necessidade de expor rota REST para isso ainda.
+
+4. **Preferência de frontend já registrada para quando chegar a hora** (não implementar agora):
+   o Cristian está avaliando Svelte, Vue.js, React, SolidJS, Angular e Qwik, nessa ordem de
+   preferência pessoal. Nenhuma decisão final tomada ainda — só uma lista de candidatos para
+   referência futura.
+
+**Próximo passo imediato ao retomar:** escrever os ADRs/RFCs desta nova decisão (seguindo a regra
+do fluxo obrigatório deste documento — ADR antes do código) cobrindo: `IWebSearchAdapter` +
+Tavily, o fluxo completo `AgentThinkUseCase`, e o ciclo de produção de artefato ponta a ponta. Só
+depois disso implementar as 9 personas, os adapters e os casos de uso, com testes unitários cada
+passo, seguindo exatamente o mesmo padrão de qualidade da Rodada 1 (`make check` limpo antes de
+cada commit, commits atômicos sem coautoria, `SCRATCHPAD.md` atualizado a cada commit).
