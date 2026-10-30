@@ -11,7 +11,6 @@ services:
       - ./ops/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
       - agent-office-microservice
-    # Não exposto externamente — acessível apenas dentro da rede Docker
   
   postgres:
     image: postgres:16-alpine
