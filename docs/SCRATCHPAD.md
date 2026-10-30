@@ -50,3 +50,51 @@ Não ignore falhas de testes, não desabilite verificações para fazer o pipeli
 ## COMMITS
 **Todos os commits que fizer, este arquivo deve ser atualizado e enviado junto**
 ---
+
+## Histórico de Implementação
+
+### Rodada 1 — Fase 0 + Fase 1 do plano de migração (2026-10-30)
+
+**Escopo entregue:**
+
+- **Fundação documental** (`docs/adr/`, `docs/rfc/`, `docs/design/`): 10 ADRs cobrindo MQTT,
+  FastAPI, modelo de agentes, artefatos Markdown, múltiplos LLMs, PostgreSQL+pgvector, Clean
+  Architecture, Poetry, Ollama externo ao Compose e convenção de portas `70xx`. 3 RFCs definindo os
+  contratos de protocolo de mensageria, sistema de artefatos e ciclo de vida de agente. 3 Design
+  Docs com a visão geral de arquitetura, modelo de domínio e fluxo de mensagens.
+- **Backend Python 3.12 + FastAPI** em `backend/`, com Clean Architecture completa:
+  - `domain/`: entidades `Agent`, `Task`, `Artifact` (com transições de estado validadas),
+    value objects `AgentId`/`TaskId`/`ArtifactId`, interfaces `ILlmAdapter`/`IMessageBus`/
+    `IAgentRepository`, exceções de domínio.
+  - `application/`: casos de uso `HireAgentUseCase` e `FireAgentUseCase`.
+  - `infrastructure/`: `InMemoryAgentRepository`, `InMemoryMessageBus`, `MqttMessageBus` (via
+    `aiomqtt`), `MockLlmAdapter`, `OllamaAdapter` (via `httpx`, URL sempre vinda de `.env`),
+    configuração centralizada via `pydantic-settings`, conexão PostgreSQL via `asyncpg`.
+  - `presentation/`: rotas FastAPI (`/health`, `/agents`), injeção de dependência via *factories*,
+    bootstrap da aplicação.
+  - Dockerfile multi-stage próprio do serviço (`backend/Dockerfile`), `.env.example` funcional.
+- **Testes**: 40 testes unitários (domínio, aplicação, infraestrutura in-memory, rotas HTTP) + 1
+  teste de integração marcado para o `MqttMessageBus` real. Cobertura de 83% no primeiro corte.
+- **Qualidade de código**: `ruff check` e `ruff format` sem nenhum apontamento; `mypy --strict` sem
+  nenhum erro em 37 arquivos-fonte.
+- **Infraestrutura**: `docker-compose.yml` atualizado com `postgres` (`pgvector/pgvector:pg16`,
+  porta `7034`) e `backend` (porta `7001`), mantendo `mosquitto` já existente (`7083`/`7000`).
+  `OLLAMA_BASE_URL` sobrescrito explicitamente para `http://172.17.0.1:11434` dentro do Compose —
+  o Ollama nunca é declarado como serviço deste projeto, roda sempre no host.
+  Stack validada de ponta a ponta: `make up` sobe tudo, `/health` e `POST /agents` respondem,
+  extensão `vector` habilitada no Postgres.
+- **Makefile**: preenchido com todos os comandos (`install`, `run`, `up`/`down`/`restart`/`logs`/`ps`,
+  `format`, `lint`, `type-check`, `check`, `test`/`test-unit`/`test-integration`/`coverage`, `clean`).
+
+**Convenções fixadas nesta rodada** (ver ADRs e commits):
+- Identificadores de código (variáveis, funções, classes) em inglês; comentários de bloco/docstrings
+  em português.
+- Tabelas e colunas de banco de dados em inglês (ainda não há tabelas de domínio nesta rodada —
+  apenas a extensão `pgvector` foi habilitada).
+- Zero hardcode de configuração: tudo vem de `backend/.env` (com `.env.example` funcional).
+- Toda porta externa de container deste projeto começa com `70` (ver ADR-010).
+
+**Pendente para rodadas futuras** (conforme `docs/migration-plan/`): Fase 2 (MQTT ligado aos casos de
+uso de pensamento de agente), Fase 3 (personas, prompts, ferramentas por papel), Fase 4 (sistema de
+artefatos completo), Fase 5 (múltiplos modelos por papel via `.env`), repositórios PostgreSQL
+concretos, frontend (aguardando pacote de sprites).
