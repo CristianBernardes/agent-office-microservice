@@ -1,0 +1,18 @@
+services:
+
+  mosquitto:
+    container_name: agent-office-microservice-mosquitto
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    ports:
+      - "7083:1883"
+      - "7000:3000"
+    volumes:
+      - ./confs/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - agent-office-microservice
+    # Não exposto externamente — acessível apenas dentro da rede Docker
+
+networks:
+  agent-office-microservice:
+    driver: bridge
