@@ -36,6 +36,7 @@
 4. **Validar:** execute `make format` e os testes, linters, verificações de tipos e demais validações disponíveis e pertinentes.
 5. **Revisar:** verifique possíveis regressões, problemas de segurança, inconsistências arquiteturais, código morto, alterações não relacionadas e falhas nos cenários excepcionais.
 6. **Concluir:** informe objetivamente o que foi implementado, quais validações foram executadas e eventuais limitações ou pendências.
+7. **Registrar e publicar (sem relatórios ao dono do produto):** a cada alteração, atualize este `docs/SCRATCHPAD.md` (rodada, tabela de commits, estado atual, limitações) e faça commit + push com ele incluído. Não envie relatórios nem peça confirmação ao Cristian: trabalhe continuamente, até o fim de todo o backlog, sem parar entre rodadas.
 
 ### Regra inegociável
 
@@ -549,6 +550,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 37 — Integração do gateway Kafka
 - `tests/integration/test_gateway_kafka_integration.py`: MQTT→gateway→`office.events` (válido) e `office.events.dlq` (inválido); pula se Kafka/gateway não estiverem no ar. RFC-004 e READMEs com a rota de interações.
 
+## Rodada 38 — Upsert de goals já fechados no Postgres
+- `closed_at` agora é preenchido no INSERT quando o status não é `open` (antes violava o CHECK). Teste de integração novo (13 no total).
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -578,7 +582,7 @@ identidade visual sugerida por papel listada acima.
 
 ### O que funciona
 
-290 testes unitários + 12 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
+290 testes unitários + 13 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
 ruff e mypy limpos. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
 activity, research; agentes têm a ferramenta research. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
 Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 001–004.
@@ -586,7 +590,6 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 ### Limitações conhecidas
 
 - Só `move` aplica a matriz papel × estágio.
-- Upsert Postgres de goals só funciona para goals criados `open`.
 - Feed exclui tópicos por agente (bus em memória sem curinga).
 - Mock de embedding tem 8 dimensões; coluna é `vector(768)`.
 

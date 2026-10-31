@@ -10,7 +10,7 @@ import pytest
 from src.domain.entities.activity_event import ActivityEvent
 from src.domain.entities.agent import Agent, Personality, Role
 from src.domain.entities.artifact import Artifact, ArtifactType
-from src.domain.entities.chat import ChatMessage, Goal, Session
+from src.domain.entities.chat import ChatMessage, Goal, GoalStatus, Session
 from src.domain.entities.meeting import Meeting, MeetingKind, MeetingStatus
 from src.domain.entities.memory import Memory
 from src.domain.entities.office_layout import OfficeLayout
@@ -173,6 +173,20 @@ class TestWorkRepositoriesIntegration:
         )
         assert [g.text for g in await repository.list_goals()] == ["Build"]
         assert [m.content for m in await repository.list_messages(session.session_id)] == ["oi"]
+
+    async def test_goal_inserted_already_done(self, pool: object) -> None:
+        repository = PostgresChatRepository(pool)  # type: ignore[arg-type]
+        session = Session(session_id=SessionId.generate())
+        await repository.save_session(session)
+        goal = Goal(
+            goal_id=GoalId.generate(),
+            session_id=session.session_id,
+            text="Closed",
+            status=GoalStatus.DONE,
+        )
+        await repository.save_goal(goal)
+        stored = [g for g in await repository.list_goals() if g.goal_id == goal.goal_id]
+        assert [g.status for g in stored] == [GoalStatus.DONE]
 
     async def test_task_roundtrip(self, pool: object) -> None:
         agent = await _agent(pool, "Dev")

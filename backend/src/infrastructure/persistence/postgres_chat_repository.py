@@ -14,8 +14,8 @@ ON CONFLICT (session_id) DO NOTHING
 """
 
 _GOAL_SQL = """
-INSERT INTO goals (goal_id, session_id, requested_by, text, status, created_at)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO goals (goal_id, session_id, requested_by, text, status, created_at, closed_at)
+VALUES ($1, $2, $3, $4, $5, $6, CASE WHEN $5 = 'open' THEN NULL ELSE now() END)
 ON CONFLICT (goal_id) DO UPDATE SET status = EXCLUDED.status,
     closed_at = CASE WHEN EXCLUDED.status = 'open' THEN NULL ELSE now() END
 """
