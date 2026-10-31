@@ -36,3 +36,10 @@ class TestFilePromptProvider:
 
         assert (Role.TECH_LEAD, Language.EN) in provider._cached_templates
         assert (Role.TECH_LEAD, Language.PT) not in provider._cached_templates
+
+    def test_unmapped_role_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from src.infrastructure.prompts import file_prompt_provider as module
+
+        monkeypatch.setattr(module, "_PROMPT_FILENAME_BY_ROLE", {})
+        with pytest.raises(RuntimeError, match="No prompt file"):
+            FilePromptProvider().get_system_prompt(Role.QA_ENGINEER, "A", Language.PT)

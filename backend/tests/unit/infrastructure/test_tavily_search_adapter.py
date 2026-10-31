@@ -59,3 +59,8 @@ class TestTavilySearchAdapter:
 
         with pytest.raises(httpx.HTTPStatusError):
             await adapter.search("qualquer consulta")
+
+    async def test_close_closes_http_client(self) -> None:
+        adapter = TavilySearchAdapter(api_key="k")
+        await adapter.close()
+        assert adapter._http_client.is_closed

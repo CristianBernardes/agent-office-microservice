@@ -572,6 +572,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 44 — Badge de CI nos READMEs
 - Badge do workflow `ci.yml` em `README.md` e `README.en.md`.
 
+## Rodada 45 — Testes de lacunas
+- Prompt sem arquivo mapeado e `close()` do Tavily cobertos (306 unit).
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -604,7 +607,8 @@ identidade visual sugerida por papel listada acima.
 | 41 | `7f691e5` | Cobertura do ToolRegistry (293 unit) |
 | 42 | `af24d88` | Factories Postgres + cache da pool (304 unit) |
 | 43 | `16cc8d9` | CI GitHub Actions (ADR-040; ADRs 001–040) |
-| 44 | este commit | Badge de CI nos READMEs |
+| 44 | `b8c1cd4` | Badge de CI nos READMEs |
+| 45 | este commit | Testes de lacunas (306 unit) |
 
 ### O que funciona
 
