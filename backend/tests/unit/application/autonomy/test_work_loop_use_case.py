@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from src.application.autonomy.work_loop_use_case import WorkLoopUseCase
+from src.application.autonomy.work_loop_use_case import _FLOOR_SESSION, WorkLoopUseCase
 from src.application.tasks.task_use_cases import AssignTaskUseCase, MoveTaskUseCase
 from src.domain.entities.agent import Agent, AgentStatus, Personality, Role
 from src.domain.entities.task import Task, TaskStatus
@@ -15,6 +15,7 @@ from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId, TaskId
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
 from src.infrastructure.persistence.in_memory_agent_repository import InMemoryAgentRepository
+from src.infrastructure.persistence.in_memory_chat_repository import InMemoryChatRepository
 from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
 
 pytestmark = pytest.mark.unit
@@ -67,6 +68,7 @@ async def _build(
         artifacts,  # type: ignore[arg-type]
         bus,
         language,
+        InMemoryChatRepository(),
     )
     return loop, tasks, agents, dispatch, artifacts
 
@@ -154,3 +156,24 @@ async def test_planning_artifact_follows_the_office_language(
     planning = next(c for c in artifacts.calls if c.path.startswith("planning/"))
     assert planning.title == title
     assert planning.content.startswith(f"# {title}")
+
+
+async def test_floor_session_is_created_on_first_speech() -> None:
+    chat = InMemoryChatRepository()
+    agents, tasks, bus = InMemoryAgentRepository(), InMemoryTaskRepository(), InMemoryMessageBus()
+    owner = _agent(Role.PRODUCT_OWNER)
+    await agents.save(owner)
+    loop = WorkLoopUseCase(
+        agents,
+        tasks,
+        AssignTaskUseCase(tasks, agents, bus),
+        MoveTaskUseCase(tasks, bus, agents),
+        _Dispatch(),  # type: ignore[arg-type]
+        _Sink(),  # type: ignore[arg-type]
+        _Sink(),  # type: ignore[arg-type]
+        bus,
+        Language.EN,
+        chat,
+    )
+    await loop._speak(owner, "hi")
+    assert await chat.find_session(_FLOOR_SESSION) is not None

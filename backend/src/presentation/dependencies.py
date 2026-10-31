@@ -467,6 +467,7 @@ def get_work_loop_use_case() -> WorkLoopUseCase:
         write_artifact=get_write_artifact_use_case(),
         message_bus=get_message_bus(),
         language=get_settings().language(),
+        chat_repository=get_chat_repository(),
     )
 
 

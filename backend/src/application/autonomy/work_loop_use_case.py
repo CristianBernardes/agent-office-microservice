@@ -18,8 +18,10 @@ from src.application.common.agent_status_publisher import publish_agent_status
 from src.application.tasks.task_use_cases import AssignTaskUseCase, MoveTaskUseCase
 from src.domain.entities.agent import Agent, AgentStatus, Role
 from src.domain.entities.artifact import ArtifactType
+from src.domain.entities.chat import Session
 from src.domain.entities.task import Task, TaskStatus
 from src.domain.interfaces.agent_repository import IAgentRepository
+from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.localization.language import Language
@@ -84,6 +86,7 @@ class WorkLoopUseCase:
         write_artifact: WriteArtifactUseCase,
         message_bus: IMessageBus,
         language: Language,
+        chat_repository: IChatRepository,
     ) -> None:
         self._agents = agent_repository
         self._tasks = task_repository
@@ -94,6 +97,7 @@ class WorkLoopUseCase:
         self._write = write_artifact
         self._bus = message_bus
         self._language = language
+        self._chat = chat_repository
 
     async def tick(self) -> int:
         """Executa um passo por estágio; devolve quantas tarefas avançaram."""
@@ -166,6 +170,8 @@ class WorkLoopUseCase:
     async def _speak(self, speaker: Agent, prompt: str, task_id: TaskId | None = None) -> str:
         """Pede ao agente uma fala via LLM e a publica no chão do escritório."""
         text = (await self._dispatch.execute(speaker.agent_id, prompt, self._language)).thought
+        if await self._chat.find_session(_FLOOR_SESSION) is None:
+            await self._chat.save_session(Session(_FLOOR_SESSION))
         await self._send.execute(
             SendMessageInput(
                 session_id=_FLOOR_SESSION,
