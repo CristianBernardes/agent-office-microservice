@@ -562,6 +562,10 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 41 — Cobertura do ToolRegistry
 - Testes de review/approve de artefato e create/assign/complete de tarefa via registry (293 unit; cobertura total 96%).
 
+## Rodada 42 — Cobertura de factories Postgres e falhas de efeitos colaterais
+- `set_database_pool` agora descarta o cache de TODOS os repositórios (antes só agent/artifact).
+- Testes das factories Postgres e das falhas toleradas da reunião (304 unit).
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -591,7 +595,8 @@ identidade visual sugerida por papel listada acima.
 | 38 | `06bdecf` | Fix closed_at de goal já concluída |
 | 39 | `c2f8042` | Embedding mock 768 dims |
 | 40 | `49e54c8` | Curingas no bus em memória; feed por agente (291 unit + 13 integração; ADRs 001–039) |
-| 41 | este commit | Cobertura do ToolRegistry (293 unit) |
+| 41 | `7f691e5` | Cobertura do ToolRegistry (293 unit) |
+| 42 | este commit | Factories Postgres + cache da pool (304 unit) |
 
 ### O que funciona
 

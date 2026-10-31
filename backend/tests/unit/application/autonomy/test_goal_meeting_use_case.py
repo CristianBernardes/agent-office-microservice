@@ -234,3 +234,26 @@ class TestDebateRounds:
         use_case, *_ = await _build([Role.PRODUCT_OWNER])
         use_case._rounds = max(1, 0)
         assert len(await use_case.execute(_input())) == 1
+
+
+class _Boom:
+    async def execute(self, data: Any) -> None:
+        raise RuntimeError("falha")
+
+    async def record_group(self, ids: list[AgentId]) -> None:
+        raise RuntimeError("falha")
+
+    async def save(self, meeting: Any) -> None:
+        raise RuntimeError("falha")
+
+
+class TestSideEffectFailures:
+    async def test_failures_in_side_effects_do_not_break_meeting(self) -> None:
+        use_case, *_ = await _build([Role.PRODUCT_OWNER, Role.TECH_LEAD])
+        use_case._create_task = _Boom()  # type: ignore[assignment]
+        use_case._record_interaction = _Boom()  # type: ignore[assignment]
+        use_case._meeting_repository = _Boom()  # type: ignore[assignment]
+
+        turns = await use_case.execute(_input())
+
+        assert len(turns) == 2

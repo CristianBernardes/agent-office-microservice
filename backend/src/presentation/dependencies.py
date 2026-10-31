@@ -126,8 +126,8 @@ def set_database_pool(pool: asyncpg.Pool | None) -> None:
     """Registra (ou remove) a pool e descarta os repositórios já cacheados."""
     global _database_pool
     _database_pool = pool
-    get_agent_repository.cache_clear()
-    get_artifact_repository.cache_clear()
+    for factory in _CACHED_REPOSITORY_FACTORIES:
+        factory.cache_clear()
 
 
 def _use_postgres() -> bool:
@@ -459,3 +459,17 @@ def get_goal_meeting_use_case() -> GoalMeetingUseCase:
         meeting_repository=get_meeting_repository(),
         rounds=get_settings().meeting_rounds,
     )
+
+
+# Bloco: factories de repositório com cache, descartadas quando a pool muda.
+_CACHED_REPOSITORY_FACTORIES = (
+    get_agent_repository,
+    get_artifact_repository,
+    get_task_repository,
+    get_chat_repository,
+    get_memory_repository,
+    get_relationship_repository,
+    get_activity_repository,
+    get_layout_repository,
+    get_meeting_repository,
+)
