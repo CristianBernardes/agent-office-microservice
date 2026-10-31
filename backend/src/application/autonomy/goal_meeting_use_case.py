@@ -15,9 +15,11 @@ from src.application.artifacts.write_artifact_use_case import (
 )
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.memory.memory_use_cases import RememberInput, RememberUseCase
+from src.application.tasks.task_use_cases import CreateTaskInput, CreateTaskUseCase
 from src.domain.entities.agent import Agent, Role
 from src.domain.entities.artifact import ArtifactType
 from src.domain.entities.memory import MemoryType
+from src.domain.entities.task import Priority
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.localization.language import Language
@@ -77,7 +79,9 @@ class GoalMeetingUseCase:
         remember: RememberUseCase,
         write_artifact: WriteArtifactUseCase,
         language: Language,
+        create_task: CreateTaskUseCase | None = None,
     ) -> None:
+        self._create_task = create_task
         self._agents = agent_repository
         self._dispatch = dispatch_goal
         self._send_message = send_message
@@ -97,6 +101,7 @@ class GoalMeetingUseCase:
                 turns.append(turn)
         if turns:
             await self._write_minutes(data, turns)
+            await self._create_backlog(turns)
         return turns
 
     async def _participants(self) -> list[Agent]:
@@ -139,6 +144,27 @@ class GoalMeetingUseCase:
             parts.append(f"{self._labels['minutes']}:\n{minutes}")
         parts.append(self._labels["turn"].format(role=agent.role.value))
         return "\n\n".join(parts)
+
+    async def _create_backlog(self, turns: list[MeetingTurn]) -> None:
+        owner = next((t.agent for t in turns if t.agent.role == Role.PRODUCT_OWNER), None)
+        if owner is None or self._create_task is None:
+            return
+        for turn in turns:
+            if turn.agent.role == Role.PRODUCT_OWNER:
+                continue
+            first_line = turn.thought.strip().splitlines()[0] if turn.thought.strip() else ""
+            try:
+                await self._create_task.execute(
+                    CreateTaskInput(
+                        title=f"[{turn.agent.role.value}] {first_line}"[:120],
+                        description=turn.thought,
+                        priority=Priority.MEDIUM,
+                        creator_id=owner.agent_id,
+                        creator_role=owner.role,
+                    )
+                )
+            except Exception:
+                logger.exception("Falha ao criar tarefa de %s", turn.agent.name)
 
     async def _write_minutes(self, data: GoalMeetingInput, turns: list[MeetingTurn]) -> None:
         title = self._labels["title"].format(goal=data.text)

@@ -35,6 +35,9 @@ class _Dispatch:
         return SimpleNamespace(thought=f"fala-{len(self.contexts)}")
 
 
+_TASKS: list[Any] = []
+
+
 class _Recorder:
     def __init__(self) -> None:
         self.calls: list[Any] = []
@@ -64,6 +67,8 @@ async def _build(
         if role == failing_role:
             failing.add(agent.agent_id)
     dispatch, chat, memory, artifact = _Dispatch(failing), _Recorder(), _Recorder(), _Recorder()
+    tasks = _Recorder()
+    _TASKS.append(tasks)
     use_case = GoalMeetingUseCase(
         repository,
         dispatch,  # type: ignore[arg-type]
@@ -71,6 +76,7 @@ async def _build(
         memory,  # type: ignore[arg-type]
         artifact,  # type: ignore[arg-type]
         language,
+        create_task=tasks,  # type: ignore[arg-type]
     )
     return use_case, dispatch, chat, memory, artifact
 
@@ -145,3 +151,19 @@ class TestGoalSubscription:
         await bus.publish("office/goals/created", {"payload": "str"})
         await asyncio.sleep(0)
         assert recorder.calls == []
+
+
+class TestBacklog:
+    async def test_po_creates_one_task_per_other_role(self) -> None:
+        await _build([Role.PRODUCT_OWNER, Role.TECH_LEAD, Role.QA_ENGINEER])
+        # o último _Recorder de tarefas pertence ao use case recém-montado
+        use_case, *_ = await _build([Role.PRODUCT_OWNER, Role.TECH_LEAD, Role.QA_ENGINEER])
+        tasks = _TASKS[-1]
+        await use_case.execute(_input())
+        assert [c.title.split("]")[0] for c in tasks.calls] == ["[tech_lead", "[qa_engineer"]
+        assert all(c.creator_role == Role.PRODUCT_OWNER for c in tasks.calls)
+
+    async def test_no_po_no_tasks(self) -> None:
+        use_case, *_ = await _build([Role.TECH_LEAD])
+        await use_case.execute(_input())
+        assert _TASKS[-1].calls == []

@@ -340,4 +340,5 @@ def get_goal_meeting_use_case() -> GoalMeetingUseCase:
         remember=get_remember_use_case(),
         write_artifact=get_write_artifact_use_case(),
         language=get_settings().language(),
+        create_task=get_create_task_use_case(),
     )

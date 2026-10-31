@@ -37,3 +37,4 @@
 | [020](./020-memoria-semantica-dos-agentes.md) | Memória semântica dos agentes | Aceito |
 | [021](./021-mqtt-real-e-contrato-de-topicos.md) | MQTT real e contrato de tópicos | Aceito |
 | [022](./022-autonomia-reuniao-de-objetivo.md) | Autonomia: reunião do time sobre um objetivo | Aceito |
+| [023](./023-po-cria-backlog-da-reuniao.md) | PO cria o backlog a partir da reunião | Aceito |
