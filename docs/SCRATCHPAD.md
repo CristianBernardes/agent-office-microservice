@@ -513,62 +513,46 @@ identidade visual sugerida por papel listada acima.
 - Corrigidos dois testes de integração que estavam obsoletos (`Role.QA`, FK do autor do artefato).
 - Repos Postgres de relacionamento/reunião/layout/atividade agora validados contra banco real. Também validados: chat/goal/mensagens, tarefa e memória com busca pgvector (10 testes de integração no total). Pendente de integração real: Kafka, Redis e o gateway Go.
 
-## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
+## Estado atual e ponto de retomada (após a Rodada 27)
 
-### Commits por rodada (branch `develop`)
+### Commits por rodada (branch `develop`, tudo no remoto)
 
 | Rodada | Commit | Tema |
 |---|---|---|
-| 4 | `1c3b64c` | Modelo de LLM por papel (Fase 5) |
-| 5 | `99c66f3` | i18n pt/en (ADR-012) |
-| 6 | `8267f46` | `POST /agents/{id}/think` (ADR-013) |
-| 7 | `78f92d3` | Repositórios PostgreSQL (ADR-014) |
-| 8 | `a03127a`, `89e4f15`, `929253b` | ADR-017, `GET /agents` + CORS (ADR-015), esqueleto do frontend |
-| 9 | `ecb1a25` | Migrações estilo Laravel (ADR-018) |
-| 10 | `871db6c` | Tarefas (ADR-016) |
-| 11 | `d35c14e` | Transições + matriz papel × estágio |
-| 12 | `fe1a4c5` | Objetivos, sessões e chat (ADR-019) |
-| 13 | `6066d20` | Memória semântica (ADR-020) |
+| 4–13 | ver `git log` | LLM por papel, i18n, think, Postgres, migrações, tarefas, transições, chat, memória |
 | 14 | `25fa799` | MQTT real + contrato de tópicos (ADR-021) |
-| 15 | `2681383` | Autonomia: reunião sobre objetivo (ADR-022) |
-| 16 | (este commit) | PO cria backlog da reunião (ADR-023) |
+| 15–16 | `2681383`, `4869413` | Autonomia: reunião e backlog do PO (ADR-022/023) |
+| 17 | `8b3b97f` | Gateway Go: MQTT→Kafka, dedupe Redis, DLQ (ADR-024) |
+| 18–19 | `7515fe1`, `6bfe83b` | goal_id/revisor (ADR-025), hire_agent (ADR-026) |
+| 20–22 | `43cf3e9`, `652a84c` | Relacionamentos (ADR-027), reuniões/start_ceremony (ADR-028) |
+| 23 | `11ef1c1` | Reuniões persistidas + rotas sociais (ADR-029) |
+| 24–25 | `11506be`, `dc26758` | Layout do escritório (ADR-030), feed de atividades (ADR-031) |
+| 26 | `e327104` | Debate multi-rodada (ADR-032) |
+| 27 | `5ccd9be`, `03f655e` | Integração real: Postgres, pgvector, MQTT (10 testes) |
 
-Tudo até a Rodada 13 está no remoto; a Rodada 14 está commitada localmente (push pendente de aprovação).
+### O que funciona
 
-### O que já funciona (231 testes unitários; format/lint/mypy limpos)
-
-- **API:** `/health`, `/agents` (CRUD parcial + `think`), `/tasks` (criar, atribuir, concluir, mover,
-  transições), `/goals`, `/messages`, `/sessions/{id}/messages`, `/agents/{id}/memories` (+ `recall`).
-  Erros localizados pt/en via `Accept-Language`; fallback em `OFFICE_LANGUAGE`.
-- **Persistência:** `PERSISTENCE_BACKEND=memory|postgres`; 9 migrações validadas em Postgres+pgvector.
-- **Mensageria:** `MESSAGE_BUS_BACKEND=memory|mqtt`, envelope da RFC-001, curingas MQTT.
-- **Agentes:** 9 papéis com prompts/permissões, `ToolRegistry` (create/assign/complete_task,
-  send_message, artefatos, busca web), LLM por papel (Ollama externo, ADR-009), embeddings.
-- **ADRs:** 001–021 (índice em `docs/adr/README.md`).
+268 testes unitários + 10 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
+ruff e mypy limpos. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
+activity. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
+Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–032.
 
 ### Limitações conhecidas
 
-- Só `move` aplica a matriz papel × estágio; ator nulo em transição vira `AgentId(UUID(int=0))`
-  (workaround a revisar).
+- Só `move` aplica a matriz papel × estágio.
 - Upsert Postgres de goals só funciona para goals criados `open`.
-- Tools sem handler: `HIRE_AGENT` e `START_CEREMONY`.
-- A query pgvector e o `MqttMessageBus` só foram testados com fakes; falta integração real.
-- Mock de embedding tem 8 dimensões; a coluna é `vector(768)` (apenas Ollama real grava no Postgres).
-- Autonomia mínima (ADR-022, opt-in `AUTONOMY_ENABLED`): reunião + backlog criado pelo PO; sem debate multi-rodada.
+- Kafka, Redis e `docker build` do gateway Go nunca foram executados de ponta a ponta.
+- Relacionamentos e reuniões só têm rotas de leitura; feed exclui tópicos por agente (bus em memória sem curinga).
+- Mock de embedding tem 8 dimensões; coluna é `vector(768)`.
 
-### Backlog ordenado (um commit por item, ADR antes do código, testes pt/en)
+### Backlog
 
-1. Autonomia dos agentes: ADR + loop que consome `office/goals/created`, reuniões, pesquisa e
-   artefatos `.md` em `workspace/projects/` (gitignored).
-2. `goal_id`/revisor/`position` em tasks, `relationships`, `meetings` (`start_ceremony`),
-   handler `hire_agent`, `office_layout` (`GET/PUT /layout`, semente a partir de `planta_baixa.png`),
-   `activity_events`.
-3. Testes de integração contra Postgres e Mosquitto reais; RFCs e Design Docs faltantes.
-4. Gateway Go (Fase 8): ADR, `gateway/` com Dockerfile próprio, Kafka (KRaft) + Redis no compose,
-   tópico `office.events` + DLQ, dedupe por `event_id`.
-5. Frontend (feito pelo autor) consumindo API, MQTT e imagens de `frontend/images/sprites/office/`.
+1. Agentes pesquisando e escrevendo `.md` em `workspace/projects/`.
+2. Rota HTTP para iniciar cerimônia; RFCs/Design Docs faltantes.
+3. Validar gateway Go com Kafka/Redis reais.
+4. Frontend (feito pelo autor).
 
 ### Regras a lembrar
 
-ADR antes do código; `make format` a cada mudança; SCRATCHPAD atualizado **em todo commit**;
-sem trailer do Copilot; commits frequentes; perguntar antes do push; responder em português.
+ADR antes do código; `make format` a cada mudança; SCRATCHPAD em **todo** commit; sem trailer do
+Copilot; commit e push sempre; responder em português; não parar para perguntar.
