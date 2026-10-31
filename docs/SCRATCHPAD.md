@@ -507,6 +507,12 @@ identidade visual sugerida por papel listada acima.
 - 268 testes unitários, ruff e mypy limpos.
 - Próximo: agentes pesquisando/escrevendo `.md`, testes de integração (Postgres/Mosquitto), RFCs/Design Docs, refresh do "Estado atual".
 
+## Rodada 27 — integração real (Postgres + Mosquitto)
+
+- `docker compose up -d postgres mosquitto` + `pytest -m integration`: 7 testes passando (MQTT, agente, artefato, relacionamento, reunião, layout, feed).
+- Corrigidos dois testes de integração que estavam obsoletos (`Role.QA`, FK do autor do artefato).
+- Repos Postgres de relacionamento/reunião/layout/atividade agora validados contra banco real. Ainda sem integração: task, goal, chat, memory (pgvector).
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)
