@@ -44,7 +44,9 @@ Escaneie o QR Code com o app do seu banco
 
 Para quem está fora do Brasil, doações via PayPal são muito bem-vindas:
 
-[![Doar via PayPal](https://img.shields.io/badge/PayPal-Doar-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?business=cristian.aob%40gmail.com&item_name=Support+the+AgentOffice+project&currency_code=USD)
+<a href="https://www.paypal.com/donate/?business=cristian.aob%40gmail.com&item_name=Support+the+AgentOffice+project&currency_code=USD">
+  <img src="https://img.shields.io/badge/PayPal-Doar-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Doar via PayPal" />
+</a>
 
 📧 Conta: **cristian.aob@gmail.com**
 
