@@ -543,7 +543,7 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 35 — Ferramenta `research` (ADR-037)
 - `ToolName.RESEARCH` para papéis com `web_search`; handler delega a `ResearchTopicUseCase`.
 
-## Estado atual e ponto de retomada (após a Rodada 31)
+## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -563,13 +563,17 @@ identidade visual sugerida por papel listada acima.
 | 29 | `6dd057f` | Rotas de escrita de reuniões (ADR-033) |
 | 30 | `7a65d4d` | Pesquisa de agentes → artefato .md (ADR-034) |
 | 31 | `c58abf1` | RFC-004 + design doc de autonomia |
+| 32 | `49ecd0e` | Permissões assign/complete (ADR-035) |
+| 33 | `07ce6e3` | Ollama tolerante (ADR-036) |
+| 34 | `10d2688` | README: seção API HTTP |
+| 35 | `9c07a79` | Ferramenta research (ADR-037) |
 
 ### O que funciona
 
-279 testes unitários + 10 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
+288 testes unitários + 10 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
 ruff e mypy limpos. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
-activity, research. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
-Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–034, RFCs 001–004.
+activity, research; agentes têm a ferramenta research. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
+Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–037, RFCs 001–004.
 
 ### Limitações conhecidas
 
