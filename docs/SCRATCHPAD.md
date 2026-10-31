@@ -543,6 +543,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 35 — Ferramenta `research` (ADR-037)
 - `ToolName.RESEARCH` para papéis com `web_search`; handler delega a `ResearchTopicUseCase`.
 
+## Rodada 36 — Rota de interação (ADR-038)
+- `POST /relationships/interactions` (delta −1..1; 422 para agentes iguais).
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -579,7 +582,7 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–037, RFCs 00
 
 - Só `move` aplica a matriz papel × estágio.
 - Upsert Postgres de goals só funciona para goals criados `open`.
-- Relacionamentos só têm rota de leitura; feed exclui tópicos por agente (bus em memória sem curinga).
+- Feed exclui tópicos por agente (bus em memória sem curinga).
 - Mock de embedding tem 8 dimensões; coluna é `vector(768)`.
 
 ### Backlog

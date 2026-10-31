@@ -52,3 +52,4 @@
 | [035](./035-permissoes-assign-complete.md) | Permissões de atribuir e concluir tarefas | Aceito |
 | [036](./036-leitura-tolerante-do-ollama.md) | Leitura tolerante da resposta do Ollama | Aceito |
 | [037](./037-ferramenta-research.md) | Ferramenta `research` para agentes | Aceito |
+| [038](./038-rota-de-interacao.md) | Rota de escrita de relacionamentos | Aceito |

@@ -12,7 +12,11 @@ from src.application.meetings.meeting_use_cases import (
     StartCeremonyInput,
     StartCeremonyUseCase,
 )
-from src.application.relationships.relationship_use_cases import ListRelationshipsUseCase
+from src.application.relationships.relationship_use_cases import (
+    ListRelationshipsUseCase,
+    RecordInteractionInput,
+    RecordInteractionUseCase,
+)
 from src.domain.entities.meeting import MeetingKind
 from src.domain.exceptions.domain_exceptions import DomainError
 from src.domain.localization.language import Language
@@ -21,6 +25,7 @@ from src.presentation.api.agents_router import get_request_language
 from src.presentation.api.relationship_schemas import (
     FinishMeetingRequest,
     MeetingResponse,
+    RecordInteractionRequest,
     RelationshipResponse,
     StartMeetingRequest,
 )
@@ -28,6 +33,7 @@ from src.presentation.dependencies import (
     get_finish_meeting_use_case,
     get_list_meetings_use_case,
     get_list_relationships_use_case,
+    get_record_interaction_use_case,
     get_start_ceremony_use_case,
 )
 
@@ -42,6 +48,20 @@ async def list_relationships(
     """Vínculos do agente com os colegas."""
     items = await use_case.execute(AgentId(value=agent_id))
     return [RelationshipResponse.from_entity(item) for item in items]
+
+
+@router.post("/relationships/interactions", response_model=RelationshipResponse)
+async def record_interaction(
+    body: RecordInteractionRequest,
+    use_case: RecordInteractionUseCase = Depends(get_record_interaction_use_case),
+) -> RelationshipResponse:
+    """Registra uma interação (delta de afinidade) entre dois agentes."""
+    if body.first == body.second:
+        raise HTTPException(422, "first e second devem ser agentes diferentes")
+    updated = await use_case.execute(
+        RecordInteractionInput(AgentId(value=body.first), AgentId(value=body.second), body.delta)
+    )
+    return RelationshipResponse.from_entity(updated)
 
 
 @router.get("/goals/{goal_id}/meetings", response_model=list[MeetingResponse])

@@ -11,6 +11,12 @@ from src.domain.entities.meeting import Meeting
 from src.domain.entities.relationship import Relationship
 
 
+class RecordInteractionRequest(BaseModel):
+    first: UUID
+    second: UUID
+    delta: float = Field(default=0.05, ge=-1.0, le=1.0)
+
+
 class RelationshipResponse(BaseModel):
     agent_a: UUID
     agent_b: UUID

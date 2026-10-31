@@ -41,6 +41,28 @@ class TestSocialRoutes:
         assert item["interactions"] == 1
         assert item["status"] == "acquaintance"
 
+    def test_record_interaction_accumulates(self) -> None:
+        a, b = uuid4(), uuid4()
+        client.post("/relationships/interactions", json={"first": str(a), "second": str(b)})
+        response = client.post(
+            "/relationships/interactions", json={"first": str(b), "second": str(a), "delta": 0.5}
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["interactions"] == 2
+        assert body["score"] == pytest.approx(0.55)
+
+    def test_record_interaction_rejects_self_and_bad_delta(self) -> None:
+        a = str(uuid4())
+        assert (
+            client.post("/relationships/interactions", json={"first": a, "second": a}).status_code
+            == 422
+        )
+        other = str(uuid4())
+        bad = {"first": a, "second": other, "delta": 5}
+        assert client.post("/relationships/interactions", json=bad).status_code == 422
+
     def test_unknown_agent_has_no_relationships(self) -> None:
         assert client.get(f"/agents/{uuid4()}/relationships").json() == []
 
