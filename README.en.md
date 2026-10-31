@@ -196,6 +196,24 @@ Some roles (Product Owner, Tech Lead, Developers, Data Analyst, Product Consulta
 to the `web_search` tool, backed by [Tavily](https://tavily.com) — a search API built for AI
 agents — see [ADR-011](docs/adr/011-tavily-como-provedor-de-busca-web.md).
 
+## HTTP API
+
+Interactive docs at `/docs`. Error messages follow the `Accept-Language` header (`pt` or `en`).
+Full contract: [RFC-004](docs/rfc/004-contrato-da-api-http.md) (in Portuguese).
+
+| Route | Purpose |
+|---|---|
+| `GET /health` | Service health |
+| `/agents` (+ `/fire`, `/think`, `/memories`, `/relationships`) | Team, reasoning, memory and bonds |
+| `/tasks` (+ `/assign`, `/complete`, `/move`, `/transitions`) | Kanban with role-based permissions |
+| `/goals`, `/messages`, `/sessions/{id}/messages` | User goals and chat |
+| `/meetings` (+ `/finish`), `/goals/{id}/meetings` | Meetings and ceremonies |
+| `POST /research` | An agent searches the web and writes a `.md` |
+| `/layout/{name}`, `/activity` | Office layout and activity feed |
+
+Autonomy (opt-in): `AUTONOMY_ENABLED=true` makes the team meet when a goal is created;
+`MEETING_ROUNDS` (1–5) sets the debate rounds. See the [design doc](docs/design/autonomia-e-reunioes.md) (in Portuguese).
+
 ## Architectural Decisions
 
 Every relevant architectural decision is documented before being implemented:

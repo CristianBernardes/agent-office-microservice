@@ -195,6 +195,24 @@ Alguns papéis (Product Owner, Tech Lead, Devs, Analista de Dados, Consultor de 
 ferramenta `web_search`, resolvida via [Tavily](https://tavily.com) — uma API de busca pensada para
 agentes de IA — ver [ADR-011](docs/adr/011-tavily-como-provedor-de-busca-web.md).
 
+## API HTTP
+
+Documentação interativa em `/docs`. Mensagens de erro seguem o cabeçalho `Accept-Language` (`pt` ou `en`).
+Contrato completo: [RFC-004](docs/rfc/004-contrato-da-api-http.md).
+
+| Rota | Função |
+|---|---|
+| `GET /health` | Saúde do serviço |
+| `/agents` (+ `/fire`, `/think`, `/memories`, `/relationships`) | Time, raciocínio, memória e vínculos |
+| `/tasks` (+ `/assign`, `/complete`, `/move`, `/transitions`) | Kanban com permissões por papel |
+| `/goals`, `/messages`, `/sessions/{id}/messages` | Objetivos do usuário e chat |
+| `/meetings` (+ `/finish`), `/goals/{id}/meetings` | Reuniões e cerimônias |
+| `POST /research` | Agente pesquisa na web e gera um `.md` |
+| `/layout/{name}`, `/activity` | Layout do escritório e feed de atividade |
+
+Autonomia (opt-in): `AUTONOMY_ENABLED=true` faz o time se reunir quando um objetivo é criado;
+`MEETING_ROUNDS` (1–5) define as rodadas de debate. Veja o [design doc](docs/design/autonomia-e-reunioes.md).
+
 ## Decisões Arquiteturais
 
 Toda decisão arquitetural relevante é documentada antes de ser implementada:

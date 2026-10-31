@@ -537,6 +537,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 33 — Ollama tolerante a respostas não-JSON (ADR-036)
 - `_parse_structured_reply`: JSON direto, objeto extraído do texto ou texto livre como `thought`. 286 testes unitários.
 
+## Rodada 34 — Passe final nos READMEs
+- Seção "API HTTP" (tabela de rotas, autonomia, `MEETING_ROUNDS`, pesquisa) em pt e en.
+
 ## Estado atual e ponto de retomada (após a Rodada 31)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
