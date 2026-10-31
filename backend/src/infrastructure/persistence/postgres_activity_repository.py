@@ -13,6 +13,7 @@ from src.domain.interfaces.activity_repository import IActivityRepository
 _INSERT_SQL = """
 INSERT INTO activity_events (event_id, agent_id, kind, payload, created_at)
 VALUES ($1, $2, $3, $4::jsonb, $5)
+ON CONFLICT (event_id) DO NOTHING
 """
 
 

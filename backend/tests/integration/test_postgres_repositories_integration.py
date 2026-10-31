@@ -154,6 +154,13 @@ class TestSocialRepositoriesIntegration:
         assert [e.kind for e in recent] == ["second", "first"]
         assert recent[0].payload == {"k": "v"}
 
+    async def test_activity_add_is_idempotent_by_event_id(self, pool: object) -> None:
+        repository = PostgresActivityRepository(pool)  # type: ignore[arg-type]
+        event = ActivityEvent(kind="dup")
+        await repository.add(event)
+        await repository.add(event)
+        assert [e.kind for e in await repository.recent(10)].count("dup") == 1
+
 
 class TestWorkRepositoriesIntegration:
     async def test_chat_goal_and_messages(self, pool: object) -> None:

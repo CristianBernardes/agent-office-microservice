@@ -606,6 +606,10 @@ ADR-044. `database_url`, `mqtt_host`, `mqtt_port`, `ollama_base_url` obrigatóri
 
 README copia `.env.example` da raiz, do backend e do gateway.
 
+## Rodada 56 — idempotência no Postgres
+
+ADR-045. `ON CONFLICT (event_id) DO NOTHING` em activity_events; teste de integração (14 integração, 309 unit).
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -649,7 +653,8 @@ README copia `.env.example` da raiz, do backend e do gateway.
 | 52 | `53609f1` | ADR-043: compose sem valores fixos (.env raiz, HOST_PORT_*, credenciais Postgres) |
 | 53 | `1737958` | ADR-044: Settings sem defaults de infraestrutura |
 | 54 | `c85e6ba` | MQTT do backend movido do compose para backend/.env.example (valores de container) |
-| 55 | este commit | README: Quick Start copia os três .env.example |
+| 55 | `dd3d2cc` | README: Quick Start copia os três .env.example |
+| 56 | este commit | ADR-045: idempotência de activity_events por event_id; conftest movido para tests/unit |
 
 ### O que funciona
 
