@@ -68,6 +68,62 @@ services:
     networks:
       - agent-office-microservice
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "7079:6379"
+    networks:
+      - agent-office-microservice
+
+  kafka:
+    image: apache/kafka:3.8.0
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "7092:9092"
+    networks:
+      - agent-office-microservice
+
+  kafka-init:
+    image: apache/kafka:3.8.0
+    depends_on:
+      - kafka
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        for t in office.events office.events.dlq; do
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic $$t --partitions 3 --replication-factor 1 && break
+            sleep 3
+          done
+        done
+    networks:
+      - agent-office-microservice
+
+  gateway:
+    build:
+      context: ./gateway
+    restart: unless-stopped
+    environment:
+      MQTT_URL: tcp://mosquitto:1883
+      KAFKA_BROKERS: kafka:9092
+      REDIS_ADDR: redis:6379
+    depends_on:
+      - mosquitto
+      - kafka
+      - redis
+    networks:
+      - agent-office-microservice
+
 networks:
   agent-office-microservice:
     driver: bridge

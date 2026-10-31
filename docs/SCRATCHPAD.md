@@ -439,6 +439,12 @@ identidade visual sugerida por papel listada acima.
 - Após a ata, o PO cria no backlog uma tarefa por contribuição dos demais papéis (determinístico).
 - 231 testes unitários. **Próximo:** gateway Go/Kafka (Fase 8), integração com Postgres/Mosquitto reais.
 
+### Rodada 17 — Gateway Go MQTT → Kafka (ADR-024)
+
+- `gateway/` (Go 1.24): assina `office/#` (QoS 1), valida o envelope, deduplica por `event_id` no Redis (SetNX 24h) e publica em `office.events` (chave = `agent_id`); inválidos vão para `office.events.dlq`.
+- Compose: `kafka` (KRaft), `kafka-init` (cria os tópicos), `redis`, `gateway`.
+- 4 testes Go (`go test ./...` ok). Dockerfile próprio. **Próximo:** goal_id/revisor nas tarefas, relationships, meetings/hire_agent, layout.
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)
