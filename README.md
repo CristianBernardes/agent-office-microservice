@@ -19,6 +19,19 @@ arquitetural rigorosa (ADRs, RFCs, Design Docs).
 
 ---
 
+## Capturas de tela
+
+![Escritório de Agentes](images/Agent_Office.png)
+*O escritório vivo: agentes em suas mesas, salas de reunião e quadro Scrum.*
+
+![Contratar agente](images/hire_agent.png)
+*Contratação de agente: os modelos listados vêm do Ollama instalado (`GET /models`), nada fixo no código.*
+
+![Quadro Kanban](images/kambam_board.png)
+*Quadro Kanban de 6 colunas: backlog → todo → in_progress → testing → in_review → done.*
+
+---
+
 ## 💙 Antes de clonar ou fazer fork — ajude a manter este projeto vivo
 
 Este repositório é **open source e gratuito**, mas é mantido no tempo livre do autor. **Qualquer
@@ -230,11 +243,74 @@ Toda decisão arquitetural relevante é documentada antes de ser implementada:
 
 ## Requisitos
 
+### Tecnologias utilizadas
+
+| Camada | Tecnologia |
+|---|---|
+| Backend | Python 3.12, FastAPI, Clean Architecture, Poetry, pytest, ruff, mypy |
+| Frontend | Svelte 5, TypeScript, Vite, Vitest (pt/en) |
+| Gateway | Go (MQTT → Kafka, dedupe com Redis) |
+| Mensageria | Mosquitto (MQTT), Apache Kafka |
+| Dados | PostgreSQL + pgvector, Redis |
+| IA | Ollama (externo ao Docker), modelos por papel via `.env` |
+| Observabilidade | Prometheus, Grafana, Kafka UI, cAdvisor e exporters |
+| Infra | Docker Compose (volumes em `./.docker/`) |
+
+### Software
+
 - [Docker](https://docs.docker.com/get-docker/) + Docker Compose
-- [Poetry](https://python-poetry.org/docs/#installation) 2.x (para desenvolvimento local do backend)
-- [Ollama](https://ollama.com) instalado e em execução **no seu host** — este projeto nunca sobe um
-  container de Ollama (ver [ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md))
-- (Opcional) Uma chave gratuita da [Tavily](https://app.tavily.com) para a ferramenta `web_search`
+- [Poetry](https://python-poetry.org/docs/#installation) 2.x (desenvolvimento local do backend)
+- Node.js 20+ (desenvolvimento do frontend) e Go 1.22+ (gateway, opcional)
+- [Ollama](https://ollama.com) no **host** — o projeto nunca sobe Ollama em container
+  ([ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md))
+- (Opcional) chave gratuita da [Tavily](https://app.tavily.com) para `web_search`
+
+### Instalando o Ollama
+
+**Linux**
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+sudo systemctl enable --now ollama
+ollama --version
+```
+
+**Windows**
+
+1. Baixe o instalador em <https://ollama.com/download/windows> e execute.
+2. Abra o PowerShell e confirme: `ollama --version`.
+3. Containers Docker acessam o Ollama do host por `http://host.docker.internal:11434`
+   (no Linux, normalmente `http://172.17.0.1:11434`; ajuste `OLLAMA_BASE_URL` no `.env`).
+   No Linux, para aceitar conexões do Docker, defina `OLLAMA_HOST=0.0.0.0` no serviço do Ollama.
+
+**Baixando os modelos** (use os nomes definidos nas variáveis `AGENT_*_MODEL` do `backend/.env`):
+
+```bash
+ollama pull qwen3.6:latest
+ollama pull gpt-oss:20b
+ollama pull nemotron-3.5-bolt:latest
+ollama list   # os modelos instalados aparecem no botão "Contratar"
+```
+
+### Quantas IAs são necessárias?
+
+- **Mínimo: 1 modelo.** Defina só `OLLAMA_MODEL` e todos os papéis o usarão.
+- **Recomendado: 3 a 5 modelos distintos**, um por perfil (PO/Tech Lead, devs, QA, dados), via
+  `AGENT_PO_MODEL`, `AGENT_SM_MODEL`, `AGENT_TECH_LEAD_MODEL`, `AGENT_DEV_SENIOR_MODEL`,
+  `AGENT_DEV_JUNIOR_MODEL`, `AGENT_QA_MODEL`, `AGENT_DATA_MODEL`, `AGENT_HR_MODEL`, `AGENT_CONSULTANT_MODEL`.
+- O time padrão tem **11 agentes**, mas eles falam um de cada vez; o Ollama carrega os modelos sob demanda.
+- Modelos de embedding (nome contendo `embed`) não aparecem na lista de contratação.
+
+### Hardware mínimo (estimativa)
+
+| Cenário | CPU | RAM | GPU / VRAM | Disco |
+|---|---|---|---|---|
+| Mínimo (1 modelo ~3–4B, lento) | 4 núcleos | 16 GB | opcional (CPU) | 30 GB livres |
+| Recomendado (modelos 7–8B) | 8 núcleos | 32 GB | 8 GB VRAM | 60 GB |
+| Confortável (modelos ~20B, ex.: `gpt-oss:20b`) | 8+ núcleos | 32–64 GB | 16 GB+ VRAM | 100 GB |
+
+A stack Docker (Postgres, Kafka, Redis, Mosquitto, Prometheus, Grafana etc.) consome cerca de
+**4–6 GB de RAM** além do Ollama. Os valores são estimativas; modelos maiores exigem mais memória.
 
 ## Início Rápido
 

@@ -752,6 +752,11 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - `docs/design/ciclo-de-trabalho.md` descreve a etapa de teste.
 - Navegador: 6 colunas na mesma linha e botão de gráficos Kaizen conferidos; checklist final concluído.
 
+## Rodada 91 — READMEs
+
+- READMEs pt/en com 3 capturas, tecnologias, instalação do Ollama (Linux/Windows), nº de IAs e hardware mínimo.
+- Botão Contratar: lista de modelos já vem de `GET /models` (Ollama `/api/tags`); campo de texto só como fallback se o Ollama estiver fora.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -830,7 +835,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 87 | `2768a1c` | ADR-052: observabilidade completa (Kafka UI, Prometheus, Grafana, exporters, cAdvisor, `/metrics` no backend e no gateway) |
 | 88 | `10bb61d` | Todos os volumes do compose movidos para `.docker/` (777 via `docker-dirs-init`) |
 | 89 | `e83db75` | Artefatos `.md` de pesquisa gerados pelos agentes em `backend/workspace` commitados |
-| 90 | este commit | `scripts/seed_team.py`, migração `testing` validada em Postgres real, design doc do ciclo atualizado |
+| 90 | `5237cc0` | `scripts/seed_team.py`, migração `testing` validada em Postgres real, design doc do ciclo atualizado |
+| 91 | este commit | READMEs pt/en detalhados com capturas, Ollama, hardware; seletor de modelos já vem do Ollama |
 
 ### O que funciona
 

@@ -18,6 +18,19 @@ rigorous architectural documentation (ADRs, RFCs, Design Docs).
 
 ---
 
+## Screenshots
+
+![Escritório de Agentes](images/Agent_Office.png)
+*The living office: agents at their desks, meeting rooms and the Scrum board.*
+
+![Hire an agent](images/hire_agent.png)
+*Hiring an agent: the listed models come from the locally installed Ollama (`GET /models`), nothing hardcoded.*
+
+![Quadro Kanban](images/kambam_board.png)
+*6-column Kanban board: backlog → todo → in_progress → testing → in_review → done.*
+
+---
+
 ## 💙 Before you clone or fork — help keep this project alive
 
 This repository is **open source and free**, but it is maintained in the author's free time.
@@ -236,11 +249,74 @@ Every relevant architectural decision is documented before being implemented:
 
 ## Requirements
 
+### Technologies
+
+| Layer | Technology |
+|---|---|
+| Backend | Python 3.12, FastAPI, Clean Architecture, Poetry, pytest, ruff, mypy |
+| Frontend | Svelte 5, TypeScript, Vite, Vitest (pt/en) |
+| Gateway | Go (MQTT → Kafka, Redis dedupe) |
+| Messaging | Mosquitto (MQTT), Apache Kafka |
+| Data | PostgreSQL + pgvector, Redis |
+| AI | Ollama (outside Docker), per-role models via `.env` |
+| Observability | Prometheus, Grafana, Kafka UI, cAdvisor and exporters |
+| Infra | Docker Compose (volumes in `./.docker/`) |
+
+### Software
+
 - [Docker](https://docs.docker.com/get-docker/) + Docker Compose
-- [Poetry](https://python-poetry.org/docs/#installation) 2.x (for local backend development)
-- [Ollama](https://ollama.com) installed and running **on your host** — this project never spins
-  up an Ollama container (see [ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md))
-- (Optional) A free [Tavily](https://app.tavily.com) API key for the `web_search` tool
+- [Poetry](https://python-poetry.org/docs/#installation) 2.x (local backend development)
+- Node.js 20+ (frontend development) and Go 1.22+ (gateway, optional)
+- [Ollama](https://ollama.com) on the **host** — the project never runs Ollama in a container
+  ([ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md))
+- (Optional) free [Tavily](https://app.tavily.com) key for `web_search`
+
+### Installing Ollama
+
+**Linux**
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+sudo systemctl enable --now ollama
+ollama --version
+```
+
+**Windows**
+
+1. Download the installer from <https://ollama.com/download/windows> and run it.
+2. Open PowerShell and check: `ollama --version`.
+3. Docker containers reach the host Ollama at `http://host.docker.internal:11434`
+   (on Linux usually `http://172.17.0.1:11434`; adjust `OLLAMA_BASE_URL` in `.env`).
+   On Linux, set `OLLAMA_HOST=0.0.0.0` on the Ollama service so Docker can connect.
+
+**Pulling models** (use the names set in the `AGENT_*_MODEL` variables of `backend/.env`):
+
+```bash
+ollama pull qwen3.6:latest
+ollama pull gpt-oss:20b
+ollama pull nemotron-3.5-bolt:latest
+ollama list   # installed models show up in the "Hire" button
+```
+
+### How many AIs are needed?
+
+- **Minimum: 1 model.** Set only `OLLAMA_MODEL` and every role will use it.
+- **Recommended: 3 to 5 distinct models**, one per profile (PO/Tech Lead, devs, QA, data), via
+  `AGENT_PO_MODEL`, `AGENT_SM_MODEL`, `AGENT_TECH_LEAD_MODEL`, `AGENT_DEV_SENIOR_MODEL`,
+  `AGENT_DEV_JUNIOR_MODEL`, `AGENT_QA_MODEL`, `AGENT_DATA_MODEL`, `AGENT_HR_MODEL`, `AGENT_CONSULTANT_MODEL`.
+- The default team has **11 agents**, but they speak one at a time; Ollama loads models on demand.
+- Embedding models (name containing `embed`) are not listed when hiring.
+
+### Minimum hardware (estimates)
+
+| Scenario | CPU | RAM | GPU / VRAM | Disk |
+|---|---|---|---|---|
+| Minimum (one ~3–4B model, slow) | 4 cores | 16 GB | optional (CPU) | 30 GB free |
+| Recommended (7–8B models) | 8 cores | 32 GB | 8 GB VRAM | 60 GB |
+| Comfortable (~20B models, e.g. `gpt-oss:20b`) | 8+ cores | 32–64 GB | 16 GB+ VRAM | 100 GB |
+
+The Docker stack (Postgres, Kafka, Redis, Mosquitto, Prometheus, Grafana, etc.) uses about
+**4–6 GB of RAM** on top of Ollama. Values are estimates; larger models need more memory.
 
 ## Quick Start
 
