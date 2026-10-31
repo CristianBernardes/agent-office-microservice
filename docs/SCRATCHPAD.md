@@ -656,6 +656,10 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 - Frontend: `lib/metrics.ts` (WIP, vazão, lead time médio/P85, cycle time, aging) com testes; limites `VITE_WIP_LIMIT_*` (0 = sem limite); coluna `n/limite` em vermelho ao exceder; cartão mostra cargo do responsável e idade.
 - Doação: `VITE_PAYPAL_URL` configurado; PayPal aparece também em pt.
 
+## Rodada 71
+
+Cerimônia de planejamento antes do trabalho (ADR-049): facilitador PO/SM, artefato `planning/`, divisão de tarefas em partes para ninguém ficar ocioso. Testes atualizados.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -715,6 +719,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 68 | este commit | Correção do sprite bugado (interagindo_com_objetos) |
 | 69 | este commit | Reset do banco/workspace, time completo contratado e backlog inicial |
 | 70 | este commit | Kanban: WIP/limites, métricas de fluxo, cargo no cartão, timestamps de task; PayPal visível também em pt |
+| 71 | este commit | Sprint planning conduzido por PO/SM, divisão de tarefas, ADR-049 |
 
 ### O que funciona
 

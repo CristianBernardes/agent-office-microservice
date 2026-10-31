@@ -85,7 +85,7 @@ async def test_task_walks_the_whole_kanban_across_ticks() -> None:
     for status in expected:
         await loop.tick()
         assert await _status(tasks) == status
-    assert len(artifacts.calls) == 1
+    assert len(artifacts.calls) == 2  # planning + entrega
     assert all(a.status == AgentStatus.IDLE for a in await agents.list_all())
 
 
@@ -106,9 +106,10 @@ async def test_prompts_use_the_office_language() -> None:
     loop, _, _, dispatch, _ = await _build(_TEAM, Language.PT)
     for _ in range(4):
         await loop.tick()
-    assert dispatch.languages == [Language.PT, Language.PT]
-    assert "Você está trabalhando" in dispatch.prompts[0]
-    assert "Revise" in dispatch.prompts[1]
+    assert dispatch.languages == [Language.PT] * 3
+    assert "planejamento" in dispatch.prompts[0]
+    assert "Você está trabalhando" in dispatch.prompts[1]
+    assert "Revise" in dispatch.prompts[2]
 
 
 async def test_newly_hired_worker_picks_up_waiting_task() -> None:
@@ -119,3 +120,22 @@ async def test_newly_hired_worker_picks_up_waiting_task() -> None:
     await loop.tick()
     assert await _status(tasks) == TaskStatus.IN_PROGRESS
     assert all(t.assigned_to is not None for t in await tasks.list_all())
+
+
+async def test_planning_splits_work_so_nobody_is_idle() -> None:
+    team = [Role.PRODUCT_OWNER, Role.DEV_SENIOR, Role.DEV_SENIOR, Role.DEV_JUNIOR, Role.QA_ENGINEER]
+    loop, tasks, _, dispatch, artifacts = await _build(team)
+    await loop.tick()
+    all_tasks = await tasks.list_all()
+    assert len(all_tasks) == 3
+    assert all(t.status == TaskStatus.TODO for t in all_tasks)
+    assert len({t.assigned_to for t in all_tasks}) == 3
+    assert "(1/3)" in all_tasks[0].title or any("(1/3)" in t.title for t in all_tasks)
+    assert "planning" in dispatch.prompts[0].lower()
+    assert artifacts.calls[0].path.startswith("planning/")
+
+
+async def test_planning_is_led_by_a_planner_role() -> None:
+    loop, tasks, agents, dispatch, _ = await _build([Role.DEV_SENIOR, Role.SCRUM_MASTER])
+    await loop.tick()
+    assert await _status(tasks) == TaskStatus.TODO
