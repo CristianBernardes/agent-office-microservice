@@ -28,6 +28,10 @@
   let showDonation = $state(shouldShowReminder(readLastShown(), new Date(), config.donationReminderDays))
   const lines = $derived(mergeLogs(store.logs, store.activity))
 
+  // Bloco: o ciclo de trabalho do backend segue o idioma escolhido na tela (ADR-051).
+  const syncLanguage = () => void api.setOfficeLanguage(i18n.language).catch(() => undefined)
+  onMount(syncLanguage)
+
   function closeDonation() {
     markShown(new Date())
     showDonation = false
@@ -81,7 +85,7 @@
   <span class="conn" class:on={store.connected}>
     {store.connected ? i18n.t.connected : i18n.t.disconnected}
   </span>
-  <LanguageSwitcher />
+  <LanguageSwitcher onchange={syncLanguage} />
   <button type="button" class="support" onclick={() => (showDonation = true)}>{i18n.t.support}</button>
 </header>
 

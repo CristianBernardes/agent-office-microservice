@@ -25,6 +25,7 @@ from src.presentation.api.health_router import router as health_router
 from src.presentation.api.layout_router import router as layout_router
 from src.presentation.api.memory_router import router as memory_router
 from src.presentation.api.models_router import router as models_router
+from src.presentation.api.office_router import router as office_router
 from src.presentation.api.research_router import router as research_router
 from src.presentation.api.social_router import router as social_router
 from src.presentation.api.tasks_router import router as tasks_router
@@ -94,6 +95,7 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
+app.include_router(office_router)
 app.include_router(agents_router)
 app.include_router(tasks_router)
 app.include_router(chat_router)

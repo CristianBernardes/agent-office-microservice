@@ -56,6 +56,7 @@ from src.domain.interfaces.prompt_provider import IPromptProvider
 from src.domain.interfaces.relationship_repository import IRelationshipRepository
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter
+from src.domain.localization.language import OfficeLanguage
 from src.infrastructure.config.settings import Settings, get_settings
 from src.infrastructure.llm.ollama_adapter import OllamaAdapter
 from src.infrastructure.llm.role_based_llm_adapter_resolver import RoleBasedLlmAdapterResolver
@@ -456,6 +457,11 @@ def get_research_use_case() -> ResearchTopicUseCase:
     )
 
 
+@lru_cache
+def get_office_language() -> OfficeLanguage:
+    return OfficeLanguage(get_settings().language())
+
+
 def get_work_loop_use_case() -> WorkLoopUseCase:
     return WorkLoopUseCase(
         agent_repository=get_agent_repository(),
@@ -466,7 +472,7 @@ def get_work_loop_use_case() -> WorkLoopUseCase:
         send_message=get_send_message_use_case(),
         write_artifact=get_write_artifact_use_case(),
         message_bus=get_message_bus(),
-        language=get_settings().language(),
+        language=get_office_language(),
         chat_repository=get_chat_repository(),
         sprint_max_days=get_settings().sprint_max_days,
     )

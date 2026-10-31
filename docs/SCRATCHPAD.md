@@ -714,12 +714,18 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 ## Pendências finais (Rodada 85 em diante)
 
-- [ ] 1. Idioma das tasks/decisões acompanha a troca pt/en (verificar se o idioma da tela chega ao backend em tarefas e decisões).
+- [x] 1. Idioma das tasks/decisões acompanha a troca pt/en (ADR-051: `PUT /office/language`, trava de confirmação ao trocar).
 - [ ] 2. Refazer o banco: recontratar o time de 11 agentes (modelos do `.env`) e recriar as 15 tarefas do comitê (script de seed versionado).
 - [ ] 3. Validar o fluxo ao vivo: in_progress → testing → in_review → done, `.md` no idioma certo, limite de 15 dias da sprint, pausas dos personagens.
 - [ ] 4. Migração `testing`: confirmar o nome da constraint `task_status_check` num Postgres real.
 - [ ] 5. Atualizar `docs/design/ciclo-de-trabalho.md` com a etapa de teste.
 - [ ] 6. Conferir no navegador: 6 colunas em uma linha e modal de gráficos Kaizen.
+
+## Rodada 86 — idioma em tempo de execução e trava
+
+- `OfficeLanguage` (domínio) + `GET/PUT /office/language`; o ciclo de trabalho lê o idioma a cada passo.
+- Frontend envia o idioma ao carregar e ao trocar; `LanguageSwitcher` pede confirmação (aviso de possível corrupção de `.md` já escritos).
+- Testes: backend 354 unit, frontend 62.
 
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
@@ -794,7 +800,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 82 | 1f0b956 | Kanban: 6 colunas compactas em uma única linha |
 | 83 | 8d87e88 | Workspace fixo (nunca criado em runtime, 777) + `.gitkeep` |
 | 84 | 8d87e88 | Personagens vivos (pausas de descanso/reflexão) + modal de gráficos Kaizen |
-| 85 | este commit | Pendências finais registradas no SCRATCHPAD |
+| 85 | `1781cfb` | Pendências finais registradas no SCRATCHPAD |
+| 86 | este commit | ADR-051: idioma do escritório em tempo de execução + trava avisando que trocar pode corromper arquivos |
 
 ### O que funciona
 

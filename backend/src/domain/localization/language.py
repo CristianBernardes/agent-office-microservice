@@ -43,3 +43,16 @@ class Language(StrEnum):
             if primary_tag in {language.value for language in cls}:
                 return cls(primary_tag)
         return fallback
+
+
+# Bloco: idioma corrente do escritório, alterável em tempo de execução (ver ADR-051).
+class OfficeLanguage:
+    def __init__(self, initial: Language) -> None:
+        self._current = initial
+
+    @property
+    def current(self) -> Language:
+        return self._current
+
+    def set(self, language: Language) -> None:
+        self._current = language

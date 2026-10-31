@@ -9,6 +9,7 @@ export interface Messages {
   connected: string
   disconnected: string
   noAgents: string
+  languageWarning: string
   charts: Record<'button' | 'title' | 'flow' | 'lead' | 'aging' | 'empty' | 'close', string>
   restPhrases: string[]
   thinkPhrases: string[]
@@ -66,6 +67,8 @@ export const pt: Messages = {
   connected: 'Tempo real conectado',
   disconnected: 'Tempo real desconectado',
   noAgents: 'Nenhum agente contratado.',
+  languageWarning:
+    'Atenção: trocar o idioma faz o time escrever os próximos arquivos .md em outro idioma e pode corromper ou misturar os arquivos já escritos. Deseja continuar?',
   charts: {
     button: '📊 Gráficos',
     title: 'Gráficos Kaizen',
@@ -165,6 +168,8 @@ export const en: Messages = {
   connected: 'Realtime connected',
   disconnected: 'Realtime disconnected',
   noAgents: 'No agents hired.',
+  languageWarning:
+    'Warning: changing the language makes the team write the next .md files in another language and may corrupt or mix the files already written. Do you want to continue?',
   charts: {
     button: '📊 Charts',
     title: 'Kaizen charts',

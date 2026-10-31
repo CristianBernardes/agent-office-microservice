@@ -20,6 +20,15 @@ describe('createApiClient', () => {
     expect(await api.listModels()).toEqual(['a', 'b'])
   })
 
+  it('envia o idioma do escritório com PUT', async () => {
+    const fetchMock = reply({ language: 'en' })
+    await createApiClient('http://api', () => 'en', fetchMock).setOfficeLanguage('en')
+    const [url, init] = fetchMock.mock.calls[0]
+    expect(url).toBe('http://api/office/language')
+    expect(init.method).toBe('PUT')
+    expect(JSON.parse(init.body)).toEqual({ language: 'en' })
+  })
+
   it('cria objetivo com POST', async () => {
     const fetchMock = reply({ goal_id: 'g' }, 201)
     await createApiClient('http://api', () => 'pt', fetchMock).createGoal('entregar')

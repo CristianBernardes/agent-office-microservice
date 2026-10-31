@@ -24,7 +24,7 @@ from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
-from src.domain.localization.language import Language
+from src.domain.localization.language import Language, OfficeLanguage
 from src.domain.services.task_splitter import (
     distribute_extra_parts,
     parse_subtasks,
@@ -96,7 +96,7 @@ class WorkLoopUseCase:
         send_message: SendMessageUseCase,
         write_artifact: WriteArtifactUseCase,
         message_bus: IMessageBus,
-        language: Language,
+        language: Language | OfficeLanguage,
         chat_repository: IChatRepository,
         sprint_max_days: int = 15,
     ) -> None:
@@ -108,9 +108,15 @@ class WorkLoopUseCase:
         self._send = send_message
         self._write = write_artifact
         self._bus = message_bus
-        self._language = language
+        self._office_language = (
+            language if isinstance(language, OfficeLanguage) else OfficeLanguage(language)
+        )
         self._chat = chat_repository
         self._sprint_max_days = sprint_max_days
+
+    @property
+    def _language(self) -> Language:
+        return self._office_language.current
 
     async def tick(self) -> int:
         """Executa um passo por estágio; devolve quantas tarefas avançaram."""

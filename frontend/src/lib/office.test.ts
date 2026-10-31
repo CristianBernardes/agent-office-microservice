@@ -23,6 +23,7 @@ function fakeApi(overrides: Partial<ApiClient> = {}): ApiClient {
     createTask: vi.fn(),
     hireAgent: vi.fn(),
     listModels: vi.fn(),
+    setOfficeLanguage: vi.fn(),
     ...overrides,
   }
 }

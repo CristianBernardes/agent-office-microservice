@@ -22,9 +22,20 @@ beforeEach(() => i18n.set('pt'))
 
 describe('componentes', () => {
   it('LanguageSwitcher troca o idioma', async () => {
-    render(LanguageSwitcher)
+    const onchange = vi.fn()
+    render(LanguageSwitcher, { onchange, confirmChange: () => true })
     await fireEvent.click(screen.getByRole('button', { name: 'EN' }))
     expect(i18n.language).toBe('en')
+    expect(onchange).toHaveBeenCalledWith('en')
+  })
+
+  it('LanguageSwitcher não troca se o aviso for recusado', async () => {
+    i18n.set('pt')
+    const onchange = vi.fn()
+    render(LanguageSwitcher, { onchange, confirmChange: () => false })
+    await fireEvent.click(screen.getByRole('button', { name: 'EN' }))
+    expect(i18n.language).toBe('pt')
+    expect(onchange).not.toHaveBeenCalled()
   })
 
   it('GoalForm envia o texto e limpa o campo', async () => {
