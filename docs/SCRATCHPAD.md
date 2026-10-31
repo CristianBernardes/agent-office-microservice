@@ -497,7 +497,7 @@ identidade visual sugerida por papel listada acima.
 
 - `ActivityEvent`, `IActivityRepository`, repos em memória e Postgres (`activity_events`).
 - `register_activity_feed` assina os tópicos de domínio no `lifespan`; `GET /activity?limit=`.
-- Limitação: tópicos por agente (`agents/{id}/...`) fora por falta de curinga no barramento.
+- Tópicos por agente (`agents/+/thought|action`) entram no feed desde a Rodada 40 (ADR-039).
 - 264 testes unitários, ruff e mypy limpos.
 - Próximo: debate multi-rodada, testes de integração, RFCs/Design Docs, refresh do "Estado atual".
 
