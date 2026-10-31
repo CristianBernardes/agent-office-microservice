@@ -21,9 +21,12 @@ from src.application.artifacts.review_artifact_use_case import ReviewArtifactUse
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
-from src.application.meetings.meeting_use_cases import StartCeremonyUseCase
+from src.application.meetings.meeting_use_cases import ListMeetingsUseCase, StartCeremonyUseCase
 from src.application.memory.memory_use_cases import RecallMemoryUseCase, RememberUseCase
-from src.application.relationships.relationship_use_cases import RecordInteractionUseCase
+from src.application.relationships.relationship_use_cases import (
+    ListRelationshipsUseCase,
+    RecordInteractionUseCase,
+)
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -194,6 +197,14 @@ def get_meeting_repository() -> IMeetingRepository:
     if _use_postgres():
         return PostgresMeetingRepository(_require_pool())
     return InMemoryMeetingRepository()
+
+
+def get_list_meetings_use_case() -> ListMeetingsUseCase:
+    return ListMeetingsUseCase(get_meeting_repository())
+
+
+def get_list_relationships_use_case() -> ListRelationshipsUseCase:
+    return ListRelationshipsUseCase(get_relationship_repository())
 
 
 def get_start_ceremony_use_case() -> StartCeremonyUseCase:
@@ -385,4 +396,5 @@ def get_goal_meeting_use_case() -> GoalMeetingUseCase:
         language=get_settings().language(),
         create_task=get_create_task_use_case(),
         record_interaction=get_record_interaction_use_case(),
+        meeting_repository=get_meeting_repository(),
     )

@@ -6,6 +6,7 @@ import asyncio
 import logging
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from uuid import UUID
 
 from src.application.agents.dispatch_goal_use_case import DispatchGoalUseCase
@@ -19,12 +20,14 @@ from src.application.relationships.relationship_use_cases import RecordInteracti
 from src.application.tasks.task_use_cases import CreateTaskInput, CreateTaskUseCase
 from src.domain.entities.agent import Agent, Role
 from src.domain.entities.artifact import ArtifactType
+from src.domain.entities.meeting import Meeting, MeetingKind, MeetingStatus
 from src.domain.entities.memory import MemoryType
 from src.domain.entities.task import Priority
 from src.domain.interfaces.agent_repository import IAgentRepository
+from src.domain.interfaces.meeting_repository import IMeetingRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.localization.language import Language
-from src.domain.value_objects.identifiers import GoalId, SessionId
+from src.domain.value_objects.identifiers import GoalId, MeetingId, SessionId
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +85,9 @@ class GoalMeetingUseCase:
         language: Language,
         create_task: CreateTaskUseCase | None = None,
         record_interaction: RecordInteractionUseCase | None = None,
+        meeting_repository: IMeetingRepository | None = None,
     ) -> None:
+        self._meeting_repository = meeting_repository
         self._record_interaction = record_interaction
         self._create_task = create_task
         self._agents = agent_repository
@@ -106,6 +111,7 @@ class GoalMeetingUseCase:
             await self._write_minutes(data, turns)
             await self._create_backlog(turns, data.goal_id)
             await self._bond(turns)
+            await self._register_meeting(data, turns)
         return turns
 
     async def _participants(self) -> list[Agent]:
@@ -148,6 +154,30 @@ class GoalMeetingUseCase:
             parts.append(f"{self._labels['minutes']}:\n{minutes}")
         parts.append(self._labels["turn"].format(role=agent.role.value))
         return "\n\n".join(parts)
+
+    # Bloco: guarda a reunião como `Meeting` concluída (ADR-028); falha aqui não derruba o fluxo.
+    async def _register_meeting(self, data: GoalMeetingInput, turns: list[MeetingTurn]) -> None:
+        if self._meeting_repository is None:
+            return
+        try:
+            now = datetime.now(UTC)
+            ids = tuple(t.agent.agent_id for t in turns)
+            await self._meeting_repository.save(
+                Meeting(
+                    meeting_id=MeetingId.generate(),
+                    kind=MeetingKind.PLANNING,
+                    title=data.text[:120],
+                    organizer_id=ids[0],
+                    participants=ids,
+                    goal_id=data.goal_id,
+                    status=MeetingStatus.DONE,
+                    summary="\n".join(f"{t.agent.name}: {t.thought}" for t in turns),
+                    started_at=now,
+                    ended_at=now,
+                )
+            )
+        except Exception:
+            logger.exception("Falha ao registrar a reunião do objetivo %s", data.goal_id)
 
     async def _bond(self, turns: list[MeetingTurn]) -> None:
         if self._record_interaction is None:

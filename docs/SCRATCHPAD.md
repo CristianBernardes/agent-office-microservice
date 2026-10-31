@@ -477,6 +477,14 @@ identidade visual sugerida por papel listada acima.
 - 252 testes unitários, ruff e mypy limpos.
 - Pendente: `GoalMeetingUseCase` ainda não persiste suas reuniões como `Meeting`; sem rota HTTP; repo Postgres de reuniões sem teste de integração.
 
+## Rodada 23 — reuniões persistidas + rotas sociais (ADR-029)
+
+- `AGENT_DATA_MODEL=nemotron3:latest` (Data Analyst) em `.env` e `.env.example`.
+- `GoalMeetingUseCase` grava `Meeting` PLANNING concluída (opcional, falha tolerada).
+- Rotas: `GET /agents/{id}/relationships`, `GET /goals/{id}/meetings`.
+- 256 testes unitários, ruff e mypy limpos.
+- Próximo: `office_layout`, `activity_events`, debate multi-rodada, testes de integração.
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)

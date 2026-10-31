@@ -183,3 +183,23 @@ class TestBacklog:
         use_case, *_ = await _build([Role.TECH_LEAD])
         await use_case.execute(_input())
         assert _TASKS[-1].calls == []
+
+
+class TestMeetingPersistence:
+    async def test_meeting_is_stored_as_done_planning(self) -> None:
+        from src.domain.entities.meeting import MeetingKind, MeetingStatus
+        from src.infrastructure.persistence.in_memory_meeting_repository import (
+            InMemoryMeetingRepository,
+        )
+
+        use_case, *_ = await _build([Role.PRODUCT_OWNER, Role.TECH_LEAD])
+        repo = InMemoryMeetingRepository()
+        use_case._meeting_repository = repo
+        data = _input()
+
+        turns = await use_case.execute(data)
+
+        [meeting] = await repo.list_by_goal(data.goal_id)
+        assert meeting.kind is MeetingKind.PLANNING
+        assert meeting.status is MeetingStatus.DONE
+        assert meeting.participants == tuple(t.agent.agent_id for t in turns)
