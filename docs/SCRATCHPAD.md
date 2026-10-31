@@ -464,6 +464,11 @@ identidade visual sugerida por papel listada acima.
 - Pendente: rota HTTP de leitura, interações negativas (rivalidade), teste contra Postgres real.
 - **Próximo:** meetings + `start_ceremony`, layout, activity_events.
 
+### Rodada 21 — Modelos por papel (`.env` / `.env.example`)
+
+- PO e Tech Lead: `qwen3.6`; Dev Sênior e Analista de Dados: `nemotron-3.5-bolt`; SM, Dev Júnior e RH: `gpt-oss:20b`; QA e Consultor: `sorc/qwen3.5-claude-4.6-opus`. Embeddings: `nomic-embed-text`.
+- Só configuração (o `.env` é ignorado pelo git; o `.env.example` é versionado).
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)
