@@ -25,6 +25,7 @@ from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
 from src.infrastructure.search.mock_search_adapter import MockSearchAdapter
+from tests.unit.application.tasks.registry_support import task_use_cases
 
 pytestmark = pytest.mark.unit
 
@@ -45,6 +46,7 @@ def _build_registry(tmp_path: Path, search_adapter: MockSearchAdapter) -> ToolRe
             artifact_repository=repository, message_bus=message_bus
         ),
         web_search_adapter=search_adapter,
+        **task_use_cases(message_bus),
     )
 
 
@@ -82,7 +84,7 @@ class TestToolRegistry:
 
         with pytest.raises(ToolNotImplementedError):
             await registry.execute(
-                tool_name=ToolName.CREATE_TASK,
+                tool_name=ToolName.SEND_MESSAGE,
                 requester_id=AgentId.generate(),
                 requester_role=Role.PRODUCT_OWNER,
                 arguments={},

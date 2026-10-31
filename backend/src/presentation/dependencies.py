@@ -19,6 +19,11 @@ from src.application.agents.hire_agent_use_case import HireAgentUseCase
 from src.application.artifacts.approve_artifact_use_case import ApproveArtifactUseCase
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
+from src.application.tasks.task_use_cases import (
+    AssignTaskUseCase,
+    CompleteTaskUseCase,
+    CreateTaskUseCase,
+)
 from src.application.tools.tool_registry import ToolRegistry
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.artifact_repository import IArtifactRepository
@@ -26,6 +31,7 @@ from src.domain.interfaces.llm_adapter import ILlmAdapter
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
+from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter
 from src.infrastructure.config.settings import Settings, get_settings
 from src.infrastructure.llm.ollama_adapter import OllamaAdapter
@@ -37,10 +43,12 @@ from src.infrastructure.persistence.in_memory_agent_repository import (
 from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
+from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
 from src.infrastructure.persistence.postgres_agent_repository import PostgresAgentRepository
 from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
+from src.infrastructure.persistence.postgres_task_repository import PostgresTaskRepository
 from src.infrastructure.prompts.file_prompt_provider import FilePromptProvider
 from src.infrastructure.search.tavily_adapter import TavilySearchAdapter
 
@@ -108,6 +116,15 @@ def get_artifact_repository() -> IArtifactRepository:
     if _use_postgres():
         return PostgresArtifactRepository(_require_pool())
     return InMemoryArtifactRepository()
+
+
+# Bloco: repositório de tarefas (singleton por processo), selecionado por PERSISTENCE_BACKEND.
+@lru_cache
+def get_task_repository() -> ITaskRepository:
+    """Retorna a instância única do repositório de tarefas usado pela aplicação."""
+    if _use_postgres():
+        return PostgresTaskRepository(_require_pool())
+    return InMemoryTaskRepository()
 
 
 # Bloco: barramento de mensagens (singleton por processo).
@@ -187,6 +204,27 @@ def get_approve_artifact_use_case() -> ApproveArtifactUseCase:
     )
 
 
+# Bloco: factories dos casos de uso de tarefas.
+def get_create_task_use_case() -> CreateTaskUseCase:
+    return CreateTaskUseCase(task_repository=get_task_repository(), message_bus=get_message_bus())
+
+
+def get_assign_task_use_case() -> AssignTaskUseCase:
+    return AssignTaskUseCase(
+        task_repository=get_task_repository(),
+        agent_repository=get_agent_repository(),
+        message_bus=get_message_bus(),
+    )
+
+
+def get_complete_task_use_case() -> CompleteTaskUseCase:
+    return CompleteTaskUseCase(
+        task_repository=get_task_repository(),
+        agent_repository=get_agent_repository(),
+        message_bus=get_message_bus(),
+    )
+
+
 # Bloco: registro de ferramentas (singleton por processo).
 # Composição central que liga os casos de uso de artefato e o adaptador de
 # busca web às ferramentas que os agentes podem invocar (ver Fase 3).
@@ -198,6 +236,9 @@ def get_tool_registry() -> ToolRegistry:
         review_artifact_use_case=get_review_artifact_use_case(),
         approve_artifact_use_case=get_approve_artifact_use_case(),
         web_search_adapter=get_web_search_adapter(),
+        create_task_use_case=get_create_task_use_case(),
+        assign_task_use_case=get_assign_task_use_case(),
+        complete_task_use_case=get_complete_task_use_case(),
     )
 
 

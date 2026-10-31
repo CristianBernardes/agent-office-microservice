@@ -28,6 +28,7 @@ from src.infrastructure.persistence.in_memory_artifact_repository import (
 )
 from src.infrastructure.prompts.file_prompt_provider import FilePromptProvider
 from src.infrastructure.search.mock_search_adapter import MockSearchAdapter
+from tests.unit.application.tasks.registry_support import task_use_cases
 
 pytestmark = pytest.mark.unit
 
@@ -57,6 +58,7 @@ def _build(
             artifact_repository=artifacts, message_bus=bus
         ),
         web_search_adapter=MockSearchAdapter(),
+        **task_use_cases(bus),
     )
     think = AgentThinkUseCase(
         llm_adapter_resolver=RoleBasedLlmAdapterResolver(

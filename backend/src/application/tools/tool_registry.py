@@ -19,12 +19,19 @@ from src.application.artifacts.write_artifact_use_case import (
     WriteArtifactInput,
     WriteArtifactUseCase,
 )
+from src.application.tasks.task_use_cases import (
+    AssignTaskUseCase,
+    CompleteTaskUseCase,
+    CreateTaskInput,
+    CreateTaskUseCase,
+)
 from src.application.tools.tool_permissions import ToolName, role_can_use_tool
 from src.domain.entities.agent import Role
 from src.domain.entities.artifact import Artifact, ArtifactType
+from src.domain.entities.task import Priority, Task
 from src.domain.exceptions.domain_exceptions import DomainError
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter, WebSearchResult
-from src.domain.value_objects.identifiers import AgentId, ArtifactId
+from src.domain.value_objects.identifiers import AgentId, ArtifactId, TaskId
 
 
 # Bloco: erro levantado quando o papel solicitante não tem permissão para a
@@ -47,9 +54,8 @@ ToolHandler = Callable[[AgentId, Role, dict[str, object]], Awaitable[object]]
 
 
 # Bloco: registro central de ferramentas.
-# Apenas as ferramentas com caso de uso real implementado nesta rodada possuem
-# handler (`write_artifact`, `review_artifact`, `approve_artifact`,
-# `web_search`) — as demais ferramentas já constam em `ToolName` e na tabela de
+# Apenas as ferramentas com caso de uso real implementado possuem handler
+# (artefatos, `web_search` e tarefas) — as demais ferramentas constam em `ToolName` e na tabela de
 # permissões (fonte única de verdade com a Fase 3), mas levantam
 # `ToolNotImplementedError` até que seus casos de uso sejam implementados.
 class ToolRegistry:
@@ -59,6 +65,9 @@ class ToolRegistry:
         review_artifact_use_case: ReviewArtifactUseCase,
         approve_artifact_use_case: ApproveArtifactUseCase,
         web_search_adapter: IWebSearchAdapter,
+        create_task_use_case: CreateTaskUseCase,
+        assign_task_use_case: AssignTaskUseCase,
+        complete_task_use_case: CompleteTaskUseCase,
     ) -> None:
         self._handlers: dict[ToolName, ToolHandler] = {
             ToolName.WRITE_ARTIFACT: self._make_write_artifact_handler(write_artifact_use_case),
@@ -67,6 +76,9 @@ class ToolRegistry:
                 approve_artifact_use_case
             ),
             ToolName.WEB_SEARCH: self._make_web_search_handler(web_search_adapter),
+            ToolName.CREATE_TASK: self._make_create_task_handler(create_task_use_case),
+            ToolName.ASSIGN_TASK: self._make_assign_task_handler(assign_task_use_case),
+            ToolName.COMPLETE_TASK: self._make_complete_task_handler(complete_task_use_case),
         }
 
     async def execute(
@@ -140,5 +152,50 @@ class ToolRegistry:
             raw_max_results = arguments.get("max_results", 5)
             max_results = raw_max_results if isinstance(raw_max_results, int) else 5
             return await adapter.search(query=str(arguments["query"]), max_results=max_results)
+
+        return handler
+
+    @staticmethod
+    def _make_create_task_handler(use_case: CreateTaskUseCase) -> ToolHandler:
+        async def handler(
+            requester_id: AgentId, requester_role: Role, arguments: dict[str, object]
+        ) -> Task:
+            return await use_case.execute(
+                CreateTaskInput(
+                    title=str(arguments["title"]),
+                    description=str(arguments.get("description", "")),
+                    priority=Priority(str(arguments.get("priority", Priority.MEDIUM.value))),
+                    creator_id=requester_id,
+                    creator_role=requester_role,
+                )
+            )
+
+        return handler
+
+    @staticmethod
+    def _make_assign_task_handler(use_case: AssignTaskUseCase) -> ToolHandler:
+        async def handler(
+            requester_id: AgentId, requester_role: Role, arguments: dict[str, object]
+        ) -> Task:
+            return await use_case.execute(
+                task_id=TaskId(value=UUID(str(arguments["task_id"]))),
+                assignee_id=AgentId(value=UUID(str(arguments["agent_id"]))),
+                actor_id=requester_id,
+                actor_role=requester_role,
+            )
+
+        return handler
+
+    @staticmethod
+    def _make_complete_task_handler(use_case: CompleteTaskUseCase) -> ToolHandler:
+        async def handler(
+            requester_id: AgentId, requester_role: Role, arguments: dict[str, object]
+        ) -> Task:
+            return await use_case.execute(
+                task_id=TaskId(value=UUID(str(arguments["task_id"]))),
+                result=str(arguments["result"]),
+                actor_id=requester_id,
+                actor_role=requester_role,
+            )
 
         return handler

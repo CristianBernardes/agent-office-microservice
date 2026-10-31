@@ -1,0 +1,106 @@
+"""Rotas HTTP de tarefas (Kanban). Camada fina: sem regra de negócio (ADR-007, ADR-016)."""
+
+from __future__ import annotations
+
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from src.application.agents.fire_agent_use_case import AgentNotFoundError
+from src.application.tasks.task_errors import TaskNotFoundError
+from src.application.tasks.task_use_cases import (
+    AssignTaskUseCase,
+    CompleteTaskUseCase,
+    CreateTaskInput,
+    CreateTaskUseCase,
+)
+from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
+from src.domain.interfaces.task_repository import ITaskRepository
+from src.domain.localization.language import Language
+from src.domain.value_objects.identifiers import AgentId, TaskId
+from src.presentation.api.agents_router import get_request_language
+from src.presentation.api.task_schemas import (
+    AssignTaskRequest,
+    CompleteTaskRequest,
+    CreateTaskRequest,
+    TaskResponse,
+)
+from src.presentation.dependencies import (
+    get_assign_task_use_case,
+    get_complete_task_use_case,
+    get_create_task_use_case,
+    get_task_repository,
+)
+
+router = APIRouter(prefix="/tasks", tags=["tasks"])
+
+
+# Bloco: traduz erros de negócio em HTTP localizado (404 inexistente, 409 transição inválida).
+def _http_error(error: Exception, language: Language) -> HTTPException:
+    if isinstance(error, TaskNotFoundError | AgentNotFoundError):
+        return HTTPException(status.HTTP_404_NOT_FOUND, error.localized(language))
+    assert isinstance(error, InvalidStateTransitionError)
+    return HTTPException(status.HTTP_409_CONFLICT, error.localized(language))
+
+
+@router.get("", response_model=list[TaskResponse])
+async def list_tasks(
+    repository: ITaskRepository = Depends(get_task_repository),
+) -> list[TaskResponse]:
+    """Lista todas as tarefas."""
+    return [TaskResponse.from_entity(task) for task in await repository.list_all()]
+
+
+@router.post("", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
+async def create_task(
+    body: CreateTaskRequest,
+    use_case: CreateTaskUseCase = Depends(get_create_task_use_case),
+) -> TaskResponse:
+    """Cria uma tarefa no backlog."""
+    task = await use_case.execute(
+        CreateTaskInput(
+            title=body.title,
+            description=body.description,
+            priority=body.priority,
+            creator_id=AgentId(value=body.actor_id),
+            creator_role=body.actor_role,
+        )
+    )
+    return TaskResponse.from_entity(task)
+
+
+@router.post("/{task_id}/assign", response_model=TaskResponse)
+async def assign_task(
+    task_id: UUID,
+    body: AssignTaskRequest,
+    use_case: AssignTaskUseCase = Depends(get_assign_task_use_case),
+    language: Language = Depends(get_request_language),
+) -> TaskResponse:
+    """Atribui a tarefa a um agente (404 inexistente, 409 agente ocupado)."""
+    try:
+        task = await use_case.execute(
+            TaskId(value=task_id),
+            AgentId(value=body.agent_id),
+            AgentId(value=body.actor_id),
+            body.actor_role,
+        )
+    except (TaskNotFoundError, AgentNotFoundError, InvalidStateTransitionError) as error:
+        raise _http_error(error, language) from error
+    return TaskResponse.from_entity(task)
+
+
+@router.post("/{task_id}/complete", response_model=TaskResponse)
+async def complete_task(
+    task_id: UUID,
+    body: CompleteTaskRequest,
+    use_case: CompleteTaskUseCase = Depends(get_complete_task_use_case),
+    language: Language = Depends(get_request_language),
+) -> TaskResponse:
+    """Conclui a tarefa (404 inexistente, 409 se não estiver em andamento)."""
+    try:
+        task = await use_case.execute(
+            TaskId(value=task_id), body.result, AgentId(value=body.actor_id), body.actor_role
+        )
+    except (TaskNotFoundError, InvalidStateTransitionError) as error:
+        raise _http_error(error, language) from error
+    return TaskResponse.from_entity(task)

@@ -12,6 +12,10 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.PT: "Tarefa '{title}' está '{status}' e não pode ser concluída — "
         "apenas tarefas 'in_progress' podem ser concluídas.",
     },
+    "task.not_found": {
+        Language.EN: "Task with ID '{task_id}' was not found.",
+        Language.PT: "Tarefa com ID '{task_id}' não foi encontrada.",
+    },
     "artifact.cannot_request_review": {
         Language.EN: "Artifact '{title}' is '{status}' and cannot be sent for review — "
         "only 'draft' artifacts can be reviewed.",

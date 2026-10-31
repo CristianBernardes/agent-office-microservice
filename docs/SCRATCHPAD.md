@@ -380,3 +380,12 @@ identidade visual sugerida por papel listada acima.
   152 unitários passando; format/lint/mypy limpos. Bancos de dev antigos: `make migrate-fresh`.
 - Também entra o código parcial de Tarefas (ADR-016: repositórios); casos de uso/rotas a seguir.
 - **Próximo:** Tarefas (casos de uso, transições, rotas, tools), goals/chat, memória, ADR-019 MQTT.
+
+### Rodada 10 — Tarefas: casos de uso, rotas e tools (ADR-016)
+
+- Casos de uso `CreateTask`/`AssignTask`/`CompleteTask` (tarefa nasce em backlog; atribuir valida o
+  agente antes; concluir devolve o agente a IDLE; evento em `office/tasks/updated`).
+- Rotas `GET/POST /tasks`, `POST /tasks/{id}/assign|complete` (404/409 localizados via `Accept-Language`).
+- Tools `create_task`, `assign_task`, `complete_task` no `ToolRegistry`; chave i18n `task.not_found`.
+- 167 unitários passando; format/lint/mypy limpos.
+- **Próximo:** `task_transitions` + matriz papel×estágio, goals/chat (`send_message`), memória, ADR-019 MQTT.

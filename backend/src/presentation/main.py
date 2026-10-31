@@ -17,6 +17,7 @@ from src.infrastructure.persistence.migrator import migrate
 from src.infrastructure.persistence.postgres_connection import create_postgres_pool
 from src.presentation.api.agents_router import router as agents_router
 from src.presentation.api.health_router import router as health_router
+from src.presentation.api.tasks_router import router as tasks_router
 from src.presentation.dependencies import set_database_pool
 
 
@@ -57,3 +58,4 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(agents_router)
+app.include_router(tasks_router)
