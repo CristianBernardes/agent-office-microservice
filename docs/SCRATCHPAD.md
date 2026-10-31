@@ -511,7 +511,7 @@ identidade visual sugerida por papel listada acima.
 
 - `docker compose up -d postgres mosquitto` + `pytest -m integration`: 7 testes passando (MQTT, agente, artefato, relacionamento, reunião, layout, feed).
 - Corrigidos dois testes de integração que estavam obsoletos (`Role.QA`, FK do autor do artefato).
-- Repos Postgres de relacionamento/reunião/layout/atividade agora validados contra banco real. Ainda sem integração: task, goal, chat, memory (pgvector).
+- Repos Postgres de relacionamento/reunião/layout/atividade agora validados contra banco real. Também validados: chat/goal/mensagens, tarefa e memória com busca pgvector (10 testes de integração no total). Pendente de integração real: Kafka, Redis e o gateway Go.
 
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 

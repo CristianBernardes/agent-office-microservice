@@ -10,10 +10,22 @@ import pytest
 from src.domain.entities.activity_event import ActivityEvent
 from src.domain.entities.agent import Agent, Personality, Role
 from src.domain.entities.artifact import Artifact, ArtifactType
+from src.domain.entities.chat import ChatMessage, Goal, Session
 from src.domain.entities.meeting import Meeting, MeetingKind, MeetingStatus
+from src.domain.entities.memory import Memory
 from src.domain.entities.office_layout import OfficeLayout
 from src.domain.entities.relationship import Relationship
-from src.domain.value_objects.identifiers import AgentId, ArtifactId, MeetingId
+from src.domain.entities.task import Task, TaskStatus
+from src.domain.value_objects.identifiers import (
+    AgentId,
+    ArtifactId,
+    GoalId,
+    MeetingId,
+    MemoryId,
+    MessageId,
+    SessionId,
+    TaskId,
+)
 from src.infrastructure.config.settings import get_settings
 from src.infrastructure.filesystem.markdown_artifact_writer import MarkdownArtifactWriter
 from src.infrastructure.persistence.migrator import fresh
@@ -22,12 +34,15 @@ from src.infrastructure.persistence.postgres_agent_repository import PostgresAge
 from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
+from src.infrastructure.persistence.postgres_chat_repository import PostgresChatRepository
 from src.infrastructure.persistence.postgres_connection import create_postgres_pool
 from src.infrastructure.persistence.postgres_layout_repository import PostgresLayoutRepository
 from src.infrastructure.persistence.postgres_meeting_repository import PostgresMeetingRepository
+from src.infrastructure.persistence.postgres_memory_repository import PostgresMemoryRepository
 from src.infrastructure.persistence.postgres_relationship_repository import (
     PostgresRelationshipRepository,
 )
+from src.infrastructure.persistence.postgres_task_repository import PostgresTaskRepository
 
 pytestmark = pytest.mark.integration
 
@@ -138,3 +153,52 @@ class TestSocialRepositoriesIntegration:
         recent = await repository.recent(10)
         assert [e.kind for e in recent] == ["second", "first"]
         assert recent[0].payload == {"k": "v"}
+
+
+class TestWorkRepositoriesIntegration:
+    async def test_chat_goal_and_messages(self, pool: object) -> None:
+        agent = await _agent(pool, "PO")
+        repository = PostgresChatRepository(pool)  # type: ignore[arg-type]
+        session = Session(session_id=SessionId.generate())
+        await repository.save_session(session)
+        goal = Goal(goal_id=GoalId.generate(), session_id=session.session_id, text="Build")
+        await repository.save_goal(goal)
+        await repository.add_message(
+            ChatMessage(
+                message_id=MessageId.generate(),
+                session_id=session.session_id,
+                content="oi",
+                sender_id=agent.agent_id,
+            )
+        )
+        assert [g.text for g in await repository.list_goals()] == ["Build"]
+        assert [m.content for m in await repository.list_messages(session.session_id)] == ["oi"]
+
+    async def test_task_roundtrip(self, pool: object) -> None:
+        agent = await _agent(pool, "Dev")
+        repository = PostgresTaskRepository(pool)  # type: ignore[arg-type]
+        task = Task(task_id=TaskId.generate(), title="T", description="d")
+        await repository.save(task)
+        task.assign(agent.agent_id)
+        task.complete("ok")
+        await repository.save(task)
+        loaded = await repository.find_by_id(task.task_id)
+        assert loaded is not None
+        assert loaded.status is TaskStatus.DONE and loaded.assigned_to == agent.agent_id
+
+    async def test_memory_recall_orders_by_similarity(self, pool: object) -> None:
+        agent = await _agent(pool, "Mem")
+        repository = PostgresMemoryRepository(pool)  # type: ignore[arg-type]
+        near = [1.0] + [0.0] * 767
+        far = [0.0, 1.0] + [0.0] * 766
+        for text, vector in (("near", near), ("far", far)):
+            await repository.save(
+                Memory(
+                    memory_id=MemoryId.generate(),
+                    agent_id=agent.agent_id,
+                    content=text,
+                    embedding=tuple(vector),
+                )
+            )
+        recalled = await repository.recall(agent.agent_id, near, 2)
+        assert [m.content for m in recalled] == ["near", "far"]
