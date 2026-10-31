@@ -202,7 +202,7 @@ Toda decisão arquitetural relevante é documentada antes de ser implementada:
 - **ADRs** (`docs/adr/`) — decisões técnicas pontuais (MQTT, FastAPI, Clean Architecture, Ollama
   externo ao Compose, Tavily, portas de container, etc.)
 - **RFCs** (`docs/rfc/`) — contratos que atravessam múltiplos componentes (protocolo de mensagens,
-  ciclo de vida de artefatos, ciclo de vida de agentes)
+  ciclo de vida de artefatos, ciclo de vida de agentes, contrato da API HTTP)
 - **Design Docs** (`docs/design/`) — visões de arquitetura geral do produto
 - **Plano de Migração** (`docs/migration-plan/`) — todas as fases do roadmap técnico, incluindo as
   ainda não implementadas

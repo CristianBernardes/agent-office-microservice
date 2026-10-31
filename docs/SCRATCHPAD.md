@@ -528,6 +528,9 @@ identidade visual sugerida por papel listada acima.
 - `POST /research`. Falha na busca não aborta. pt/en.
 - 279 testes unitários, ruff e mypy limpos.
 
+## Rodada 31 — RFC-004 e Design Doc de autonomia
+- `docs/rfc/004-contrato-da-api-http.md` (todas as rotas) e `docs/design/autonomia-e-reunioes.md`.
+
 ## Estado atual e ponto de retomada (após a Rodada 27)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
