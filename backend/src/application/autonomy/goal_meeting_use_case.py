@@ -14,6 +14,7 @@ from src.application.artifacts.write_artifact_use_case import (
     WriteArtifactInput,
     WriteArtifactUseCase,
 )
+from src.application.autonomy.task_title import clean_title
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.memory.memory_use_cases import RememberInput, RememberUseCase
 from src.application.relationships.relationship_use_cases import RecordInteractionUseCase
@@ -237,11 +238,12 @@ class GoalMeetingUseCase:
         for turn in final_turns:
             if turn.agent.role == Role.PRODUCT_OWNER:
                 continue
-            first_line = turn.thought.strip().splitlines()[0] if turn.thought.strip() else ""
+            role = turn.agent.role.value
+            title = clean_title(turn.thought, role)
             try:
                 await self._create_task.execute(
                     CreateTaskInput(
-                        title=f"[{turn.agent.role.value}] {first_line}"[:120],
+                        title=f"[{role}] {title}"[:120],
                         description=turn.thought,
                         priority=Priority.MEDIUM,
                         creator_id=owner.agent_id,

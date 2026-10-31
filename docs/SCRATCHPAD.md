@@ -782,7 +782,14 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Bug: a pose alternativa de `idle` (`interagindo_com_objetos`, 48 quadros) tratava a folha como 4 direções × 12, então a direção "frente" apontava para os quadros 36–47 (carrinho de props), mostrando uma fatia estranha no lugar do personagem. Os 24 primeiros quadros são as 4 direções × 6; os 24 últimos são o carrinho. Corrigido com `frames: 24, total: 48`; teste de regressão em `sprites.test.ts`.
 - Nova pasta `sql/` (`tasks.pt.sql`, `tasks.en.sql`, `clear_tasks.sql`, `README.md`) para criar as 15 tarefas de uma vez no Postgres; testada em banco temporário com as migrações.
 
-## Estado atual e ponto de retomada (após a Rodada 46)
+### Rodada 98 — Postgres/MQTT por padrão, títulos limpos (ADR-053)
+
+- `PERSISTENCE_BACKEND=postgres` e `MESSAGE_BUS_BACKEND=mqtt` em `backend/.env.example`; migrações
+  rodam no startup (lifespan). Dados sobrevivem a reinícios do backend.
+- `tests/conftest.py` força backends em memória: testes independem do `.env` (360 passam).
+- `task_title.clean_title`: remove `[papel]`, markdown e linhas só de separadores (`---`).
+
+## Estado atual e ponto de retomada (após a Rodada 98)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -867,7 +874,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 94 | `b04ff45` | Modal de confirmação profissional (`ConfirmModal`) no lugar do `window.confirm` na troca de idioma |
 | 95 | `d31ab04` | Correção de sprites: animação limitada a uma direção da folha (antes girava) e direção de caminhada pelo trajeto |
 | 96 | `cd39667` | READMEs pt/en: captura `alert.png` e seção de fluxo dos containers com diagramas Mermaid (todos os serviços do compose) |
-| 97 | este commit | Sprite: folha `interagindo_com_objetos` só tem 24 quadros de personagem (o resto é o carrinho de props); pasta `sql/` com as 15 tarefas em pt/en |
+| 97 | `76f091c` | Sprite: folha `interagindo_com_objetos` só tem 24 quadros de personagem (o resto é o carrinho de props); pasta `sql/` com as 15 tarefas em pt/en |
+| 98 | este commit | Postgres + MQTT por padrão (ADR-053), testes isolados do `.env`, títulos de tarefa higienizados (`clean_title`), SCRATCHPAD reescrito |
 
 ### O que funciona
 
@@ -878,15 +886,16 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 
 ### Limitações conhecidas
 
-- `move` aplica a matriz papel × estágio; `assign`/`complete` aplicam permissão por papel (ADR-035) e a entidade valida o estágio. Frontend feito pelo assistente (ADR-047).
+- Mermaid dos READMEs não foi validado por renderização (mermaid-cli indisponível no ambiente).
+- Qualidade das respostas depende do modelo Ollama local; saídas ruins são higienizadas só nos títulos.
+- Sprites verificados por testes unitários e inspeção no navegador; novos sheets exigem conferir quadros.
+- Ollama é externo (não vai no compose).
 
 ### Backlog
 
-1. (feito na Rodada 35) ferramenta `research`.
-2. (feito na Rodada 32) permissões em `assign`/`complete`.
-3. (feito na Rodada 37) teste de integração do gateway Kafka.
-5. Itens do plano de migração ainda abertos: ver Rodada 47+ (checklists das Fases 6–8).
-4. Frontend (feito pelo autor).
+1. Validar o Mermaid por renderização quando houver ambiente com Chromium.
+2. Mais guardas de saída de LLM (descrições, atas) além dos títulos.
+3. Testes de integração com Postgres real no CI.
 
 ### Regras a lembrar
 

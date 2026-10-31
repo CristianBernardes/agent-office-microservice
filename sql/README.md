@@ -16,5 +16,5 @@ docker exec -i agent-office-microservice-postgres psql -U "$POSTGRES_USER" -d "$
 docker exec -i agent-office-microservice-postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" < sql/tasks.en.sql
 ```
 
-> Com `PERSISTENCE_BACKEND=memory` (padrão) o backend não lê o Postgres; use `python3 scripts/seed_team.py`.
-> With `PERSISTENCE_BACKEND=memory` (default) the backend does not read Postgres; use `python3 scripts/seed_team.py`.
+> Com `PERSISTENCE_BACKEND=memory` o backend não lê o Postgres (use `postgres`, padrão do `.env.example`); use `python3 scripts/seed_team.py`.
+> With `PERSISTENCE_BACKEND=memory` the backend does not read Postgres (use `postgres`, the `.env.example` default); use `python3 scripts/seed_team.py`.
