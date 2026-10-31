@@ -7,7 +7,7 @@
 
 ▶️ **Watch the demo video:**
 
-[![Watch the video](https://img.youtube.com/vi/sAiGLPTWMv4/maxresdefault.jpg)](https://youtu.be/sAiGLPTWMv4)
+[![Watch the video](images/Agent_Office_2.png)](https://youtu.be/sAiGLPTWMv4)
 
 
 > An IT office simulated by AI agents — each with its own role, personality and language model,
