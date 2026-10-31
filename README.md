@@ -3,6 +3,7 @@
 **🌐 Idioma:** Português (BR) · [🇺🇸 English](./README.en.md)
 
 [![CI](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml/badge.svg)](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml)
+[![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-green.svg)](./LICENSE) [![Doar](https://img.shields.io/badge/apoie-Pix%20%7C%20PayPal-ff69b4.svg)](#-antes-de-clonar-ou-fazer-fork--ajude-a-manter-este-projeto-vivo)
 
 > Um escritório de TI simulado por agentes de IA — cada um com um papel, personalidade e modelo de
 > linguagem próprios, colaborando em tempo real via MQTT para pesquisar, debater, decidir e
