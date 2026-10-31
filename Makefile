@@ -7,6 +7,8 @@
 # ─────────────────────────────────────────────────────────────────────────
 
 BACKEND_DIR := backend
+GATEWAY_DIR := gateway
+FRONTEND_DIR := frontend
 COMPOSE     := docker compose
 POETRY      := poetry
 
@@ -15,7 +17,7 @@ POETRY      := poetry
 .PHONY: help install run up down restart logs ps \
         test test-unit test-integration coverage \
         migrate migrate-rollback migrate-status migrate-fresh make-migration \
-        lint format type-check check \
+        lint format format-go format-frontend format-all type-check check \
         clean check-poetry
 
 ## help: Lista todos os comandos disponíveis deste Makefile.
@@ -35,6 +37,9 @@ help:
 	@echo ""
 	@echo "  Qualidade de código:"
 	@echo "    make format           - formata o código com ruff format"
+	@echo "    make format-go        - formata o gateway Go (gofmt)"
+	@echo "    make format-frontend  - formata o frontend (prettier)"
+	@echo "    make format-all       - formata backend, gateway e frontend"
 	@echo "    make lint             - executa ruff check (lint)"
 	@echo "    make type-check       - executa mypy em modo estrito"
 	@echo "    make check            - roda format + lint + type-check + test"
@@ -104,6 +109,17 @@ type-check: check-poetry
 
 ## check: Roda a sequência completa de validação — formatação, lint, tipos e testes.
 check: format lint type-check test
+
+## format-go: Formata o código do gateway Go com gofmt.
+format-go:
+	cd $(GATEWAY_DIR) && gofmt -w .
+
+## format-frontend: Formata o código do frontend (prettier).
+format-frontend:
+	cd $(FRONTEND_DIR) && npx --yes prettier --write "src/**/*.{ts,svelte,css}"
+
+## format-all: Formata backend, gateway e frontend.
+format-all: format format-go format-frontend
 
 # ─── Testes ─────────────────────────────────────────────────────────────────
 

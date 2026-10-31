@@ -684,6 +684,10 @@ O planejador pede ao LLM `Título | Entregável` por subtarefa (`parse_subtasks`
 
 O ciclo de trabalho falhava com `SessionNotFoundError`: a sessão fixa do chão do escritório nunca era criada. `WorkLoopUseCase` agora recebe `IChatRepository` e a cria na primeira fala. Time contratado usando os modelos por cargo do `.env` (`AGENT_*_MODEL`).
 
+## Rodada 78
+
+Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -750,6 +754,7 @@ O ciclo de trabalho falhava com `SessionNotFoundError`: a sessão fixa do chão 
 | 75 | este commit | Modal de doação com a história do projeto (pt/en) |
 | 76 | este commit | Planejamento gera subtarefas distintas (título + entregável) via LLM; título do `.md` de planejamento no idioma do escritório |
 | 77 | este commit | Corrige sessão do chão do escritório inexistente (ciclo falhava em toda fala); recriação do time/tarefas |
+| 78 | este commit | Makefile: format-go, format-frontend e format-all |
 
 ### O que funciona
 
