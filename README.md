@@ -1,5 +1,7 @@
 # AgentOffice Microservice
 
+**🌐 Idioma:** Português (BR) · [🇺🇸 English](./README.en.md)
+
 > Um escritório de TI simulado por agentes de IA — cada um com um papel, personalidade e modelo de
 > linguagem próprios, colaborando em tempo real via MQTT para pesquisar, debater, decidir e
 > documentar, exatamente como um time humano de produto/tecnologia faria.
@@ -12,6 +14,48 @@ versionáveis, não apenas em logs efêmeros.
 Projeto **open source**, construído do zero seguindo **Clean Architecture**, princípios **SOLID**,
 **Clean Code**, **DRY**, **YAGNI**, injeção de dependência, testes automatizados e documentação
 arquitetural rigorosa (ADRs, RFCs, Design Docs).
+
+---
+
+## 💙 Antes de clonar ou fazer fork — ajude a manter este projeto vivo
+
+Este repositório é **open source e gratuito**, mas é mantido no tempo livre do autor. **Qualquer
+valor de doação é bem-vindo** e ajuda diretamente a cobrir os **custos de saúde e o plano de saúde
+da minha família**, além de manter tempo e energia disponíveis para continuar desenvolvendo o
+AgentOffice.
+
+Se este projeto te ajudou, te inspirou, ou você simplesmente quer ver essa ideia crescer bem no
+GitHub — considere doar antes de seguir para o clone/fork abaixo:
+
+<table>
+<tr>
+<td align="center" width="260">
+
+**🇧🇷 Pix (Brasil)**
+
+<img src="images/pix-qr-code.jpeg" alt="QR Code Pix para doação" width="220" />
+
+Escaneie o QR Code com o app do seu banco
+
+</td>
+<td align="center" width="260">
+
+**🌍 PayPal (Internacional)**
+
+Para quem está fora do Brasil, doações via PayPal são muito bem-vindas:
+
+[![Doar via PayPal](https://img.shields.io/badge/PayPal-Doar-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?business=cristian.aob%40gmail.com&item_name=Support+the+AgentOffice+project&currency_code=USD)
+
+📧 Conta: **cristian.aob@gmail.com**
+
+</td>
+</tr>
+</table>
+
+Toda doação, de qualquer valor, ajuda a manter a saúde da minha família e a ideia deste projeto
+viva — obrigado! 🙏
+
+---
 
 ## O Time
 
@@ -225,3 +269,11 @@ Este projeto é open source e aceita contribuições. Antes de abrir um PR, leia
 [`docs/SCRATCHPAD.md`](docs/SCRATCHPAD.md) — ele define os padrões de qualidade obrigatórios
 (SOLID, Clean Code, testes, ADRs) que toda contribuição deve seguir, além do histórico detalhado de
 decisões e do estado atual de implementação de cada fase do projeto.
+
+---
+
+## 💙 Gostou do projeto?
+
+Qualquer valor de doação é bem-vindo e ajuda a cobrir os custos de saúde da minha família e a
+manter este projeto open source vivo e crescendo. Veja as formas de doar (Pix e PayPal) no topo
+deste README, ou na [versão em inglês](./README.en.md).
