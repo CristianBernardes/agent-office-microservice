@@ -694,6 +694,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Backend: enum, política de transições, migration, `_test` no ciclo de trabalho; testes unitários/e2e atualizados.
 - Frontend: coluna "Em teste"/"Testing", limite `VITE_WIP_LIMIT_TESTING`, progresso e métricas.
 
+## Rodada 80 — Coluna Concluído
+
+- A grade do Kanban tinha 5 colunas; com `testing` a sexta (Concluído) quebrava de linha. Ajustada para 6.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -761,7 +765,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 76 | este commit | Planejamento gera subtarefas distintas (título + entregável) via LLM; título do `.md` de planejamento no idioma do escritório |
 | 77 | este commit | Corrige sessão do chão do escritório inexistente (ciclo falhava em toda fala); recriação do time/tarefas |
 | 78 | fe9850a | Makefile: format-go, format-frontend e format-all |
-| 79 | este commit | Etapa de teste (QA) antes da revisão — ADR-050 |
+| 79 | 4250ad1 | Etapa de teste (QA) antes da revisão — ADR-050 |
+| 80 | este commit | Kanban: grade com 6 colunas (Concluído visível) |
 
 ### O que funciona
 
