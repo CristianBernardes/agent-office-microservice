@@ -21,7 +21,7 @@ jobs:
       - run: poetry run ruff format --check src tests
       - run: poetry run ruff check src tests
       - run: poetry run mypy src/
-      - run: poetry run pytest -m unit -q
+      - run: poetry run pytest -m unit -q --cov=src
 
   gateway:
     runs-on: ubuntu-latest
@@ -35,3 +35,29 @@ jobs:
           go-version-file: gateway/go.mod
       - run: go vet ./...
       - run: go test ./...
+
+  integration:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install poetry
+      - run: docker compose up -d postgres mosquitto redis kafka kafka-init gateway
+      - run: sleep 45
+      - run: poetry install
+        working-directory: backend
+      - run: poetry run python -m src.infrastructure.persistence.migrator migrate
+        working-directory: backend
+      - run: poetry run pytest -m integration -q
+        working-directory: backend
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t agent-office-backend backend
+      - run: docker build -t agent-office-gateway gateway

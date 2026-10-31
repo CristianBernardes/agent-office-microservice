@@ -1,42 +1,31 @@
 ---
-id: 95066222-22bd-4a0b-9e09-83747f8fb476
+id: a69e5842-e624-4229-8191-65096da6484e
 title: Kafka
 type: analysis
 status: draft
-author_id: 1acec441-53bf-4774-a4ce-bde7eaf8c92b
-created_at: 2026-10-31T12:12:39.856548+00:00
-updated_at: 2026-10-31T12:12:39.856550+00:00
+author_id: 6d4bc128-b5a6-4b7d-bce9-74530d144df3
+created_at: 2026-10-31T12:16:51.796390+00:00
+updated_at: 2026-10-31T12:16:51.796394+00:00
 ---
 
-# Apache Kafka
+# Apache Kafka Overview
 
-## Summary
+**Summary**
+Apache Kafka is an open‑source distributed event streaming platform designed for high‑throughput, real‑time ingestion and processing of streaming data. It combines three core capabilities:
+1. **Publish‑Subscribe Messaging** – enables producers to write streams of events and consumers to read them, supporting both queuing (work distribution) and publish‑subscribe (multi‑subscriber) patterns through a partitioned log model.
+2. **Durable Storage** – events are persisted on disk in an immutable, replicated log, allowing data to be retained for arbitrary periods or until a user‑defined retention limit is reached.
+3. **Stream Processing** – provides the ability to process streams in real time or retrospectively using joins, aggregations, filters, and transformations with exactly‑once semantics.
 
-Apache Kafka is an open‑source distributed event streaming platform that provides real‑time ingestion, durable storage, and stream processing of high‑volume data streams. It combines queuing and publish‑subscribe models via a partitioned log, offering scalability, fault‑tolerance, and exactly‑once processing. Kafka is used across many sectors (manufacturing, finance, insurance, telecom, transportation, energy) and is adopted by more than 80 % of Fortune 100 companies. Its ecosystem includes connectors for numerous data sources and sinks, and APIs for producers, consumers, connectors, and stream processing.
+Kafka’s architecture consists of servers (brokers) that manage the log and clients that produce or consume data over a high‑performance TCP protocol. It runs on bare‑metal, virtual machines, or containers across on‑premise or cloud environments. More than 80% of Fortune 100 companies use Kafka for data pipelines, analytics, integration, and mission‑critical applications.
 
-## Key Capabilities
+**Key Features**
+- **Scalable & Fault‑Tolerant** – horizontal scaling via partitions; replication ensures durability.
+- **Unified APIs** – four primary APIs (Producer, Consumer, Connector, Streams) support diverse use cases.
+- **Connectivity** – out‑of‑the‑box connectors for databases (e.g., PostgreSQL), messaging systems (JMS), search engines (Elasticsearch), cloud storage (AWS S3), and more.
+- **Exactly‑Once Processing** – supports event‑time processing and precise state management.
 
-1. **Publish/Subscribe & Queuing** – Enables multiple consumers to read from the same stream while allowing work distribution across worker instances.
-2. **Durable Log** – Records are persisted to disk and replicated; retention can be time‑ or size‑based.
-3. **Stream Processing** – Supports real‑time and retrospective processing with joins, aggregations, filters, and exactly‑once semantics.
-4. **Connectors** – Out‑of‑the‑box integration with databases, message brokers, object stores, search engines, and more.
-
-## Architecture Overview
-
-- **Topics** are split into partitions, each stored as an immutable log on Kafka brokers.
-- **Producers** write records to topic partitions; **consumers** read from partitions using offset tracking.
-- **Replication** across multiple brokers provides fault tolerance.
-- **APIs** – Producer, Consumer, Connector, Streams, and Admin APIs.
-
-## Adoption & Trust
-
-- More than 80 % of Fortune 100 companies use Kafka.
-- High ratings in industry verticals: Manufacturing (10/10), Insurance (10/10), Telecom (8/10), Transportation (8/10), Energy and Utilities (10/10), Banks (7/10).
-- Simple to deploy on bare‑metal, VMs, or containers in on‑premise or cloud environments.
-
-## Conclusion
-
-Apache Kafka’s unified approach to streaming data—combining high‑throughput ingestion, durable storage, and flexible processing—makes it a cornerstone for modern data pipelines and mission‑critical applications. Its robust ecosystem, wide industry adoption, and proven reliability position Kafka as a leading solution for real‑time event streaming.
+**Conclusion**
+Kafka’s combination of high‑performance messaging, durable log storage, and powerful stream processing makes it a versatile, trusted solution for modern data architectures. Its proven adoption across diverse industries (manufacturing, finance, insurance, telecom, transportation, energy) underscores its reliability and ease of use for building robust, real‑time data pipelines.
 
 ## Sources
 - [Introduction | Apache Kafka](https://kafka.apache.org/intro)

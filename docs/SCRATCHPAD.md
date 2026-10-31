@@ -575,6 +575,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 46 — Revisão de limitações e backlog
 - Limitações e backlog do SCRATCHPAD atualizados com o estado real.
 
+## Rodada 47 — CI completo (ADR-041)
+- `fail_under = 85` na cobertura (atual 96,6%); job `integration` no push para `main`; job `docker` verifica o build das imagens.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -625,7 +628,7 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 1. (feito na Rodada 35) ferramenta `research`.
 2. (feito na Rodada 32) permissões em `assign`/`complete`.
 3. (feito na Rodada 37) teste de integração do gateway Kafka.
-5. Backlog técnico esgotado: novos itens vêm de pedidos do Cristian ou de bugs encontrados.
+5. Itens do plano de migração ainda abertos: ver Rodada 47+ (checklists das Fases 6–8).
 4. Frontend (feito pelo autor).
 
 ### Regras a lembrar
