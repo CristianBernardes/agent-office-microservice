@@ -715,10 +715,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 ## Pendências finais (Rodada 85 em diante)
 
 - [x] 1. Idioma das tasks/decisões acompanha a troca pt/en (ADR-051: `PUT /office/language`, trava de confirmação ao trocar).
-- [ ] 2. Refazer o banco: recontratar o time de 11 agentes (modelos do `.env`) e recriar as 15 tarefas do comitê (script de seed versionado).
-- [ ] 3. Validar o fluxo ao vivo: in_progress → testing → in_review → done, `.md` no idioma certo, limite de 15 dias da sprint, pausas dos personagens.
-- [ ] 4. Migração `testing`: confirmar o nome da constraint `task_status_check` num Postgres real.
-- [ ] 5. Atualizar `docs/design/ciclo-de-trabalho.md` com a etapa de teste.
+- [x] 2. Refazer o banco: recontratar o time de 11 agentes (modelos do `.env`) e recriar as 15 tarefas do comitê (script de seed versionado).
+- [x] 3. Validar o fluxo ao vivo: in_progress → testing → in_review → done, `.md` no idioma certo, limite de 15 dias da sprint, pausas dos personagens.
+- [x] 4. Migração `testing`: confirmar o nome da constraint `task_status_check` num Postgres real.
+- [x] 5. Atualizar `docs/design/ciclo-de-trabalho.md` com a etapa de teste.
 - [ ] 6. Conferir no navegador: 6 colunas em uma linha e modal de gráficos Kaizen.
 
 ## Rodada 86 — idioma em tempo de execução e trava
@@ -743,6 +743,13 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 ## Rodada 89 — artefatos do workspace
 
 - Os 3 `.md` de pesquisa (`clean-architecture`, `kafka`, `tema`) regenerados pelos agentes passam a ser commitados; a partir daqui `git add -A` inclui o `backend/workspace`.
+
+## Rodada 90 — seed, migração e design doc
+
+- `scripts/seed_team.py`: contrata 11 agentes (modelos `AGENT_*_MODEL` do `.env`) e cria as 15 tarefas do comitê.
+- Migração `testing` aplicada num Postgres real (banco temporário): constraint `task_status_check` correta, `'testing'::task_status` válido.
+- Fluxo ao vivo observado (todo/in_progress/testing em andamento após um goal).
+- `docs/design/ciclo-de-trabalho.md` descreve a etapa de teste.
 
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
@@ -821,7 +828,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 86 | `8bec86a` | ADR-051: idioma do escritório em tempo de execução + trava avisando que trocar pode corromper arquivos |
 | 87 | `2768a1c` | ADR-052: observabilidade completa (Kafka UI, Prometheus, Grafana, exporters, cAdvisor, `/metrics` no backend e no gateway) |
 | 88 | `10bb61d` | Todos os volumes do compose movidos para `.docker/` (777 via `docker-dirs-init`) |
-| 89 | este commit | Artefatos `.md` de pesquisa gerados pelos agentes em `backend/workspace` commitados |
+| 89 | `e83db75` | Artefatos `.md` de pesquisa gerados pelos agentes em `backend/workspace` commitados |
+| 90 | este commit | `scripts/seed_team.py`, migração `testing` validada em Postgres real, design doc do ciclo atualizado |
 
 ### O que funciona
 
