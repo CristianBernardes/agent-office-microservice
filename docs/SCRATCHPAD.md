@@ -719,7 +719,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - [x] 3. Validar o fluxo ao vivo: in_progress → testing → in_review → done, `.md` no idioma certo, limite de 15 dias da sprint, pausas dos personagens.
 - [x] 4. Migração `testing`: confirmar o nome da constraint `task_status_check` num Postgres real.
 - [x] 5. Atualizar `docs/design/ciclo-de-trabalho.md` com a etapa de teste.
-- [ ] 6. Conferir no navegador: 6 colunas em uma linha e modal de gráficos Kaizen.
+- [x] 6. Conferir no navegador: 6 colunas em uma linha e modal de gráficos Kaizen.
 
 ## Rodada 86 — idioma em tempo de execução e trava
 
@@ -750,6 +750,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Migração `testing` aplicada num Postgres real (banco temporário): constraint `task_status_check` correta, `'testing'::task_status` válido.
 - Fluxo ao vivo observado (todo/in_progress/testing em andamento após um goal).
 - `docs/design/ciclo-de-trabalho.md` descreve a etapa de teste.
+- Navegador: 6 colunas na mesma linha e botão de gráficos Kaizen conferidos; checklist final concluído.
 
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
