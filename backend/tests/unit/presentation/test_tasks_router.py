@@ -15,6 +15,7 @@ pytestmark = pytest.mark.unit
 
 client = TestClient(app)
 ACTOR = {"actor_id": str(uuid4()), "actor_role": "product_owner"}
+DEV = {"actor_id": str(uuid4()), "actor_role": "dev_senior"}
 
 
 @pytest.fixture(autouse=True)
@@ -52,14 +53,14 @@ class TestTasksRoutes:
         agent_id, task_id = _hire(), _create()
         assigned = client.post(f"/tasks/{task_id}/assign", json={"agent_id": agent_id, **ACTOR})
         assert assigned.json()["status"] == "in_progress"
-        done = client.post(f"/tasks/{task_id}/complete", json={"result": "ok", **ACTOR})
+        done = client.post(f"/tasks/{task_id}/complete", json={"result": "ok", **DEV})
         assert done.json()["status"] == "done"
         assert done.json()["result"] == "ok"
 
     def test_unknown_task_is_404_in_both_languages(self) -> None:
         url = f"/tasks/{uuid4()}/complete"
-        pt = client.post(url, json={"result": "x", **ACTOR}, headers={"Accept-Language": "pt-BR"})
-        en = client.post(url, json={"result": "x", **ACTOR}, headers={"Accept-Language": "en"})
+        pt = client.post(url, json={"result": "x", **DEV}, headers={"Accept-Language": "pt-BR"})
+        en = client.post(url, json={"result": "x", **DEV}, headers={"Accept-Language": "en"})
         assert pt.status_code == en.status_code == 404
         assert "não foi encontrada" in pt.json()["detail"]
         assert "was not found" in en.json()["detail"]
@@ -74,17 +75,21 @@ class TestTasksRoutes:
         task_id = _create()
         pt = client.post(
             f"/tasks/{task_id}/complete",
-            json={"result": "x", **ACTOR},
+            json={"result": "x", **DEV},
             headers={"Accept-Language": "pt"},
         )
         en = client.post(
             f"/tasks/{task_id}/complete",
-            json={"result": "x", **ACTOR},
+            json={"result": "x", **DEV},
             headers={"Accept-Language": "en"},
         )
         assert pt.status_code == en.status_code == 409
         assert "apenas tarefas" in pt.json()["detail"]
         assert "only 'in_progress'" in en.json()["detail"]
+
+    def test_dev_assign_is_403(self) -> None:
+        response = client.post(f"/tasks/{_create()}/assign", json={"agent_id": _hire(), **DEV})
+        assert response.status_code == 403
 
     def test_busy_agent_is_409(self) -> None:
         agent_id = _hire()

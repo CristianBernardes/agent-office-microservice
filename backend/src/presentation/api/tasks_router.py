@@ -93,7 +93,12 @@ async def assign_task(
             AgentId(value=body.actor_id),
             body.actor_role,
         )
-    except (TaskNotFoundError, AgentNotFoundError, InvalidStateTransitionError) as error:
+    except (
+        TaskNotFoundError,
+        AgentNotFoundError,
+        InvalidStateTransitionError,
+        PermissionDeniedError,
+    ) as error:
         raise _http_error(error, language) from error
     return TaskResponse.from_entity(task)
 
@@ -110,7 +115,7 @@ async def complete_task(
         task = await use_case.execute(
             TaskId(value=task_id), body.result, AgentId(value=body.actor_id), body.actor_role
         )
-    except (TaskNotFoundError, InvalidStateTransitionError) as error:
+    except (TaskNotFoundError, InvalidStateTransitionError, PermissionDeniedError) as error:
         raise _http_error(error, language) from error
     return TaskResponse.from_entity(task)
 

@@ -105,6 +105,25 @@ class TestAssign:
         assert stored.status == TaskStatus.BACKLOG
 
 
+class TestRolePermissions:
+    async def test_dev_cannot_assign(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        agent = await _agent(agents)
+        with pytest.raises(PermissionDeniedError) as error:
+            await AssignTaskUseCase(tasks, agents, bus).execute(
+                await _create(tasks, bus), agent.agent_id, PO, Role.DEV_JUNIOR
+            )
+        assert "não pode atribuir" in error.value.localized(Language.PT)
+
+    async def test_product_owner_cannot_complete(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        with pytest.raises(PermissionDeniedError) as error:
+            await CompleteTaskUseCase(tasks, agents, bus).execute(
+                await _create(tasks, bus), "x", PO, Role.PRODUCT_OWNER
+            )
+        assert "not allowed to complete" in error.value.localized(Language.EN)
+
+
 class TestComplete:
     async def test_completes_and_frees_agent(self, world) -> None:  # type: ignore[no-untyped-def]
         tasks, agents, bus = world
@@ -122,7 +141,7 @@ class TestComplete:
         tasks, agents, bus = world
         with pytest.raises(InvalidStateTransitionError) as error:
             await CompleteTaskUseCase(tasks, agents, bus).execute(
-                await _create(tasks, bus), "x", PO, Role.PRODUCT_OWNER
+                await _create(tasks, bus), "x", PO, Role.DEV_SENIOR
             )
         assert "apenas tarefas" in error.value.localized(Language.PT)
 
@@ -130,7 +149,7 @@ class TestComplete:
         tasks, agents, bus = world
         with pytest.raises(TaskNotFoundError):
             await CompleteTaskUseCase(tasks, agents, bus).execute(
-                TaskId.generate(), "x", PO, Role.PRODUCT_OWNER
+                TaskId.generate(), "x", PO, Role.DEV_SENIOR
             )
 
 

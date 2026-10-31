@@ -16,7 +16,7 @@ from src.domain.exceptions.domain_exceptions import (
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
-from src.domain.policies.task_workflow import can_move, is_valid_move
+from src.domain.policies.task_workflow import can_assign, can_complete, can_move, is_valid_move
 from src.domain.value_objects.identifiers import AgentId, GoalId, TaskId
 
 # Bloco: tópico de notificação de atualização de tarefa, conforme a RFC-001.
@@ -102,6 +102,8 @@ class AssignTaskUseCase:
     async def execute(
         self, task_id: TaskId, assignee_id: AgentId, actor_id: AgentId, actor_role: Role
     ) -> Task:
+        if not can_assign(actor_role):
+            raise PermissionDeniedError("task.assign_forbidden", role=actor_role.value)
         task = await self._task_repository.find_by_id(task_id)
         if task is None:
             raise TaskNotFoundError("task.not_found", task_id=task_id)
@@ -137,6 +139,8 @@ class CompleteTaskUseCase:
     async def execute(
         self, task_id: TaskId, result: str, actor_id: AgentId, actor_role: Role
     ) -> Task:
+        if not can_complete(actor_role):
+            raise PermissionDeniedError("task.complete_forbidden", role=actor_role.value)
         task = await self._task_repository.find_by_id(task_id)
         if task is None:
             raise TaskNotFoundError("task.not_found", task_id=task_id)

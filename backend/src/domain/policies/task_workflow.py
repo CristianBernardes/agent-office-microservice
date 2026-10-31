@@ -33,3 +33,13 @@ def is_valid_move(current: TaskStatus, target: TaskStatus) -> bool:
 def can_move(role: Role, current: TaskStatus, target: TaskStatus) -> bool:
     """Indica se o papel pode executar o movimento."""
     return role in _ALLOWED_MOVES.get((current, target), frozenset())
+
+
+def can_assign(role: Role) -> bool:
+    """Apenas coordenadores distribuem trabalho."""
+    return role in _COORDINATORS
+
+
+def can_complete(role: Role) -> bool:
+    """Quem executa ou revisa pode concluir uma tarefa."""
+    return role in _DEVS | _REVIEWERS

@@ -531,6 +531,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 31 — RFC-004 e Design Doc de autonomia
 - `docs/rfc/004-contrato-da-api-http.md` (todas as rotas) e `docs/design/autonomia-e-reunioes.md`.
 
+## Rodada 32 — Permissões em assign/complete (ADR-035)
+- `can_assign` / `can_complete` na política de domínio; 403 localizado. 282 testes unitários.
+
 ## Estado atual e ponto de retomada (após a Rodada 31)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -569,7 +572,7 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–034, RFCs 00
 ### Backlog
 
 1. Ferramenta `research` para agentes no loop autônomo (hoje só via HTTP).
-2. Matriz papel × estágio em `assign`/`complete`.
+2. (feito na Rodada 32) permissões em `assign`/`complete`.
 3. Teste de integração do gateway Kafka (marcador próprio).
 4. Frontend (feito pelo autor).
 

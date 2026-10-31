@@ -22,6 +22,14 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.PT: "O papel '{role}' não pode mover uma tarefa "
         "de '{from_status}' para '{to_status}'.",
     },
+    "task.assign_forbidden": {
+        Language.EN: "Role '{role}' is not allowed to assign tasks.",
+        Language.PT: "O papel '{role}' não pode atribuir tarefas.",
+    },
+    "task.complete_forbidden": {
+        Language.EN: "Role '{role}' is not allowed to complete tasks.",
+        Language.PT: "O papel '{role}' não pode concluir tarefas.",
+    },
     "task.not_found": {
         Language.EN: "Task with ID '{task_id}' was not found.",
         Language.PT: "Tarefa com ID '{task_id}' não foi encontrada.",
