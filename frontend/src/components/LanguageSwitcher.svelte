@@ -1,17 +1,23 @@
 <script lang="ts">
   import { i18n } from '../lib/i18n.svelte'
   import type { Language } from '../lib/types'
+  import ConfirmModal from './ConfirmModal.svelte'
 
-  let {
-    onchange,
-    confirmChange = (message: string) => window.confirm(message),
-  }: { onchange?: (language: Language) => void; confirmChange?: (message: string) => boolean } = $props()
+  let { onchange }: { onchange?: (language: Language) => void } = $props()
+
+  let pending = $state<Language | null>(null)
 
   const options: Language[] = ['pt', 'en']
 
   // Bloco: trava — trocar o idioma pode corromper arquivos já escritos, então exige confirmação.
   function choose(lang: Language) {
-    if (lang === i18n.language || !confirmChange(i18n.t.languageWarning)) return
+    if (lang !== i18n.language) pending = lang
+  }
+
+  function confirm() {
+    const lang = pending
+    pending = null
+    if (!lang) return
     i18n.set(lang)
     onchange?.(lang)
   }
@@ -29,6 +35,17 @@
     </button>
   {/each}
 </div>
+
+{#if pending}
+  <ConfirmModal
+    title={i18n.t.languageWarningTitle}
+    message={i18n.t.languageWarning}
+    confirmLabel={i18n.t.confirmChange}
+    cancelLabel={i18n.t.cancel}
+    onconfirm={confirm}
+    oncancel={() => (pending = null)}
+  />
+{/if}
 
 <style>
   .switcher { display: inline-flex; gap: 4px; }

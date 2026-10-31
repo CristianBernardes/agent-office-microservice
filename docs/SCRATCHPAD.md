@@ -761,6 +761,11 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - Modal de doação (pt/en) e READMEs (pt/en) dizem abertamente: o autor se endividou com a saúde da filha e precisa de ajuda; a doação é voluntária e o projeto não depende dela.
 
+## Rodada 94 — modal de confirmação
+
+- Novo `ConfirmModal.svelte` (alertdialog acessível, Esc/clique fora cancelam, foco inicial, textos pt/en) substitui o `window.confirm` do `LanguageSwitcher`.
+- Testes do `LanguageSwitcher` atualizados (abre o modal, confirma e cancela). 62 testes e `svelte-check` ok.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -842,7 +847,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 90 | `5237cc0` | `scripts/seed_team.py`, migração `testing` validada em Postgres real, design doc do ciclo atualizado |
 | 91 | `3e75623` | READMEs pt/en detalhados com capturas, Ollama, hardware; seletor de modelos já vem do Ollama |
 | 92 | `f45e3ea` | Auditoria do `git log` x SCRATCHPAD: apêndice com o histórico completo de commits |
-| 93 | este commit | Texto de doação transparente (dívida com saúde da filha, sem apelo emocional) no modal e nos READMEs |
+| 93 | `96488a8` | Texto de doação transparente (dívida com saúde da filha, sem apelo emocional) no modal e nos READMEs |
+| 94 | este commit | Modal de confirmação profissional (`ConfirmModal`) no lugar do `window.confirm` na troca de idioma |
 
 ### O que funciona
 
