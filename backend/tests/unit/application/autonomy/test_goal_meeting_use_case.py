@@ -46,6 +46,14 @@ class _Recorder:
         self.calls.append(data)
 
 
+class _GroupRecorder:
+    def __init__(self, sink: _Recorder) -> None:
+        self._sink = sink
+
+    async def record_group(self, ids: list[AgentId]) -> None:
+        await self._sink.execute(ids)
+
+
 def _agent(role: Role) -> Agent:
     return Agent(
         agent_id=AgentId.generate(),
@@ -99,6 +107,13 @@ class TestGoalMeeting:
         assert artifact.calls[0].path.endswith("/meeting.md")
         assert artifact.calls[0].author_role == Role.PRODUCT_OWNER
         assert "fala-1" in dispatch.contexts[1]
+
+    async def test_meeting_bonds_every_pair_of_speakers(self) -> None:
+        use_case, *_ = await _build([Role.PRODUCT_OWNER, Role.TECH_LEAD, Role.QA_ENGINEER])
+        bonds = _Recorder()
+        use_case._record_interaction = _GroupRecorder(bonds)  # type: ignore[assignment]
+        turns = await use_case.execute(_input())
+        assert bonds.calls == [[t.agent.agent_id for t in turns]]
 
     async def test_context_is_localized(self) -> None:
         use_case, dispatch, *_ = await _build([Role.PRODUCT_OWNER], Language.PT)

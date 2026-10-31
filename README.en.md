@@ -170,10 +170,10 @@ interface, allowing the implementation to be swapped without touching business r
 └───────────────────────────────────────────────┘
 ```
 
-The frontend (Svelte + Phaser.js, pixel-art) and the Go gateway — responsible for serving the
-frontend in real time **and** for routing, with delivery and idempotency guarantees, the MQTT
-messages exchanged by the Python backend — are part of the full product vision and have not been
-implemented in this repository yet. See details in
+The frontend (Svelte + Phaser.js, pixel-art) is part of the full product vision and is not
+implemented in this repository yet. The Go gateway (MQTT → Kafka with dedupe and DLQ, see
+[ADR-024](docs/adr/024-gateway-go-mqtt-kafka.md)) already exists in [`gateway/`](gateway/); serving
+the frontend in real time is still pending. See details in
 [`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md) and the full migration
 plan in [`docs/migration-plan/fase-8-microservicos/`](docs/migration-plan/fase-8-microservicos/README.md)
 (both written in Portuguese).

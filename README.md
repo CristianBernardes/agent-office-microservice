@@ -170,10 +170,10 @@ interface de domínio, permitindo troca de implementação sem alterar regra de 
 └───────────────────────────────────────────────┘
 ```
 
-O frontend (Svelte + Phaser.js, pixel-art) e o gateway Go — responsável por servir o frontend em
-tempo real **e** por rotear, com garantias de entrega e idempotência, as mensagens MQTT trocadas
-pelo backend Python — fazem parte da visão completa do produto e ainda não foram implementados
-neste repositório. Ver detalhes em [`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md)
+O frontend (Svelte + Phaser.js, pixel-art) faz parte da visão completa do produto e ainda não foi
+implementado neste repositório. O gateway Go (MQTT → Kafka com dedupe e DLQ, ver
+[ADR-024](docs/adr/024-gateway-go-mqtt-kafka.md)) já existe em [`gateway/`](gateway/); servir o
+frontend em tempo real ainda é pendente. Ver detalhes em [`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md)
 e no plano de migração em [`docs/migration-plan/fase-8-microservicos/`](docs/migration-plan/fase-8-microservicos/README.md).
 
 ### Artefatos como cidadãos de primeira classe

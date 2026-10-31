@@ -41,3 +41,4 @@
 | [024](./024-gateway-go-mqtt-kafka.md) | Gateway Go: MQTT → Kafka | Aceito |
 | [025](./025-tarefas-vinculadas-a-objetivo-e-revisor.md) | Tarefas vinculadas a objetivo e revisor | Aceito |
 | [026](./026-handler-hire-agent.md) | Handler da ferramenta hire_agent | Aceito |
+| [027](./027-relacionamentos-entre-agentes.md) | Relacionamentos entre agentes | Aceito |

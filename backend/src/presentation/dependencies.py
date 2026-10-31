@@ -22,6 +22,7 @@ from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCa
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
 from src.application.memory.memory_use_cases import RecallMemoryUseCase, RememberUseCase
+from src.application.relationships.relationship_use_cases import RecordInteractionUseCase
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -37,6 +38,7 @@ from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
 from src.domain.interfaces.memory_repository import IMemoryRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
+from src.domain.interfaces.relationship_repository import IRelationshipRepository
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter
 from src.infrastructure.config.settings import Settings, get_settings
@@ -54,6 +56,9 @@ from src.infrastructure.persistence.in_memory_chat_repository import InMemoryCha
 from src.infrastructure.persistence.in_memory_memory_repository import (
     InMemoryMemoryRepository,
 )
+from src.infrastructure.persistence.in_memory_relationship_repository import (
+    InMemoryRelationshipRepository,
+)
 from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
 from src.infrastructure.persistence.postgres_agent_repository import PostgresAgentRepository
 from src.infrastructure.persistence.postgres_artifact_repository import (
@@ -62,6 +67,9 @@ from src.infrastructure.persistence.postgres_artifact_repository import (
 from src.infrastructure.persistence.postgres_chat_repository import PostgresChatRepository
 from src.infrastructure.persistence.postgres_memory_repository import (
     PostgresMemoryRepository,
+)
+from src.infrastructure.persistence.postgres_relationship_repository import (
+    PostgresRelationshipRepository,
 )
 from src.infrastructure.persistence.postgres_task_repository import PostgresTaskRepository
 from src.infrastructure.prompts.file_prompt_provider import FilePromptProvider
@@ -158,6 +166,18 @@ def get_memory_repository() -> IMemoryRepository:
     if _use_postgres():
         return PostgresMemoryRepository(_require_pool())
     return InMemoryMemoryRepository()
+
+
+# Bloco: repositório de relacionamentos (singleton por processo).
+@lru_cache
+def get_relationship_repository() -> IRelationshipRepository:
+    if _use_postgres():
+        return PostgresRelationshipRepository(_require_pool())
+    return InMemoryRelationshipRepository()
+
+
+def get_record_interaction_use_case() -> RecordInteractionUseCase:
+    return RecordInteractionUseCase(get_relationship_repository())
 
 
 # Bloco: barramento de mensagens (singleton por processo).
@@ -343,4 +363,5 @@ def get_goal_meeting_use_case() -> GoalMeetingUseCase:
         write_artifact=get_write_artifact_use_case(),
         language=get_settings().language(),
         create_task=get_create_task_use_case(),
+        record_interaction=get_record_interaction_use_case(),
     )

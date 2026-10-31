@@ -457,6 +457,13 @@ identidade visual sugerida por papel listada acima.
 
 - Documentação: READMEs pt/en com Kafka/Redis nas portas e status do gateway Go.
 
+### Rodada 20 — Relacionamentos entre agentes (ADR-027)
+
+- `Relationship` (par ordenado, score [-1,1], status derivado), `IRelationshipRepository` (memória + Postgres upsert), `RecordInteractionUseCase`/`ListRelationshipsUseCase`.
+- `GoalMeetingUseCase` registra +0.05 para cada par que falou na reunião. 245 testes unitários.
+- Pendente: rota HTTP de leitura, interações negativas (rivalidade), teste contra Postgres real.
+- **Próximo:** meetings + `start_ceremony`, layout, activity_events.
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)

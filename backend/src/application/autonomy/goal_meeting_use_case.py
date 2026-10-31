@@ -15,6 +15,7 @@ from src.application.artifacts.write_artifact_use_case import (
 )
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.memory.memory_use_cases import RememberInput, RememberUseCase
+from src.application.relationships.relationship_use_cases import RecordInteractionUseCase
 from src.application.tasks.task_use_cases import CreateTaskInput, CreateTaskUseCase
 from src.domain.entities.agent import Agent, Role
 from src.domain.entities.artifact import ArtifactType
@@ -80,7 +81,9 @@ class GoalMeetingUseCase:
         write_artifact: WriteArtifactUseCase,
         language: Language,
         create_task: CreateTaskUseCase | None = None,
+        record_interaction: RecordInteractionUseCase | None = None,
     ) -> None:
+        self._record_interaction = record_interaction
         self._create_task = create_task
         self._agents = agent_repository
         self._dispatch = dispatch_goal
@@ -102,6 +105,7 @@ class GoalMeetingUseCase:
         if turns:
             await self._write_minutes(data, turns)
             await self._create_backlog(turns, data.goal_id)
+            await self._bond(turns)
         return turns
 
     async def _participants(self) -> list[Agent]:
@@ -144,6 +148,14 @@ class GoalMeetingUseCase:
             parts.append(f"{self._labels['minutes']}:\n{minutes}")
         parts.append(self._labels["turn"].format(role=agent.role.value))
         return "\n\n".join(parts)
+
+    async def _bond(self, turns: list[MeetingTurn]) -> None:
+        if self._record_interaction is None:
+            return
+        try:
+            await self._record_interaction.record_group([t.agent.agent_id for t in turns])
+        except Exception:
+            logger.exception("Falha ao registrar relacionamentos da reunião")
 
     async def _create_backlog(self, turns: list[MeetingTurn], goal_id: GoalId) -> None:
         owner = next((t.agent for t in turns if t.agent.role == Role.PRODUCT_OWNER), None)
