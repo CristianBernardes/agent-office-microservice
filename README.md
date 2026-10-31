@@ -30,6 +30,9 @@ arquitetural rigorosa (ADRs, RFCs, Design Docs).
 ![Quadro Kanban](images/kambam_board.png)
 *Quadro Kanban de 6 colunas: backlog → todo → in_progress → testing → in_review → done.*
 
+![Alerta de troca de idioma](images/alert.png)
+*Aviso ao trocar o idioma: alterar depois do projeto iniciado pode corromper arquivos já escritos; é preciso confirmar.*
+
 ---
 
 ## 💙 Antes de clonar ou fazer fork — ajude a manter este projeto vivo
@@ -124,6 +127,119 @@ Comando do usuário
 Todo o fluxo é orientado a eventos MQTT com um envelope de mensagem padrão (`event_id`, `timestamp`,
 `agent_id`, `agent_role`, `payload`) — ver
 [RFC-001](docs/rfc/001-protocolo-de-comunicacao-entre-agentes.md).
+
+## Fluxo dos containers
+
+Todos os serviços do `docker-compose.yml` e como se conectam (volumes sempre em `./.docker/`):
+
+```mermaid
+flowchart LR
+    user([Usuário no navegador])
+    ollama[("Ollama<br/>externo, no host<br/>:11434")]
+
+    subgraph app["Aplicação"]
+        frontend["frontend<br/>Svelte + Vite :5173"]
+        backend["backend<br/>FastAPI :7001"]
+        gateway["gateway<br/>Go"]
+    end
+
+    subgraph msg["Mensageria e estado"]
+        mosquitto["mosquitto<br/>MQTT :7083 / WS :7000"]
+        kafka["kafka<br/>office.events / office.events.dlq"]
+        kafkainit["kafka-init<br/>cria os tópicos"]
+        redis["redis<br/>dedupe de eventos"]
+        postgres["postgres + pgvector<br/>:7034"]
+    end
+
+    subgraph obs["Observabilidade"]
+        kafkaui["kafka-ui :7080"]
+        kexp["kafka-exporter"]
+        pexp["postgres-exporter"]
+        rexp["redis-exporter"]
+        cadvisor["cadvisor"]
+        prometheus["prometheus :7090"]
+        grafana["grafana :7030"]
+    end
+
+    init["docker-dirs-init<br/>cria ./.docker/* (volumes)"]
+
+    user -->|HTTP| frontend
+    user -->|HTTP / docs| backend
+    frontend -->|REST| backend
+    frontend <-->|MQTT WebSocket| mosquitto
+    backend -->|publica eventos| mosquitto
+    backend -->|SQL / vetores| postgres
+    backend -->|LLM / embeddings| ollama
+    mosquitto -->|"office/*"| gateway
+    gateway -->|dedupe| redis
+    gateway -->|produz| kafka
+    kafkainit -.->|cria tópicos| kafka
+    kafkaui -->|inspeciona| kafka
+
+    kexp -->|métricas| kafka
+    pexp --> postgres
+    rexp --> redis
+    prometheus -->|scrape| backend
+    prometheus -->|scrape| gateway
+    prometheus -->|scrape| kexp
+    prometheus -->|scrape| pexp
+    prometheus -->|scrape| rexp
+    prometheus -->|scrape| cadvisor
+    grafana -->|consulta| prometheus
+    init -.->|pré-requisito dos volumes| prometheus
+    init -.-> grafana
+    init -.-> kafka
+    init -.-> redis
+    init -.-> mosquitto
+```
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant F as frontend
+    participant B as backend
+    participant O as Ollama
+    participant M as Mosquitto
+    participant G as gateway
+    participant R as Redis
+    participant K as Kafka
+    participant P as Postgres
+    participant PR as Prometheus/Grafana
+
+    U->>F: envia um objetivo
+    F->>B: POST /goals
+    B->>O: chama o modelo do papel (AGENT_*_MODEL)
+    B->>P: grava tarefas e artefatos
+    B->>M: publica office/tasks/updated, office/artifacts/created...
+    M-->>F: WebSocket: atualiza o escritório em tempo real
+    M->>G: topics office/*
+    G->>R: SETNX da chave do evento (idempotência)
+    alt evento novo
+        G->>K: office.events
+    else falha ao produzir
+        G->>K: office.events.dlq
+    end
+    PR->>B: scrape /metrics
+    PR->>G: scrape :9100
+```
+
+| Container | Função |
+|---|---|
+| `docker-dirs-init` | Cria os diretórios de volume em `./.docker/` e ajusta permissões; roda uma vez antes dos demais |
+| `frontend` | Interface Svelte 5 + Vite (escritório, Kanban, contratação) |
+| `backend` | API FastAPI (Clean Architecture): agentes, tarefas, ciclo Scrum; fala com o Ollama |
+| `mosquitto` | Broker MQTT (TCP e WebSocket) para eventos em tempo real |
+| `gateway` | Ponte Go: MQTT → Kafka, com dedupe no Redis e DLQ |
+| `kafka` / `kafka-init` | Log de eventos e criação dos tópicos `office.events` e `office.events.dlq` |
+| `redis` | Dedupe (idempotência) do gateway |
+| `postgres` | Persistência (+ pgvector) |
+| `kafka-ui` | Acompanhar tópicos, mensagens e consumidores |
+| `kafka-exporter`, `postgres-exporter`, `redis-exporter`, `cadvisor` | Exportam métricas de Kafka, Postgres, Redis e dos containers |
+| `prometheus` | Coleta (scrape) de todas as métricas |
+| `grafana` | Dashboards sobre o Prometheus |
+
+O **Ollama** roda fora do Docker, no host (ver [Instalando o Ollama](#instalando-o-ollama)).
 
 ## Arquitetura
 

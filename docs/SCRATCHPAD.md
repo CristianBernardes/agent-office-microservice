@@ -772,6 +772,11 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - `spriteFor` agora devolve `start`/`count` da direção; o CSS anima só esse trecho. Parado = frente; ao andar a direção vem do trajeto (`directionBetween` em `layout.ts`).
 - Testes novos em `sprites.test.ts` e `layout.test.ts` (64 ok).
 
+## Rodada 96 — README: alerta e fluxo dos containers
+
+- `images/alert.png` adicionada às capturas de `README.md` e `README.en.md`.
+- Nova seção "Fluxo dos containers" / "Container flow" com um fluxograma Mermaid de todos os serviços do `docker-compose.yml` (docker-dirs-init, frontend, backend, mosquitto, gateway, kafka, kafka-init, redis, postgres, kafka-ui, exporters, cadvisor, prometheus, grafana, mais o Ollama externo), um diagrama de sequência do caminho de um objetivo e uma tabela de funções.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -855,7 +860,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 92 | `f45e3ea` | Auditoria do `git log` x SCRATCHPAD: apêndice com o histórico completo de commits |
 | 93 | `96488a8` | Texto de doação transparente (dívida com saúde da filha, sem apelo emocional) no modal e nos READMEs |
 | 94 | `b04ff45` | Modal de confirmação profissional (`ConfirmModal`) no lugar do `window.confirm` na troca de idioma |
-| 95 | este commit | Correção de sprites: animação limitada a uma direção da folha (antes girava) e direção de caminhada pelo trajeto |
+| 95 | `d31ab04` | Correção de sprites: animação limitada a uma direção da folha (antes girava) e direção de caminhada pelo trajeto |
+| 96 | este commit | READMEs pt/en: captura `alert.png` e seção de fluxo dos containers com diagramas Mermaid (todos os serviços do compose) |
 
 ### O que funciona
 
