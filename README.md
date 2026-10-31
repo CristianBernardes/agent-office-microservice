@@ -250,6 +250,8 @@ Todas as portas externas (host) deste projeto seguem a convenção de prefixo `7
 | Mosquitto (MQTT TCP) | `7083` |
 | Mosquitto (MQTT WebSocket) | `7000` |
 | PostgreSQL | `7034` |
+| Kafka | `7092` |
+| Redis | `7079` |
 
 ## Desenvolvimento
 

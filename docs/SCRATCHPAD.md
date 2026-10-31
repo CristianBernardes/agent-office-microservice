@@ -455,6 +455,8 @@ identidade visual sugerida por papel listada acima.
 - RH/PO/Tech Lead contratam agentes pela ferramenta (personalidade neutra, modelo padrão do Ollama). `start_ceremony` segue sem handler.
 - 232 testes unitários. **Próximo:** relationships, meetings, layout, testes de integração.
 
+- Documentação: READMEs pt/en com Kafka/Redis nas portas e status do gateway Go.
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)

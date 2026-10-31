@@ -256,6 +256,8 @@ All external (host) ports of this project follow the `70` prefix convention — 
 | Mosquitto (MQTT TCP) | `7083` |
 | Mosquitto (MQTT WebSocket) | `7000` |
 | PostgreSQL | `7034` |
+| Kafka | `7092` |
+| Redis | `7079` |
 
 ## Development
 
