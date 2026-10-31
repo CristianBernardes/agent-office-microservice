@@ -51,8 +51,6 @@ services:
       - ./backend/.env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      MQTT_HOST: mosquitto
-      MQTT_PORT: "1883"
       # Dentro do container, "localhost" aponta para o próprio container, não
       # para o host — por isso o IP da bridge padrão do Docker é usado para
       # alcançar o Ollama rodando no host. O Ollama continua SEMPRE externo a

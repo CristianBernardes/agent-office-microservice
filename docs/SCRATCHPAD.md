@@ -598,6 +598,10 @@ ADR-043. `.env.example` na raiz (Postgres, portas externas, URL do Ollama); `doc
 
 ADR-044. `database_url`, `mqtt_host`, `mqtt_port`, `ollama_base_url` obrigatórios; testes definem via `tests/conftest.py`. 309 unit, mypy e ruff limpos.
 
+## Rodada 54 — MQTT fora do compose
+
+`MQTT_HOST`/`MQTT_PORT` removidos do `docker-compose.yml`; `backend/.env.example` traz `mosquitto:1883` (container). Fora do Docker, use localhost:7083.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -639,7 +643,8 @@ ADR-044. `database_url`, `mqtt_host`, `mqtt_port`, `ollama_base_url` obrigatóri
 | 50 | `a1485c7` | Gateway configurável via .env (ADR-042) |
 | 51 | `3d9339c` | Gateway .env com hosts/portas de container; Tavily URL/timeout em settings |
 | 52 | `53609f1` | ADR-043: compose sem valores fixos (.env raiz, HOST_PORT_*, credenciais Postgres) |
-| 53 | este commit | ADR-044: Settings sem defaults de infraestrutura |
+| 53 | `1737958` | ADR-044: Settings sem defaults de infraestrutura |
+| 54 | este commit | MQTT do backend movido do compose para backend/.env.example (valores de container) |
 
 ### O que funciona
 
