@@ -931,6 +931,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 117 | este commit | Verificação final: backend 363 unit, frontend 64 testes verdes; estado atual atualizado. Pendências só do autor: Stripe/Sponsors, conta Apoia-se (trocar [LINK-APOIA-SE] no artigo), publicar divulgação, validar Mermaid |
 | 118 | este commit | Makefile: alvos lint-go, test-go, build-go, lint-frontend, test-frontend, build-frontend, install-frontend e check-all | `make lint-go`, `make lint-frontend` e `make test-go` | `Makefile`, `docs/SCRATCHPAD.md` |
 | 119 | este commit | Containers recriados, banco refeito (`migrator fresh`) e seed de 11 agentes + 15 tarefas para testar a TAVILY_API_KEY | health 200, 11 agentes, 15 tarefas | `docs/SCRATCHPAD.md` |
+| 120 | este commit | Formatação prettier do frontend (`make format-frontend`) commitada | alterações apenas de formato | `frontend/src/**`, `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 
