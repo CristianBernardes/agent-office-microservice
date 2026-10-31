@@ -836,7 +836,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 88 | `10bb61d` | Todos os volumes do compose movidos para `.docker/` (777 via `docker-dirs-init`) |
 | 89 | `e83db75` | Artefatos `.md` de pesquisa gerados pelos agentes em `backend/workspace` commitados |
 | 90 | `5237cc0` | `scripts/seed_team.py`, migração `testing` validada em Postgres real, design doc do ciclo atualizado |
-| 91 | este commit | READMEs pt/en detalhados com capturas, Ollama, hardware; seletor de modelos já vem do Ollama |
+| 91 | `3e75623` | READMEs pt/en detalhados com capturas, Ollama, hardware; seletor de modelos já vem do Ollama |
+| 92 | este commit | Auditoria do `git log` x SCRATCHPAD: apêndice com o histórico completo de commits |
 
 ### O que funciona
 
@@ -861,3 +862,141 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 
 ADR antes do código; `make format` a cada mudança; SCRATCHPAD em **todo** commit; sem trailer do
 Copilot; commit e push sempre; responder em português; não parar para perguntar.
+
+## Apêndice — histórico completo do git (auditado na Rodada 92)
+
+Auditoria: todos os commits do `git log` listados abaixo, em ordem cronológica (alguns não tinham hash na tabela de rodadas).
+
+| Hash | Data | Mensagem |
+|---|---|---|
+| `a292898` | 2026-10-30 | Commit inicial de planejamento |
+| `723353e` | 2026-10-30 | Adiconado arquivos iniciais do Projeto |
+| `7ed7c37` | 2026-10-30 | Adicionado arquivo .gitignore e mais arquivos a pasta docs |
+| `2ab7d5b` | 2026-10-30 | Adicionado postgres ao arquivo docker-compose.yml |
+| `758995e` | 2026-10-30 | Aletrado senha e banco de dados do postgres no  docker-compose.yml |
+| `cf05919` | 2026-10-30 | Criado pasta ops para arquivos de inicialização do banco de dados |
+| `0fa38f8` | 2026-10-30 | Alteração da pasta de configuração do mqtt |
+| `0c1d599` | 2026-10-30 | Removido comentário do container do  mqtt |
+| `2713878` | 2026-10-30 | Adicionado ADRs, RFCs e Design Docs da Fase 0 (fundação arquitetural) |
+| `855da9d` | 2026-10-30 | Implementado esqueleto Clean Architecture do backend Python (Fase 1) |
+| `cd46b27` | 2026-10-30 | Adicionado Postgres (pgvector) e backend ao docker-compose.yml, portas 70xx |
+| `35993cd` | 2026-10-30 | Preenchido Makefile e README do microserviço, atualizado .gitignore |
+| `ecdaa9d` | 2026-10-30 | Atualizado SCRATCHPAD.md com histórico da rodada Fase 0 + Fase 1 |
+| `d86ba17` | 2026-10-30 | Adicionado verificacao de pre-requisito do Poetry no Makefile |
+| `b99b2b5` | 2026-10-30 | Padronizado OLLAMA_BASE_URL para 172.17.0.1 como valor padrao do projeto |
+| `842c132` | 2026-10-30 | Registrado no SCRATCHPAD.md o ponto de retomada para a proxima sessao |
+| `39077be` | 2026-10-30 | Adicionado ADR-011 sobre Tavily como provedor de busca web |
+| `288966c` | 2026-10-30 | Atualizado RFC-001, RFC-002 e RFC-003 com o escopo implementado na rodada 3 |
+| `c2f9670` | 2026-10-30 | Implementado AgentThinkUseCase e envelope padrao de mensagens (Fase 2) |
+| `5f8515a` | 2026-10-30 | Implementadas as 9 personas com prompts, permissoes e ToolRegistry (Fase 3) |
+| `cc7f427` | 2026-10-30 | Implementados IWebSearchAdapter, TavilySearchAdapter e MockSearchAdapter |
+| `4e70396` | 2026-10-30 | Implementado sistema completo de artefatos: write, review e approve (Fase 4) |
+| `e3cd330` | 2026-10-30 | Conectada injecao de dependencia das Fases 2, 3 e 4 no dependencies.py |
+| `f6f7f10` | 2026-10-30 | Atualizada arquitetura geral: frontend Svelte e gateway Go sem autenticacao |
+| `e8ba9f2` | 2026-10-30 | Atualizado SCRATCHPAD.md com historico da rodada 3 |
+| `c9230cc` | 2026-10-30 | Reescrito README.md para descrever o produto e a arquitetura, nao o progresso |
+| `91db91c` | 2026-10-30 | Adicionada secao de doacoes (Pix/PayPal) e README.en.md em ingles |
+| `5021e31` | 2026-10-30 | Tornado o botao PayPal clicavel usando tag HTML dentro da tabela |
+| `d23b8d7` | 2026-10-30 | Corrigido diagrama: Go e a ponte MQTT-Python, nao um servico paralelo |
+| `1c3b64c` | 2026-10-31 | Fase 5: modelo de LLM por papel via .env (ILlmAdapterResolver) |
+| `99c66f3` | 2026-10-31 | Rodada 5: i18n pt/en (ADR-012) — erros localizados, prompts por idioma, Accept-Language |
+| `8267f46` | 2026-10-31 | Rodada 6: endpoint POST /agents/{id}/think para despachar objetivos (ADR-013) |
+| `78f92d3` | 2026-10-31 | Rodada 7: repositórios PostgreSQL e seleção de persistência por env (ADR-014) |
+| `84d1c94` | 2026-10-31 | Documenta PERSISTENCE_BACKEND no .env.example |
+| `89e4f15` | 2026-10-31 | feat(api): GET /agents e CORS configurável (ADR-015) |
+| `a03127a` | 2026-10-31 | docs(adr): ADR-017 modelo de dados orientado a objetivos e fluxo de trabalho |
+| `929253b` | 2026-10-31 | chore(frontend): esqueleto do frontend com sprites e imagens do escritório |
+| `ecb1a25` | 2026-10-31 | feat(db): migrações estilo Laravel e schema completo do escritório (ADR-018) |
+| `871db6c` | 2026-10-31 | feat(tasks): casos de uso, rotas e tools de tarefas com i18n (ADR-016) |
+| `d35c14e` | 2026-10-31 | feat(tasks): histórico de transições e matriz papel x estágio com rotas move/transitions |
+| `fe1a4c5` | 2026-10-31 | feat(chat): objetivos, sessões e mensagens com rotas, tool send_message e testes (ADR-019) |
+| `6066d20` | 2026-10-31 | feat(memory): memória semântica dos agentes com pgvector (ADR-020) |
+| `25fa799` | 2026-10-31 | feat(messaging): MQTT real no lifespan, curingas e contrato de tópicos (ADR-021) |
+| `a8358d6` | 2026-10-31 | docs(scratchpad): estado atual, commits por rodada, limitações e backlog |
+| `2681383` | 2026-10-31 | feat(autonomy): reunião do time sobre objetivos (ADR-022) |
+| `4869413` | 2026-10-31 | feat(autonomy): PO cria backlog a partir da reunião (ADR-023) |
+| `8b3b97f` | 2026-10-31 | feat(gateway): relay MQTT->Kafka em Go com dedupe Redis e DLQ (ADR-024) |
+| `9a5ee08` | 2026-10-31 | fix(gateway): alinha imagem Go do Dockerfile com go.mod (1.26) |
+| `7515fe1` | 2026-10-31 | feat(tasks): goal_id e reviewer_id nas tarefas (ADR-025) |
+| `6bfe83b` | 2026-10-31 | feat(tools): handler hire_agent (ADR-026) |
+| `c5d02eb` | 2026-10-31 | docs: READMEs pt/en com gateway Go, Kafka e Redis |
+| `43cf3e9` | 2026-10-31 | feat(relationships): vínculo entre agentes atualizado por reuniões (ADR-027) |
+| `dcfd030` | 2026-10-31 | chore(config): modelos Ollama por papel no .env.example |
+| `652a84c` | 2026-10-31 | feat(meetings): dominio de reunioes e ferramenta start_ceremony (ADR-028) |
+| `11ef1c1` | 2026-10-31 | feat: persist goal meetings, add relationship/meeting routes (ADR-029), nemotron3 for data analyst |
+| `11506be` | 2026-10-31 | feat: office layout API and persistence (ADR-030) |
+| `dc26758` | 2026-10-31 | feat: activity feed from bus events (ADR-031) |
+| `e327104` | 2026-10-31 | feat: multi-round debate in goal meetings (ADR-032) |
+| `5ccd9be` | 2026-10-31 | test: integration tests for social/layout/activity postgres repos |
+| `03f655e` | 2026-10-31 | test: integration tests for chat, task and pgvector memory |
+| `701be12` | 2026-10-31 | docs(scratchpad): refresh current state after round 27 |
+| `b75bcf7` | 2026-10-31 | fix(compose): gateway waits for kafka-init topics; validated MQTT->Kafka e2e |
+| `6dd057f` | 2026-10-31 | feat(meetings): rotas POST /meetings e /finish (ADR-033) |
+| `7a65d4d` | 2026-10-31 | feat(research): agentes pesquisam e geram artefato .md (ADR-034) |
+| `c58abf1` | 2026-10-31 | docs: RFC-004 contrato da API e design doc de autonomia |
+| `bf9d3dc` | 2026-10-31 | docs: atualiza estado atual do SCRATCHPAD |
+| `49ecd0e` | 2026-10-31 | feat: permissões por papel em assign e complete (ADR-035) |
+| `0bf42c0` | 2026-10-31 | feat: leitura tolerante da resposta do Ollama (ADR-036) |
+| `07ce6e3` | 2026-10-31 | docs: ADR-036 e SCRATCHPAD da rodada 33 |
+| `10d2688` | 2026-10-31 | docs: seção API HTTP nos READMEs (pt/en) |
+| `9c07a79` | 2026-10-31 | feat(tools): ferramenta research para agentes (ADR-037) |
+| `7f1dd72` | 2026-10-31 | docs: atualiza estado atual do SCRATCHPAD (rodadas 32-35) |
+| `60776a8` | 2026-10-31 | feat(api): POST /relationships/interactions (ADR-038) |
+| `b20afc7` | 2026-10-31 | test(integration): gateway MQTT para Kafka e docs de rota (rodada 37) |
+| `06bdecf` | 2026-10-31 | fix(postgres): goal inserido ja fechado respeita o CHECK de closed_at (rodada 38) |
+| `c2f8042` | 2026-10-31 | fix(llm): mock de embedding com 768 dimensoes (rodada 39) |
+| `49e54c8` | 2026-10-31 | feat: curingas no bus em memória e feed por agente (ADR-039) |
+| `461afc4` | 2026-10-31 | docs: atualiza SCRATCHPAD (feed por agente) |
+| `7f691e5` | 2026-10-31 | test: cobertura do ToolRegistry (review/approve/tarefas) |
+| `af24d88` | 2026-10-31 | fix: set_database_pool limpa todos os caches; testes de factories e falhas da reunião |
+| `16cc8d9` | 2026-10-31 | ci: workflow GitHub Actions (ADR-040) |
+| `b8c1cd4` | 2026-10-31 | docs: badge de CI nos READMEs |
+| `7f964ec` | 2026-10-31 | test: cobre prompt sem mapeamento e close do Tavily |
+| `c1c8a5e` | 2026-10-31 | docs: revisa limitações e backlog no SCRATCHPAD |
+| `85246fb` | 2026-10-31 | ci: cobertura minima 85%, integracao em main e build Docker (ADR-041) |
+| `583fd26` | 2026-10-31 | docs: inicio rapido com todos os modelos e migrate |
+| `4927af8` | 2026-10-31 | test: e2e do fluxo PO -> Dev -> QA pela API |
+| `ee3b230` | 2026-10-31 | docs: tabela de commits do SCRATCHPAD (rodadas 44-49) |
+| `a1485c7` | 2026-10-31 | feat(gateway): configuracao somente via .env, sem valores fixos (ADR-042) |
+| `3d9339c` | 2026-10-31 | fix(gateway): .env com hosts/portas de container; tavily configuravel |
+| `53609f1` | 2026-10-31 | Compose sem valores fixos: .env raiz e interpolação (ADR-043) |
+| `1737958` | 2026-10-31 | Settings sem defaults de infraestrutura (ADR-044) |
+| `c85e6ba` | 2026-10-31 | MQTT do backend via .env.example |
+| `dd3d2cc` | 2026-10-31 | README: Quick Start com os três .env.example |
+| `4f637a6` | 2026-10-31 | Idempotência de activity_events por event_id (ADR-045) |
+| `bce6183` | 2026-10-31 | ADR-046: consumidor Kafka→MQTT fora do escopo |
+| `bfd7674` | 2026-10-31 | feat(frontend): frontend Svelte 5 com mapa, kanban, chat, logs, doação e i18n (ADR-047) |
+| `5b9d28f` | 2026-10-31 | feat(frontend): Dockerfile, serviço no compose, job de CI e README |
+| `72b57c2` | 2026-10-31 | feat(frontend): formulário de contratação de agentes e modelo padrão via env |
+| `00c3848` | 2026-10-31 | feat(frontend): botão para contratar o time padrão |
+| `3481ea7` | 2026-10-31 | feat: escolha do modelo de IA ao contratar (GET /models) |
+| `55fd2b7` | 2026-10-31 | feat: agentes respondem no idioma do objetivo; /models sem embeddings |
+| `af89e77` | 2026-10-31 | feat: ciclo de trabalho autônomo e escritório vivo (caminhadas, sprites distintos, cargo) |
+| `a536e8f` | 2026-10-31 | feat: responsável obrigatório fora do backlog e diretiva de idioma nos prompts |
+| `7a7c044` | 2026-10-31 | feat(frontend): usa todas as folhas de sprites com poses alternativas |
+| `71a8e84` | 2026-10-31 | feat: cargos traduzidos nos cabeçalhos da ata |
+| `01b6b55` | 2026-10-31 | fix(frontend): anima só os quadros do personagem em interagindo_com_objetos |
+| `9b50022` | 2026-10-31 | docs: rodada 69 reset do ambiente e time inicial |
+| `7c989bb` | 2026-10-31 | feat: métricas Kanban, WIP, cargo no cartão, PayPal visível |
+| `e165023` | 2026-10-31 | feat: cerimônia de sprint planning e divisão de tarefas (ADR-049) |
+| `7109164` | 2026-10-31 | chore: atualiza artefatos de pesquisa do workspace |
+| `e7a1d43` | 2026-10-31 | refactor: extrai task_splitter, DRY no ciclo; RFC-005 e design doc |
+| `3a8882d` | 2026-10-31 | fix(frontend): remove texto de debug solto na página |
+| `f66141a` | 2026-10-31 | fix: timeout do Ollama configurável via .env |
+| `fe3fce8` | 2026-10-31 | feat: história do projeto no modal de doação (pt/en) |
+| `84671cb` | 2026-10-31 | feat: planejamento gera subtarefas distintas e .md no idioma do escritório |
+| `5fb7e7b` | 2026-10-31 | fix: cria a sessão do chão do escritório antes da primeira fala do ciclo |
+| `fe9850a` | 2026-10-31 | build: format-go, format-frontend e format-all no Makefile |
+| `4250ad1` | 2026-10-31 | feat: etapa de teste (QA) antes da revisão (ADR-050) |
+| `3615f39` | 2026-10-31 | fix(frontend): grade do Kanban com 6 colunas |
+| `fa5efa5` | 2026-10-31 | feat: sprint com no máximo 15 dias fictícios (SPRINT_MAX_DAYS) |
+| `1f0b956` | 2026-10-31 | fix(frontend): Kanban compacto, 6 colunas em uma linha |
+| `8d87e88` | 2026-10-31 | feat: workspace fixo 777, personagens com pausas e modal de graficos Kaizen |
+| `1781cfb` | 2026-10-31 | docs: pendencias finais no SCRATCHPAD |
+| `8bec86a` | 2026-10-31 | feat: idioma do escritorio em tempo de execucao (ADR-051) e trava ao trocar idioma |
+| `2768a1c` | 2026-10-31 | feat: observabilidade completa com Kafka UI, Prometheus e Grafana (ADR-052) |
+| `10bb61d` | 2026-10-31 | chore: todos os volumes do compose ficam em .docker/ |
+| `e83db75` | 2026-10-31 | chore: commita artefatos de pesquisa do workspace |
+| `5237cc0` | 2026-10-31 | Rodada 90: seed do time, migração testing validada, design doc do ciclo |
+| `09cf9f6` | 2026-10-31 | Rodada 90: checklist final concluído (conferência no navegador) |
+| `3e75623` | 2026-10-31 | Rodada 91: READMEs detalhados com capturas, Ollama e hardware |
