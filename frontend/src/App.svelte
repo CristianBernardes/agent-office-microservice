@@ -100,7 +100,6 @@
   </div>
   <div class="grid">
     <TeamBoard agents={store.agents} tasks={store.tasks} selectedId={store.selectedAgentId} onselect={(id) => store.select(id)} />
-    wanderIntervalMs={config.wanderIntervalMs}
     <ChatPanel messages={store.messages} agents={store.agents} />
     <LogPanel {lines} agents={store.agents} />
   </div>

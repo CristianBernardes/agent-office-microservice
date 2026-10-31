@@ -664,6 +664,10 @@ Cerimônia de planejamento antes do trabalho (ADR-049): facilitador PO/SM, artef
 
 Auditoria SOLID/DRY/YAGNI: divisão de tarefas extraída para `domain/services/task_splitter.py` (com testes), helper `_speak` elimina duplicação no ciclo, RFC-005 e design doc `ciclo-de-trabalho.md`.
 
+## Rodada 73
+
+Removido texto de debug `wanderIntervalMs=...` que aparecia solto na página (App.svelte).
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -725,6 +729,7 @@ Auditoria SOLID/DRY/YAGNI: divisão de tarefas extraída para `domain/services/t
 | 70 | este commit | Kanban: WIP/limites, métricas de fluxo, cargo no cartão, timestamps de task; PayPal visível também em pt |
 | 71 | este commit | Sprint planning conduzido por PO/SM, divisão de tarefas, ADR-049 |
 | 72 | este commit | Refatoração SRP/DRY (task_splitter, _speak), RFC-005 e design doc do ciclo |
+| 73 | este commit | Remove texto de debug `wanderIntervalMs` solto no App.svelte |
 
 ### O que funciona
 
