@@ -511,7 +511,7 @@ identidade visual sugerida por papel listada acima.
 
 - `docker compose up -d postgres mosquitto` + `pytest -m integration`: 7 testes passando (MQTT, agente, artefato, relacionamento, reunião, layout, feed).
 - Corrigidos dois testes de integração que estavam obsoletos (`Role.QA`, FK do autor do artefato).
-- Repos Postgres de relacionamento/reunião/layout/atividade agora validados contra banco real. Também validados: chat/goal/mensagens, tarefa e memória com busca pgvector (10 testes de integração no total). Pendente de integração real: Kafka, Redis e o gateway Go.
+- Repos Postgres de relacionamento/reunião/layout/atividade agora validados contra banco real. Também validados: chat/goal/mensagens, tarefa e memória com busca pgvector (10 testes de integração no total). Kafka/Redis/gateway validados na Rodada 37.
 
 ## Rodada 28 — gateway Go validado ponta a ponta
 
@@ -546,6 +546,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 36 — Rota de interação (ADR-038)
 - `POST /relationships/interactions` (delta −1..1; 422 para agentes iguais).
 
+## Rodada 37 — Integração do gateway Kafka
+- `tests/integration/test_gateway_kafka_integration.py`: MQTT→gateway→`office.events` (válido) e `office.events.dlq` (inválido); pula se Kafka/gateway não estiverem no ar. RFC-004 e READMEs com a rota de interações.
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -570,13 +573,15 @@ identidade visual sugerida por papel listada acima.
 | 33 | `07ce6e3` | Ollama tolerante (ADR-036) |
 | 34 | `10d2688` | README: seção API HTTP |
 | 35 | `9c07a79` | Ferramenta research (ADR-037) |
+| 36 | `60776a8` | POST /relationships/interactions (ADR-038) |
+| 37 | ver `git log` | Integração gateway Kafka (2 testes) |
 
 ### O que funciona
 
-288 testes unitários + 10 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
+290 testes unitários + 12 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
 ruff e mypy limpos. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
 activity, research; agentes têm a ferramenta research. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
-Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–037, RFCs 001–004.
+Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 001–004.
 
 ### Limitações conhecidas
 

@@ -21,6 +21,7 @@ Contrato das rotas HTTP consumidas pelo frontend. Routers são camadas finas: va
 | POST | `/agents/{id}/fire`, `/agents/{id}/think` | Demite / aciona raciocínio |
 | GET/POST | `/agents/{id}/memories`, POST `/recall` | Memória do agente e busca semântica |
 | GET | `/agents/{id}/relationships` | Vínculos (ADR-027) |
+| POST | `/relationships/interactions` | Registra interação `first`/`second`/`delta` (ADR-038) |
 | GET/POST | `/tasks` | Kanban |
 | POST | `/tasks/{id}/assign`, `/complete`, `/move` | Transições (matriz por papel) |
 | GET | `/tasks/{id}/transitions` | Histórico |

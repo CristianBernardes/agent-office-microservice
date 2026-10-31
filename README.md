@@ -204,6 +204,7 @@ Contrato completo: [RFC-004](docs/rfc/004-contrato-da-api-http.md).
 |---|---|
 | `GET /health` | Saúde do serviço |
 | `/agents` (+ `/fire`, `/think`, `/memories`, `/relationships`) | Time, raciocínio, memória e vínculos |
+| `/relationships/interactions` | Registra interação entre dois agentes |
 | `/tasks` (+ `/assign`, `/complete`, `/move`, `/transitions`) | Kanban com permissões por papel |
 | `/goals`, `/messages`, `/sessions/{id}/messages` | Objetivos do usuário e chat |
 | `/meetings` (+ `/finish`), `/goals/{id}/meetings` | Reuniões e cerimônias |
