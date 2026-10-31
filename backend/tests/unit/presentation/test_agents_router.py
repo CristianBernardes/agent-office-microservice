@@ -44,3 +44,15 @@ class TestAgentsRoutes:
         unknown_agent_id = "00000000-0000-0000-0000-000000000000"
         response = client.post(f"/agents/{unknown_agent_id}/fire")
         assert response.status_code == 404
+
+
+class TestAgentsRoutesLanguage:
+    _UNKNOWN = "/agents/00000000-0000-0000-0000-000000000000/fire"
+
+    def test_not_found_in_portuguese_with_accept_language(self) -> None:
+        response = client.post(self._UNKNOWN, headers={"Accept-Language": "pt-BR"})
+        assert "não foi encontrado" in response.json()["detail"]
+
+    def test_not_found_in_english_with_accept_language(self) -> None:
+        response = client.post(self._UNKNOWN, headers={"Accept-Language": "en-US"})
+        assert "was not found" in response.json()["detail"]

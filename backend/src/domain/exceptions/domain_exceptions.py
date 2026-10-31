@@ -9,12 +9,28 @@ infraestrutura.
 
 from __future__ import annotations
 
+from src.domain.localization.language import Language
+from src.domain.localization.messages import translate
+
 
 # Bloco: exceção-base de domínio.
 # Serve como ponto único de captura para qualquer violação de regra de negócio,
 # diferenciando erros esperados (regra violada) de erros inesperados (bug).
 class DomainError(Exception):
-    """Erro base para qualquer violação de invariante do domínio."""
+    """Erro base para qualquer violação de invariante do domínio.
+
+    Carrega uma chave de mensagem + parâmetros; ``str()`` rende em inglês (logs) e
+    ``localized`` rende no idioma pedido (ver ADR-012).
+    """
+
+    def __init__(self, message_key: str, **params: object) -> None:
+        self.message_key = message_key
+        self.params = params
+        super().__init__(translate(message_key, Language.EN, **params))
+
+    def localized(self, language: Language) -> str:
+        """Mensagem de erro no idioma informado."""
+        return translate(self.message_key, language, **self.params)
 
 
 # Bloco: violação de transição de estado de uma entidade.
@@ -27,5 +43,5 @@ class InvalidStateTransitionError(DomainError):
 # Bloco: violação de invariante de valor.
 # Usada por value objects quando um valor recebido não satisfaz as regras de
 # construção do objeto (ex.: um identificador vazio).
-class InvalidValueError(DomainError):
+class InvalidValueError(DomainError, ValueError):
     """Levantada quando um valor fornecido viola uma invariante do domínio."""

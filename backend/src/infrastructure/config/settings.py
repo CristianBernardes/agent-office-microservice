@@ -14,6 +14,7 @@ from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from src.domain.entities.agent import Role
+from src.domain.localization.language import Language
 
 
 # Bloco: definição de todas as configurações do serviço.
@@ -36,6 +37,9 @@ class Settings(BaseSettings):
     ollama_model: str = "nemotron-3.5-bolt:latest"
     ollama_embedding_model: str = "nomic-embed-text:latest"
 
+    # Idioma do escritório (prompts dos agentes e fallback de erros): pt | en (ADR-012)
+    office_language: str = "en"
+
     # Modelo por papel (Fase 5). Vazio = usa `ollama_model`.
     agent_po_model: str = ""
     agent_sm_model: str = ""
@@ -55,6 +59,10 @@ class Settings(BaseSettings):
     # HTTP da API do backend
     api_host: str = "0.0.0.0"
     api_port: int = 8000
+
+    def language(self) -> Language:
+        """Idioma padrão do escritório, normalizado (valor inválido cai em inglês)."""
+        return Language.parse(self.office_language)
 
     def role_models(self) -> dict[Role, str]:
         """Retorna os modelos configurados por papel (apenas os não vazios)."""

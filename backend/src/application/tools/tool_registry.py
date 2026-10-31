@@ -79,16 +79,12 @@ class ToolRegistry:
         """Valida a permissão do papel e delega à ferramenta correspondente."""
         if not role_can_use_tool(requester_role, tool_name):
             raise ToolPermissionDeniedError(
-                f"O papel '{requester_role.value}' não tem permissão para usar a ferramenta "
-                f"'{tool_name.value}'."
+                "tool.permission_denied", role=requester_role.value, tool=tool_name.value
             )
 
         handler = self._handlers.get(tool_name)
         if handler is None:
-            raise ToolNotImplementedError(
-                f"A ferramenta '{tool_name.value}' ainda não possui um handler implementado "
-                "nesta rodada do projeto."
-            )
+            raise ToolNotImplementedError("tool.not_implemented", tool=tool_name.value)
 
         return await handler(requester_id, requester_role, arguments)
 

@@ -314,3 +314,17 @@ identidade visual sugerida por papel listada acima.
   falha apenas porque o broker não estava no ar (`make up` necessário).
 - **Ainda pendente:** `PostgresArtifactRepository`/`PostgresAgentRepository`, ponto de entrada para
   o Cristian disparar objetivos, provedor OpenAI-compatible (não decidido), início do frontend Svelte.
+
+### Rodada 5 — i18n pt/en (2026-10-31)
+
+- ADR-012. `domain/localization/` (`Language`, catálogo `MESSAGES`, `translate`).
+- `DomainError(message_key, **params)` com `localized(language)`; todos os erros de entidades/casos
+  de uso migrados para chaves. `InvalidValueError` também é `ValueError`.
+- Prompts movidos para `prompts/pt/` e criados `prompts/en/` (9 papéis);
+  `IPromptProvider.get_system_prompt(role, name, language)`, cache por (papel, idioma).
+- `OFFICE_LANGUAGE` (pt|en, padrão en) em `Settings`/`.env`; `AgentThinkUseCase` recebe `language`.
+- API: `Accept-Language` localiza o `detail` do 404 de `fire`.
+- Testes: catálogo completo, parse/Accept-Language, erros localizados, prompts nos 2 idiomas,
+  rota com 2 idiomas, settings. 107 unitários passando.
+- **Pendente:** Postgres repos, entrada para disparar objetivos, OpenAI-compatible, frontend Svelte
+  (já nascendo com i18n pt/en).

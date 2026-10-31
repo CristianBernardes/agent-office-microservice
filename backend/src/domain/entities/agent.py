@@ -12,7 +12,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 
-from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
+from src.domain.exceptions.domain_exceptions import (
+    InvalidStateTransitionError,
+    InvalidValueError,
+)
 from src.domain.value_objects.identifiers import AgentId, TaskId
 
 
@@ -61,9 +64,8 @@ class Personality:
             ("neuroticism", self.neuroticism),
         ):
             if not 0.0 <= trait_value <= 1.0:
-                raise ValueError(
-                    f"O traço de personalidade '{trait_name}' deve estar entre 0.0 e 1.0, "
-                    f"recebido: {trait_value}"
+                raise InvalidValueError(
+                    "agent.invalid_trait", trait_name=trait_name, trait_value=trait_value
                 )
 
 
@@ -84,9 +86,7 @@ class Agent:
     def start_thinking(self) -> None:
         """Move o agente para o estado de pensamento (processamento via LLM)."""
         if self.status == AgentStatus.OFFLINE:
-            raise InvalidStateTransitionError(
-                f"Agente '{self.name}' está OFFLINE e não pode iniciar um pensamento."
-            )
+            raise InvalidStateTransitionError("agent.offline_cannot_think", name=self.name)
         self.status = AgentStatus.THINKING
 
     def assign_task(self, task_id: TaskId) -> None:
@@ -98,8 +98,7 @@ class Agent:
         """
         if self.status != AgentStatus.IDLE:
             raise InvalidStateTransitionError(
-                f"Agente '{self.name}' está '{self.status.value}' e não pode receber "
-                "uma nova tarefa — apenas agentes 'idle' podem ser alocados."
+                "agent.cannot_receive_task", name=self.name, status=self.status.value
             )
         self.current_task_id = task_id
         self.status = AgentStatus.WORKING
@@ -108,8 +107,7 @@ class Agent:
         """Conclui a tarefa atual do agente, retornando-o ao estado ``IDLE``."""
         if self.status != AgentStatus.WORKING:
             raise InvalidStateTransitionError(
-                f"Agente '{self.name}' está '{self.status.value}' e não possui uma "
-                "tarefa em andamento para concluir."
+                "agent.no_task_to_complete", name=self.name, status=self.status.value
             )
         self.current_task_id = None
         self.status = AgentStatus.IDLE

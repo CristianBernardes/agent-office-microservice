@@ -56,8 +56,7 @@ class Artifact:
         """Move o artefato de ``DRAFT`` para ``IN_REVIEW``."""
         if self.status != ArtifactStatus.DRAFT:
             raise InvalidStateTransitionError(
-                f"Artefato '{self.title}' está '{self.status.value}' e não pode ser "
-                "enviado para revisão — apenas artefatos 'draft' podem ser revisados."
+                "artifact.cannot_request_review", title=self.title, status=self.status.value
             )
         self.status = ArtifactStatus.IN_REVIEW
         self.updated_at = datetime.now(UTC)
@@ -66,8 +65,7 @@ class Artifact:
         """Aprova o artefato, movendo-o de ``IN_REVIEW`` para ``APPROVED``."""
         if self.status != ArtifactStatus.IN_REVIEW:
             raise InvalidStateTransitionError(
-                f"Artefato '{self.title}' está '{self.status.value}' e não pode ser "
-                "aprovado — apenas artefatos 'in_review' podem ser aprovados."
+                "artifact.cannot_approve", title=self.title, status=self.status.value
             )
         self.status = ArtifactStatus.APPROVED
         self.updated_at = datetime.now(UTC)
@@ -76,8 +74,7 @@ class Artifact:
         """Arquiva o artefato, movendo-o de ``APPROVED`` para ``ARCHIVED``."""
         if self.status != ArtifactStatus.APPROVED:
             raise InvalidStateTransitionError(
-                f"Artefato '{self.title}' está '{self.status.value}' e não pode ser "
-                "arquivado — apenas artefatos 'approved' podem ser arquivados."
+                "artifact.cannot_archive", title=self.title, status=self.status.value
             )
         self.status = ArtifactStatus.ARCHIVED
         self.updated_at = datetime.now(UTC)

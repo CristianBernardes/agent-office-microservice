@@ -38,7 +38,7 @@ class ApproveArtifactUseCase:
         """Busca o artefato, aprova-o e notifica via MQTT."""
         artifact = await self._artifact_repository.find_by_id(artifact_id)
         if artifact is None:
-            raise ArtifactNotFoundError(f"Artefato com ID '{artifact_id}' não foi encontrado.")
+            raise ArtifactNotFoundError("artifact.not_found", artifact_id=artifact_id)
 
         artifact.approve()
         await self._artifact_repository.save(artifact)

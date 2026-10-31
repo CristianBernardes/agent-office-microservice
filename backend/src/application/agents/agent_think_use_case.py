@@ -18,6 +18,7 @@ from src.domain.interfaces.llm_adapter import LlmThoughtResponse
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
+from src.domain.localization.language import Language
 
 # Bloco: templates de tópico por tipo de evento, conforme a RFC-001.
 _STATUS_TOPIC_TEMPLATE = "office/agents/{agent_id}/status"
@@ -36,18 +37,22 @@ class AgentThinkUseCase:
         message_bus: IMessageBus,
         prompt_provider: IPromptProvider,
         tool_registry: ToolRegistry,
+        language: Language,
     ) -> None:
         self._llm_adapter_resolver = llm_adapter_resolver
         self._message_bus = message_bus
         self._prompt_provider = prompt_provider
         self._tool_registry = tool_registry
+        self._language = language
 
     async def execute(self, agent: Agent, context: str) -> LlmThoughtResponse:
         """Move o agente para `THINKING`, consulta o LLM e publica pensamento/ação."""
         agent.start_thinking()
         await self._publish_status(agent)
 
-        system_prompt = self._prompt_provider.get_system_prompt(agent.role, agent.name)
+        system_prompt = self._prompt_provider.get_system_prompt(
+            agent.role, agent.name, self._language
+        )
         llm_adapter = self._llm_adapter_resolver.resolve(agent.role)
         response = await llm_adapter.think(system_prompt=system_prompt, context=context)
 

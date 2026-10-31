@@ -14,6 +14,7 @@ from src.application.tools.tool_registry import ToolRegistry
 from src.domain.entities.agent import Agent, AgentStatus, Personality, Role
 from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
 from src.domain.interfaces.llm_adapter import LlmThoughtResponse
+from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId
 from src.infrastructure.filesystem.markdown_artifact_writer import MarkdownArtifactWriter
 from src.infrastructure.llm.mock_llm_adapter import MockLlmAdapter
@@ -73,6 +74,7 @@ class TestAgentThinkUseCase:
             llm_adapter_resolver=_resolver_for(MockLlmAdapter()),
             message_bus=message_bus,
             prompt_provider=FilePromptProvider(),
+            language=Language.PT,
             tool_registry=_build_tool_registry(tmp_path, message_bus),
         )
 
@@ -95,6 +97,7 @@ class TestAgentThinkUseCase:
             llm_adapter_resolver=_resolver_for(MockLlmAdapter()),
             message_bus=message_bus,
             prompt_provider=FilePromptProvider(),
+            language=Language.PT,
             tool_registry=_build_tool_registry(tmp_path, message_bus),
         )
 
@@ -124,6 +127,7 @@ class TestAgentThinkUseCase:
             llm_adapter_resolver=_resolver_for(MockLlmAdapter()),
             message_bus=message_bus,
             prompt_provider=FilePromptProvider(),
+            language=Language.PT,
             tool_registry=_build_tool_registry(tmp_path, message_bus),
         )
 
@@ -160,6 +164,7 @@ class TestAgentThinkUseCase:
             llm_adapter_resolver=_resolver_for(MockLlmAdapter(responses=[llm_response])),
             message_bus=message_bus,
             prompt_provider=FilePromptProvider(),
+            language=Language.PT,
             tool_registry=_build_tool_registry(tmp_path, message_bus),
         )
 

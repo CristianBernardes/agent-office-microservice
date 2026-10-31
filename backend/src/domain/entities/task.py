@@ -60,8 +60,7 @@ class Task:
         """
         if self.status != TaskStatus.IN_PROGRESS:
             raise InvalidStateTransitionError(
-                f"Tarefa '{self.title}' está '{self.status.value}' e não pode ser "
-                "concluída — apenas tarefas 'in_progress' podem ser concluídas."
+                "task.cannot_complete", title=self.title, status=self.status.value
             )
         self.result = result
         self.status = TaskStatus.DONE

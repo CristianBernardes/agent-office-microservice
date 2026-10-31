@@ -39,7 +39,7 @@ class ReviewArtifactUseCase:
         """Busca o artefato, move-o para ``IN_REVIEW`` e notifica via MQTT."""
         artifact = await self._artifact_repository.find_by_id(artifact_id)
         if artifact is None:
-            raise ArtifactNotFoundError(f"Artefato com ID '{artifact_id}' não foi encontrado.")
+            raise ArtifactNotFoundError("artifact.not_found", artifact_id=artifact_id)
 
         artifact.request_review()
         await self._artifact_repository.save(artifact)

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 
 from src.application.agents.fire_agent_use_case import (
     AgentNotFoundError,
@@ -17,11 +17,18 @@ from src.application.agents.fire_agent_use_case import (
 )
 from src.application.agents.hire_agent_use_case import HireAgentInput, HireAgentUseCase
 from src.domain.entities.agent import Personality
+from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId
+from src.infrastructure.config.settings import get_settings
 from src.presentation.api.agent_schemas import AgentResponse, HireAgentRequest
 from src.presentation.dependencies import get_fire_agent_use_case, get_hire_agent_use_case
 
 router = APIRouter(prefix="/agents", tags=["agents"])
+
+
+# Bloco: idioma da requisição a partir de Accept-Language (fallback: idioma do escritório).
+def get_request_language(accept_language: str | None = Header(default=None)) -> Language:
+    return Language.from_accept_language(accept_language, default=get_settings().language())
 
 
 # Bloco: endpoint de contratação de um novo agente.
@@ -54,12 +61,13 @@ async def hire_agent(
 async def fire_agent(
     agent_id: UUID,
     use_case: FireAgentUseCase = Depends(get_fire_agent_use_case),
+    language: Language = Depends(get_request_language),
 ) -> AgentResponse:
     """Desliga (demite) o agente identificado por ``agent_id``."""
     try:
         agent = await use_case.execute(AgentId(value=agent_id))
     except AgentNotFoundError as not_found_error:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(not_found_error)
+            status_code=status.HTTP_404_NOT_FOUND, detail=not_found_error.localized(language)
         ) from not_found_error
     return AgentResponse.from_entity(agent)

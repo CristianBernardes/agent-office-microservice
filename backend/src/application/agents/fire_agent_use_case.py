@@ -29,7 +29,7 @@ class FireAgentUseCase:
         """Busca o agente pelo ID, marca-o como ``OFFLINE`` e persiste a mudança."""
         agent = await self._agent_repository.find_by_id(agent_id)
         if agent is None:
-            raise AgentNotFoundError(f"Agente com ID '{agent_id}' não foi encontrado.")
+            raise AgentNotFoundError("agent.not_found", agent_id=agent_id)
 
         agent.go_offline()
         await self._agent_repository.save(agent)

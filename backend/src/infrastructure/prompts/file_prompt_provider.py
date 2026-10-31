@@ -1,6 +1,6 @@
 """Implementação do ``IPromptProvider`` que lê os prompts de arquivos Markdown.
 
-Cada papel tem um arquivo próprio em ``src/infrastructure/prompts/{role}.md``
+Cada papel tem um arquivo próprio em ``src/infrastructure/prompts/{idioma}/{role}.md``
 (ver `docs/migration-plan/fase-3-personas/README.md`), carregado e armazenado em
 cache na primeira leitura — os prompts não mudam durante a execução do processo.
 """
@@ -11,6 +11,7 @@ from pathlib import Path
 
 from src.domain.entities.agent import Role
 from src.domain.interfaces.prompt_provider import IPromptProvider
+from src.domain.localization.language import Language
 
 # Bloco: diretório onde os arquivos de prompt residem, relativo a este módulo.
 _PROMPTS_DIRECTORY = Path(__file__).parent
@@ -35,19 +36,20 @@ _PROMPT_FILENAME_BY_ROLE: dict[Role, str] = {
 # Bloco: provedor de prompts baseado em arquivos Markdown.
 class FilePromptProvider(IPromptProvider):
     def __init__(self) -> None:
-        self._cached_templates: dict[Role, str] = {}
+        self._cached_templates: dict[tuple[Role, Language], str] = {}
 
-    def get_system_prompt(self, role: Role, agent_name: str) -> str:
+    def get_system_prompt(self, role: Role, agent_name: str, language: Language) -> str:
         """Lê (com cache) o template do papel e o personaliza com o nome do agente."""
-        template = self._load_template(role)
+        template = self._load_template(role, language)
         return template.format(name=agent_name)
 
-    def _load_template(self, role: Role) -> str:
-        if role not in self._cached_templates:
+    def _load_template(self, role: Role, language: Language) -> str:
+        cache_key = (role, language)
+        if cache_key not in self._cached_templates:
             filename = _PROMPT_FILENAME_BY_ROLE.get(role)
             if filename is None:
-                raise RuntimeError(f"Nenhum arquivo de prompt mapeado para o papel '{role.value}'.")
-            file_path = _PROMPTS_DIRECTORY / filename
-            self._cached_templates[role] = file_path.read_text(encoding="utf-8")
+                raise RuntimeError(f"No prompt file mapped for role '{role.value}'.")
+            file_path = _PROMPTS_DIRECTORY / language.value / filename
+            self._cached_templates[cache_key] = file_path.read_text(encoding="utf-8")
 
-        return self._cached_templates[role]
+        return self._cached_templates[cache_key]

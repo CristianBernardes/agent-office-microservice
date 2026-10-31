@@ -176,4 +176,5 @@ def get_agent_think_use_case() -> AgentThinkUseCase:
         message_bus=get_message_bus(),
         prompt_provider=get_prompt_provider(),
         tool_registry=get_tool_registry(),
+        language=get_settings().language(),
     )
