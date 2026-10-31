@@ -445,6 +445,11 @@ identidade visual sugerida por papel listada acima.
 - Compose: `kafka` (KRaft), `kafka-init` (cria os tópicos), `redis`, `gateway`.
 - 4 testes Go (`go test ./...` ok). Dockerfile próprio. **Próximo:** goal_id/revisor nas tarefas, relationships, meetings/hire_agent, layout.
 
+### Rodada 18 — Tarefas ligadas ao objetivo e ao revisor (ADR-025)
+
+- `Task.goal_id` e `Task.reviewer_id` persistidos no Postgres; a reunião vincula o backlog ao objetivo.
+- 231 testes unitários. **Próximo:** relationships, meetings/hire_agent, layout, testes de integração.
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)

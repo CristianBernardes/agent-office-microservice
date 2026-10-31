@@ -39,3 +39,4 @@
 | [022](./022-autonomia-reuniao-de-objetivo.md) | Autonomia: reunião do time sobre um objetivo | Aceito |
 | [023](./023-po-cria-backlog-da-reuniao.md) | PO cria o backlog a partir da reunião | Aceito |
 | [024](./024-gateway-go-mqtt-kafka.md) | Gateway Go: MQTT → Kafka | Aceito |
+| [025](./025-tarefas-vinculadas-a-objetivo-e-revisor.md) | Tarefas vinculadas a objetivo e revisor | Aceito |

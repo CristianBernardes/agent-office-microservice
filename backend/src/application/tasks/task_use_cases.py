@@ -17,7 +17,7 @@ from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.policies.task_workflow import can_move, is_valid_move
-from src.domain.value_objects.identifiers import AgentId, TaskId
+from src.domain.value_objects.identifiers import AgentId, GoalId, TaskId
 
 # Bloco: tópico de notificação de atualização de tarefa, conforme a RFC-001.
 _TASK_UPDATED_TOPIC = "office/tasks/updated"
@@ -62,6 +62,7 @@ class CreateTaskInput:
     priority: Priority
     creator_id: AgentId
     creator_role: Role
+    goal_id: GoalId | None = None
 
 
 # Bloco: caso de uso de criação de tarefa (nasce no backlog).
@@ -76,6 +77,7 @@ class CreateTaskUseCase:
             title=data.title,
             description=data.description,
             priority=data.priority,
+            goal_id=data.goal_id,
         )
         await self._task_repository.save(task)
         await _record_transition(

@@ -162,6 +162,7 @@ class TestBacklog:
         await use_case.execute(_input())
         assert [c.title.split("]")[0] for c in tasks.calls] == ["[tech_lead", "[qa_engineer"]
         assert all(c.creator_role == Role.PRODUCT_OWNER for c in tasks.calls)
+        assert all(c.goal_id is not None for c in tasks.calls)
 
     async def test_no_po_no_tasks(self) -> None:
         use_case, *_ = await _build([Role.TECH_LEAD])

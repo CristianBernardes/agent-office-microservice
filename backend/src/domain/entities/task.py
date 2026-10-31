@@ -12,7 +12,7 @@ from enum import Enum
 
 from src.domain.entities.agent import Role
 from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
-from src.domain.value_objects.identifiers import AgentId, TaskId
+from src.domain.value_objects.identifiers import AgentId, GoalId, TaskId
 
 
 # Bloco: estados do ciclo de vida de uma tarefa.
@@ -46,6 +46,8 @@ class Task:
     assigned_to: AgentId | None = field(default=None)
     result: str | None = field(default=None)
     completed_at: datetime | None = field(default=None)
+    goal_id: GoalId | None = field(default=None)
+    reviewer_id: AgentId | None = field(default=None)
 
     def move_to(self, new_status: TaskStatus) -> None:
         """Muda o estágio (a permissão é verificada pela política ``task_workflow``)."""

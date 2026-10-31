@@ -101,7 +101,7 @@ class GoalMeetingUseCase:
                 turns.append(turn)
         if turns:
             await self._write_minutes(data, turns)
-            await self._create_backlog(turns)
+            await self._create_backlog(turns, data.goal_id)
         return turns
 
     async def _participants(self) -> list[Agent]:
@@ -145,7 +145,7 @@ class GoalMeetingUseCase:
         parts.append(self._labels["turn"].format(role=agent.role.value))
         return "\n\n".join(parts)
 
-    async def _create_backlog(self, turns: list[MeetingTurn]) -> None:
+    async def _create_backlog(self, turns: list[MeetingTurn], goal_id: GoalId) -> None:
         owner = next((t.agent for t in turns if t.agent.role == Role.PRODUCT_OWNER), None)
         if owner is None or self._create_task is None:
             return
@@ -161,6 +161,7 @@ class GoalMeetingUseCase:
                         priority=Priority.MEDIUM,
                         creator_id=owner.agent_id,
                         creator_role=owner.role,
+                        goal_id=goal_id,
                     )
                 )
             except Exception:
