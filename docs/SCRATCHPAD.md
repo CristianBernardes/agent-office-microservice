@@ -815,6 +815,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - `.github/FUNDING.yml` (botão Sponsor com link PayPal), badges nos READMEs, rascunhos de posts PT/EN em `docs/divulgacao/`.
 - Pendente do autor: gravar GIF/vídeo curto e publicar; avaliar GitHub Sponsors/Ko-fi/Apoia.se.
 
+### Rodada 104 — GitHub Sponsors
+
+- Perfil aprovado; `github: CristianBernardes` no `FUNDING.yml` e botão nos dois READMEs.
+
 ## Estado atual e ponto de retomada (após a Rodada 101)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -906,7 +910,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 100 | `927edb3` | Seção de doação centralizada (`div align=center`) nos READMEs |
 | 101 | `3998ea9` | `clean_body`, testes de integração em banco `<db>_test`, verificação MQTT→Kafka |
 | 102 | `2c16021` | LICENSE (MIT) em inglês e português, com nota de doações voluntárias; links nos READMEs |
-| 103 | este commit | `FUNDING.yml`, badges de licença/doação e rascunhos de divulgação (`docs/divulgacao/`) |
+| 103 | `19b9668` | `FUNDING.yml`, badges de licença/doação e rascunhos de divulgação (`docs/divulgacao/`) |
+| 104 | este commit | GitHub Sponsors (`CristianBernardes`) no `FUNDING.yml` e nos READMEs |
 
 ### O que funciona
 

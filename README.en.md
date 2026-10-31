@@ -73,6 +73,15 @@ Donations via PayPal are very welcome, from anywhere in the world:
 
 📧 Account: **cristian.aob@gmail.com**
 
+
+**💜 GitHub Sponsors**
+
+Monthly or one-time, directly through GitHub:
+
+<a href="https://github.com/sponsors/CristianBernardes">
+  <img src="https://img.shields.io/badge/GitHub%20Sponsors-Sponsor-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor on GitHub Sponsors" />
+</a>
+
 </td>
 <td align="center" width="260">
 
