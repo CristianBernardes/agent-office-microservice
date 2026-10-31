@@ -3,6 +3,7 @@ import type {
   Agent,
   ChatMessage,
   Goal,
+  HireAgentInput,
   Language,
   MoveTaskInput,
   Priority,
@@ -38,6 +39,7 @@ export interface ApiClient {
   createGoal(text: string): Promise<Goal>
   moveTask(taskId: string, input: MoveTaskInput): Promise<Task>
   createTask(input: CreateTaskInput): Promise<Task>
+  hireAgent(input: HireAgentInput): Promise<Agent>
 }
 
 // Bloco: cliente REST tipado; fetch e idioma são injetados para facilitar testes (DIP).
@@ -70,6 +72,7 @@ export function createApiClient(
     listMessages: (sessionId) => request<ChatMessage[]>(`/sessions/${sessionId}/messages`),
     createGoal: (text) => post<Goal>('/goals', { text }),
     createTask: (input) => post<Task>('/tasks', input),
+    hireAgent: (input) => post<Agent>('/agents', input),
     moveTask: (taskId, input) => post<Task>(`/tasks/${taskId}/move`, input),
   }
 }

@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/svelte'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ChatPanel from './ChatPanel.svelte'
 import DonationModal from './DonationModal.svelte'
+import HireForm from './HireForm.svelte'
 import GoalForm from './GoalForm.svelte'
 import KanbanBoard from './KanbanBoard.svelte'
 import LanguageSwitcher from './LanguageSwitcher.svelte'
@@ -76,5 +77,14 @@ describe('componentes', () => {
     i18n.set('en')
     view.rerender({ paypalUrl: 'https://paypal.me/x', pixLabel: 'Pix', onclose: vi.fn() })
     expect(await screen.findByRole('link')).toHaveProperty('href', 'https://paypal.me/x')
+  })
+
+  it('HireForm envia nome, cargo e modelo', async () => {
+    const onsubmit = vi.fn().mockResolvedValue(undefined)
+    render(HireForm, { defaultModel: 'qwen', onsubmit })
+    await fireEvent.input(screen.getByLabelText('Nome'), { target: { value: 'Ana' } })
+    await fireEvent.change(screen.getByLabelText('Cargo'), { target: { value: 'tech_lead' } })
+    await fireEvent.click(screen.getByRole('button', { name: 'Contratar' }))
+    expect(onsubmit).toHaveBeenCalledWith({ name: 'Ana', role: 'tech_lead', llm_model: 'qwen' })
   })
 })

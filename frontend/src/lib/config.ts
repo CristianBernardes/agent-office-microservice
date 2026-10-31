@@ -5,6 +5,7 @@ export interface AppConfig {
   mqttWsUrl: string
   defaultLanguage: Language
   pixLabel: string
+  defaultLlmModel: string
   paypalUrl: string
   donationReminderDays: number
   refreshIntervalMs: number
@@ -35,6 +36,7 @@ export function loadConfig(env: Env): AppConfig {
     mqttWsUrl: required(env, 'VITE_MQTT_WS_URL'),
     defaultLanguage: language,
     pixLabel: required(env, 'VITE_PIX_LABEL'),
+    defaultLlmModel: required(env, 'VITE_DEFAULT_LLM_MODEL'),
     paypalUrl: env.VITE_PAYPAL_URL ?? '',
     donationReminderDays: nonNegativeInt(env, 'VITE_DONATION_REMINDER_DAYS'),
     refreshIntervalMs: nonNegativeInt(env, 'VITE_REFRESH_INTERVAL_MS'),

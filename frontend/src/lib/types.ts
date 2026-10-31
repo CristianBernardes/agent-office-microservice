@@ -59,6 +59,12 @@ export interface ChatMessage {
   content: string
 }
 
+export interface HireAgentInput {
+  name: string
+  role: Role
+  llm_model: string
+}
+
 export interface MoveTaskInput {
   to_status: TaskStatus
   actor_id: string

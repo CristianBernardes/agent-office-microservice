@@ -50,6 +50,14 @@ describe('createApiClient', () => {
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual(input)
   })
 
+  it('contrata agente', async () => {
+    const fetchMock = reply({}, 201)
+    const input = { name: 'Ana', role: 'dev_senior' as const, llm_model: 'm' }
+    await createApiClient('http://api', () => 'pt', fetchMock).hireAgent(input)
+    expect(fetchMock.mock.calls[0][0]).toBe('http://api/agents')
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual(input)
+  })
+
   it('lança ApiError em resposta de erro', async () => {
     const api = createApiClient('http://api', () => 'pt', reply({ detail: 'x' }, 422))
     await expect(api.listTasks()).rejects.toBeInstanceOf(ApiError)

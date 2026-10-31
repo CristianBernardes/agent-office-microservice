@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import ChatPanel from './components/ChatPanel.svelte'
   import DonationModal from './components/DonationModal.svelte'
+  import HireForm from './components/HireForm.svelte'
   import GoalForm from './components/GoalForm.svelte'
   import KanbanBoard from './components/KanbanBoard.svelte'
   import LanguageSwitcher from './components/LanguageSwitcher.svelte'
@@ -16,7 +17,7 @@
   import { mergeLogs } from './lib/logs'
   import { OfficeStore } from './lib/office.svelte'
   import { connectRealtime } from './lib/realtime'
-  import type { Agent, Priority, Task, TaskStatus } from './lib/types'
+  import type { Agent, HireAgentInput, Priority, Task, TaskStatus } from './lib/types'
 
   const config = loadConfig(import.meta.env)
   i18n.init(config.defaultLanguage, localStorage)
@@ -29,6 +30,11 @@
   function closeDonation() {
     markShown(new Date())
     showDonation = false
+  }
+
+  async function hireAgent(input: HireAgentInput) {
+    await api.hireAgent(input)
+    await store.load(api)
   }
 
   async function createGoal(text: string) {
@@ -84,6 +90,7 @@
     selectedId={store.selectedAgentId}
     onselect={(id) => store.select(id)}
   />
+  <HireForm defaultModel={config.defaultLlmModel} onsubmit={hireAgent} />
   <div class="grid">
     <GoalForm onsubmit={createGoal} />
     <TaskForm hasAgents={store.agents.length > 0} onsubmit={createTask} />

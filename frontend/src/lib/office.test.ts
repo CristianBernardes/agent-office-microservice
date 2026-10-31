@@ -20,6 +20,7 @@ function fakeApi(overrides: Partial<ApiClient> = {}): ApiClient {
     createGoal: vi.fn(),
     moveTask: vi.fn(),
     createTask: vi.fn(),
+    hireAgent: vi.fn(),
     ...overrides,
   }
 }

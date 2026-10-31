@@ -11,6 +11,12 @@ export interface Messages {
   noAgents: string
   noActivity: string
   loadError: string
+  hireTitle: string
+  hireName: string
+  hireRole: string
+  hireModel: string
+  hireSubmit: string
+  hireDone: string
   goalTitle: string
   goalPlaceholder: string
   goalSubmit: string
@@ -57,6 +63,12 @@ export const pt: Messages = {
   noAgents: 'Nenhum agente contratado.',
   noActivity: 'Nenhuma atividade ainda.',
   loadError: 'Não foi possível carregar os dados.',
+  hireTitle: 'Contratar agente',
+  hireName: 'Nome',
+  hireRole: 'Cargo',
+  hireModel: 'Modelo (Ollama)',
+  hireSubmit: 'Contratar',
+  hireDone: 'Agente contratado!',
   goalTitle: 'Novo objetivo',
   goalPlaceholder: 'Descreva o que o time deve entregar…',
   goalSubmit: 'Enviar ao time',
@@ -126,6 +138,12 @@ export const en: Messages = {
   noAgents: 'No agents hired.',
   noActivity: 'No activity yet.',
   loadError: 'Could not load data.',
+  hireTitle: 'Hire an agent',
+  hireName: 'Name',
+  hireRole: 'Role',
+  hireModel: 'Model (Ollama)',
+  hireSubmit: 'Hire',
+  hireDone: 'Agent hired!',
   goalTitle: 'New goal',
   goalPlaceholder: 'Describe what the team should deliver…',
   goalSubmit: 'Send to the team',
