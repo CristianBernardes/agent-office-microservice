@@ -44,7 +44,7 @@ Donations via PayPal are very welcome, from anywhere in the world:
 
 **🇧🇷 Pix (Brazil only)**
 
-<img src="images/pix-qr-code.jpeg" alt="Pix QR Code for donations" width="220" />
+<img src="frontend/images/pix-qr-code.jpeg" alt="Pix QR Code for donations" width="220" />
 
 Scan the QR Code with your Brazilian bank app
 

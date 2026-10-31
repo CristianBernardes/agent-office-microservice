@@ -33,7 +33,7 @@ GitHub — considere doar antes de seguir para o clone/fork abaixo:
 
 **🇧🇷 Pix (Brasil)**
 
-<img src="images/pix-qr-code.jpeg" alt="QR Code Pix para doação" width="220" />
+<img src="frontend/images/pix-qr-code.jpeg" alt="QR Code Pix para doação" width="220" />
 
 Escaneie o QR Code com o app do seu banco
 

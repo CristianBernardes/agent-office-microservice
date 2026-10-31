@@ -357,8 +357,12 @@ identidade visual sugerida por papel listada acima.
   (pgvector 768), `relationships`, `tool_invocations`, `activity_events`, `office_layout`; `event_id`
   para idempotência (Fase 8). Matriz de responsabilidade por papel/etapa definida.
 - ADR-015: frontend Svelte descartado nesta fase (o cenário/front serão feitos pelo autor; ativos em
-  `images/sprites/office/`); mantidos `GET /agents` e CORS configurável.
+  `frontend/images/sprites/office/`); mantidos `GET /agents` e CORS configurável.
 - ADR-016 (Tarefas): código parcial (repositórios) ainda NAO commitado; será refeito sobre o
   schema do ADR-017.
 - **Próximo:** migrações + base genérica Postgres; Tarefas/goals/transições; chat; memória; ADR-018
   (contrato MQTT); ADR de autonomia; Fase 8 (Go + Kafka); frontend.
+
+- Convenção: **um Dockerfile por microserviço** (`backend/Dockerfile`, futuramente `frontend/Dockerfile`,
+  `gateway/Dockerfile`), nunca um Dockerfile único na raiz. Ativos de arte agora em `frontend/images/`
+  (esqueleto do frontend).

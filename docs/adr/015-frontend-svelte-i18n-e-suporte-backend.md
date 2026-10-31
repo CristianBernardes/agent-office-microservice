@@ -7,14 +7,14 @@
 ## Contexto
 
 O frontend foi decidido como Svelte + TypeScript (Rodada 3). Os sprites dos 9 papéis já existem em
-`images/sprites/{role}/{estado}.png` (tiras de frames 48×96, 24 frames por animação de 1152 px).
+`frontend/images/sprites/{role}/{estado}.png` (tiras de frames 48×96, 24 frames por animação de 1152 px).
 O backend não tinha como listar agentes nem aceitava requisições de outra origem.
 
 ## Decisão
 
 - `frontend/`: Svelte 5 + TypeScript + Vite + Vitest. Sem Phaser/escritório completo nesta rodada
   (YAGNI): primeiro corte = painel com os agentes animados, contratar, despachar objetivo e demitir.
-- Sprites consumidos **direto de `images/sprites/`** via `import.meta.glob` (sem duplicar assets).
+- Sprites consumidos **direto de `frontend/images/sprites/`** via `import.meta.glob` (sem duplicar assets).
   O mapeamento status → animação fica em um módulo puro e testado (`sprites.ts`):
   idle→`aguardando_uma_tarefa`, thinking→`analisando_documentacao_e_adrs`,
   working→`trabalhando_no_computador`, talking→`participando_de_reunioes`,
