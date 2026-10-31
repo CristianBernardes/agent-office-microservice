@@ -23,6 +23,7 @@ from src.domain.interfaces.web_search_adapter import WebSearchResult
 from src.domain.value_objects.identifiers import AgentId, ArtifactId
 from src.infrastructure.filesystem.markdown_artifact_writer import MarkdownArtifactWriter
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
+from src.infrastructure.persistence.in_memory_agent_repository import InMemoryAgentRepository
 from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
@@ -32,7 +33,9 @@ from tests.unit.application.tasks.registry_support import task_use_cases
 pytestmark = pytest.mark.unit
 
 
-def _build_registry(tmp_path: Path, search_adapter: MockSearchAdapter) -> ToolRegistry:
+def _build_registry(
+    tmp_path: Path, search_adapter: MockSearchAdapter, agents: InMemoryAgentRepository | None = None
+) -> ToolRegistry:
     repository = InMemoryArtifactRepository(
         writer=MarkdownArtifactWriter(workspace_root=str(tmp_path))
     )
@@ -48,7 +51,7 @@ def _build_registry(tmp_path: Path, search_adapter: MockSearchAdapter) -> ToolRe
             artifact_repository=repository, message_bus=message_bus
         ),
         web_search_adapter=search_adapter,
-        **task_use_cases(message_bus),
+        **task_use_cases(message_bus, agents=agents),
     )
 
 
@@ -203,3 +206,57 @@ async def test_qa_cannot_use_research_tool(tmp_path: Path) -> None:
         await registry.execute(
             ToolName.RESEARCH, AgentId.generate(), Role.QA_ENGINEER, {"topic": "x"}
         )
+
+
+async def test_artifact_review_and_approve_tools(tmp_path: Path) -> None:
+    registry = _build_registry(tmp_path, MockSearchAdapter())
+    lead = AgentId.generate()
+    artifact = await registry.execute(
+        ToolName.WRITE_ARTIFACT,
+        lead,
+        Role.TECH_LEAD,
+        {
+            "title": "ADR",
+            "content": "# ADR",
+            "artifact_type": ArtifactType.BACKLOG.value,
+            "path": "adr/1.md",
+        },
+    )
+    arguments = {"artifact_id": str(artifact.artifact_id)}  # type: ignore[attr-defined]
+
+    reviewed = await registry.execute(ToolName.REVIEW_ARTIFACT, lead, Role.TECH_LEAD, arguments)
+    approved = await registry.execute(ToolName.APPROVE_ARTIFACT, lead, Role.TECH_LEAD, arguments)
+
+    assert isinstance(reviewed, Artifact) and isinstance(approved, Artifact)
+
+
+async def test_task_tools_create_assign_and_complete(tmp_path: Path) -> None:
+    from src.domain.entities.agent import Agent, Personality
+
+    agents = InMemoryAgentRepository()
+    dev = Agent(
+        agent_id=AgentId.generate(),
+        name="Ana",
+        role=Role.DEV_SENIOR,
+        personality=Personality(0.5, 0.5, 0.5, 0.5, 0.5),
+        llm_model="m",
+    )
+    await agents.save(dev)
+    registry = _build_registry(tmp_path, MockSearchAdapter(), agents)
+    po = AgentId.generate()
+
+    task = await registry.execute(
+        ToolName.CREATE_TASK, po, Role.PRODUCT_OWNER, {"title": "Landing", "priority": "high"}
+    )
+    task_id = str(task.task_id)  # type: ignore[attr-defined]
+    await registry.execute(
+        ToolName.ASSIGN_TASK,
+        po,
+        Role.PRODUCT_OWNER,
+        {"task_id": task_id, "agent_id": str(dev.agent_id)},
+    )
+    done = await registry.execute(
+        ToolName.COMPLETE_TASK, dev.agent_id, Role.DEV_SENIOR, {"task_id": task_id, "result": "ok"}
+    )
+
+    assert done.status.value == "done"  # type: ignore[attr-defined]

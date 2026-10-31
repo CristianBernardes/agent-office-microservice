@@ -559,6 +559,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 40 — Curingas no bus em memória e feed por agente (ADR-039)
 - `topic_matches` compartilhado; feed assina `office/agents/+/thought|action`.
 
+## Rodada 41 — Cobertura do ToolRegistry
+- Testes de review/approve de artefato e create/assign/complete de tarefa via registry (293 unit; cobertura total 96%).
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -587,7 +590,8 @@ identidade visual sugerida por papel listada acima.
 | 37 | `b20afc7` | Integração gateway Kafka (2 testes) |
 | 38 | `06bdecf` | Fix closed_at de goal já concluída |
 | 39 | `c2f8042` | Embedding mock 768 dims |
-| 40 | este commit | Curingas no bus em memória; feed por agente (291 unit + 13 integração; ADRs 001–039) |
+| 40 | `49e54c8` | Curingas no bus em memória; feed por agente (291 unit + 13 integração; ADRs 001–039) |
+| 41 | este commit | Cobertura do ToolRegistry (293 unit) |
 
 ### O que funciona
 
