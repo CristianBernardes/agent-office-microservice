@@ -286,6 +286,7 @@ def get_llm_adapter_resolver() -> ILlmAdapterResolver:
             base_url=settings.ollama_base_url,
             model=model,
             embedding_model=settings.ollama_embedding_model,
+            request_timeout_seconds=settings.ollama_request_timeout_seconds,
         )
 
     return RoleBasedLlmAdapterResolver(

@@ -668,6 +668,10 @@ Auditoria SOLID/DRY/YAGNI: divisão de tarefas extraída para `domain/services/t
 
 Removido texto de debug `wanderIntervalMs=...` que aparecia solto na página (App.svelte).
 
+## Rodada 74
+
+Reunião/ciclo falhavam com `httpx.ReadTimeout` (120s fixo): agora `OLLAMA_REQUEST_TIMEOUT_SECONDS` (padrão 600) vem do `.env`.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -730,6 +734,7 @@ Removido texto de debug `wanderIntervalMs=...` que aparecia solto na página (Ap
 | 71 | este commit | Sprint planning conduzido por PO/SM, divisão de tarefas, ADR-049 |
 | 72 | este commit | Refatoração SRP/DRY (task_splitter, _speak), RFC-005 e design doc do ciclo |
 | 73 | este commit | Remove texto de debug `wanderIntervalMs` solto no App.svelte |
+| 74 | este commit | Timeout do Ollama via .env (`OLLAMA_REQUEST_TIMEOUT_SECONDS`) |
 
 ### O que funciona
 

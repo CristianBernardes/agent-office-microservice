@@ -47,6 +47,7 @@ class Settings(BaseSettings):
 
     # Ollama — sempre externo ao Docker Compose deste projeto (ver ADR-009)
     ollama_base_url: str
+    ollama_request_timeout_seconds: float = Field(default=600, gt=0)
     ollama_model: str = "nemotron-3.5-bolt:latest"
     ollama_embedding_model: str = "nomic-embed-text:latest"
 

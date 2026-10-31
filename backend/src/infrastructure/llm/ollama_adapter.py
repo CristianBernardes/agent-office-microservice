@@ -47,11 +47,17 @@ def _parse_structured_reply(raw_content: str) -> dict[str, Any]:
 
 # Bloco: adaptador de LLM para o Ollama, acessado via HTTP.
 class OllamaAdapter(ILlmAdapter):
-    def __init__(self, base_url: str, model: str, embedding_model: str) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        model: str,
+        embedding_model: str,
+        request_timeout_seconds: float = _REQUEST_TIMEOUT_SECONDS,
+    ) -> None:
         self._base_url = base_url.rstrip("/")
         self._model = model
         self._embedding_model = embedding_model
-        self._http_client = httpx.AsyncClient(timeout=_REQUEST_TIMEOUT_SECONDS)
+        self._http_client = httpx.AsyncClient(timeout=request_timeout_seconds)
 
     @property
     def model_name(self) -> str:
