@@ -30,9 +30,10 @@ rigorous architectural documentation (ADRs, RFCs, Design Docs).
 *6-column Kanban board: backlog → todo → in_progress → testing → in_review → done.*
 
 ![Language change alert](images/alert.png)
+*Warning when switching language: changing it after the project started may corrupt files already written; confirmation is required.*
 
 ![Observability dashboard in Grafana](images/grafana.png)
-*Warning when switching language: changing it after the project started may corrupt files already written; confirmation is required.*
+*Grafana dashboard: backend, gateway and Kafka metrics.*
 
 ---
 
