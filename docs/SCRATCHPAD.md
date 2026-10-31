@@ -641,6 +641,10 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 
 - Cabeçalhos da ata usam o cargo localizado (pt/en) em vez do id do papel. Suíte unitária: 330 testes verdes.
 
+## Rodada 68 — Sprite bugado
+
+- `interagindo_com_objetos.png` tem 48 quadros, mas só os 24 primeiros são o personagem (o resto é um carrinho). `SpriteSheet.total` separa quadros animados de quadros da folha.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -697,6 +701,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 65 | este commit | Responsável obrigatório fora do backlog + diretiva de idioma nos prompts |
 | 66 | este commit | Poses alternativas dos sprites (interagindo_com_objetos, outra_postura_de_trabalho) |
 | 67 | este commit | Cargos traduzidos nas atas |
+| 68 | este commit | Correção do sprite bugado (interagindo_com_objetos) |
 
 ### O que funciona
 
