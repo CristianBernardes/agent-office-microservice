@@ -28,14 +28,14 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # Banco de dados
-    database_url: str = "postgresql://agm:agm@localhost:7034/agm"
+    database_url: str
 
     # Backend de persistência: memory | postgres (ADR-014)
     persistence_backend: Literal["memory", "postgres"] = "memory"
 
     # Barramento MQTT
-    mqtt_host: str = "localhost"
-    mqtt_port: int = 7083
+    mqtt_host: str
+    mqtt_port: int
 
     # Barramento de mensagens: memory | mqtt (ADR-021)
     message_bus_backend: Literal["memory", "mqtt"] = "memory"
@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     meeting_rounds: int = Field(default=1, ge=1, le=5)
 
     # Ollama — sempre externo ao Docker Compose deste projeto (ver ADR-009)
-    ollama_base_url: str = "http://172.17.0.1:11434"
+    ollama_base_url: str
     ollama_model: str = "nemotron-3.5-bolt:latest"
     ollama_embedding_model: str = "nomic-embed-text:latest"
 
@@ -106,4 +106,5 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """Retorna a instância única (singleton por processo) de ``Settings``."""
-    return Settings()
+    # Campos obrigatórios vêm do ambiente (pydantic-settings), não de argumentos.
+    return Settings()  # type: ignore[call-arg]
