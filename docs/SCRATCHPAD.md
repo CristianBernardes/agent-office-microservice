@@ -922,6 +922,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 108 | este commit | Tentativa de embed (iframe) do vídeo nos READMEs, com a miniatura clicável como alternativa |
 | 109 | este commit | Iframe removido dos READMEs (GitHub não renderiza); aguardando URL `user-attachments` do vídeo para player inline |
 | 110 | este commit | Link simples do YouTube abaixo da miniatura nos READMEs |
+| 111 | este commit | Vídeo de demonstração (`videos/video_demo.mp4`, convertido de HEVC para H.264) em tag `<video>` nos READMEs |
 
 ### O que funciona
 

@@ -7,6 +7,8 @@
 
 ▶️ **Assista ao vídeo de demonstração:**
 
+<video src="https://github.com/CristianBernardes/agent-office-microservice/raw/master/videos/video_demo.mp4" controls muted width="100%"></video>
+
 [![Assista ao vídeo](https://img.youtube.com/vi/sAiGLPTWMv4/maxresdefault.jpg)](https://youtu.be/sAiGLPTWMv4)
 
 [https://youtu.be/sAiGLPTWMv4](https://youtu.be/sAiGLPTWMv4)

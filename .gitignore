@@ -24,3 +24,6 @@ workspace/*
 # Variáveis do docker-compose
 .env
 !.env.example
+
+# Vídeo original (HEVC, pesado); o README usa videos/video_demo.mp4
+videos/*.MOV
