@@ -262,6 +262,7 @@ make up
 make migrate   # aplica as migrações do banco
 
 # 5. Acesse
+# Escritório:   http://localhost:5173 (frontend)
 # API:          http://localhost:7001
 # Documentação: http://localhost:7001/docs
 # MQTT:         localhost:7083 (TCP) / localhost:7000 (WebSocket)
@@ -274,6 +275,7 @@ Todas as portas externas (host) deste projeto seguem a convenção de prefixo `7
 
 | Serviço | Porta externa |
 |---------|------------------|
+| Frontend (UI) | `5173` (deve casar com `CORS_ALLOWED_ORIGINS`) |
 | Backend (API HTTP) | `7001` |
 | Mosquitto (MQTT TCP) | `7083` |
 | Mosquitto (MQTT WebSocket) | `7000` |
@@ -296,6 +298,8 @@ make format            # formatação automática (ruff format)
 make type-check        # verificação de tipos estática (mypy --strict)
 make check             # roda format + lint + type-check + test
 ```
+
+Frontend (Svelte 5, pt/en, config via `frontend/.env`): `cd frontend && cp .env.example .env && npm ci && npm run dev`; testes com `npx vitest run`.
 
 Mais detalhes sobre a estrutura do backend em [`backend/README.md`](backend/README.md).
 

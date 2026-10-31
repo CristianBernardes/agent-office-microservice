@@ -619,7 +619,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 - Frontend completo em `frontend/` (Svelte 5 + TS + Vite, Vitest + Testing Library): mapa do escritório com sprites animados por status, quadro Kanban, time e tarefas atribuídas (andamento), conversas do time, logs em tempo real (MQTT/WS + atividade), formulário de objetivo e de nova tarefa (agentes quebram em subtarefas e escrevem os `.md` via tools), i18n pt/en.
 - Doação: Pix (QR) em português, PayPal em inglês (`VITE_PAYPAL_URL`, opcional); popup na primeira visita e a cada `VITE_DONATION_REMINDER_DAYS` dias; botão "Apoiar" sempre no cabeçalho. QR copiado de `frontend/images/` no `predev`/`prebuild` (original intacto).
 - Configuração só por `VITE_*` (`frontend/.env.example`). 41 testes, `svelte-check` e build limpos.
-- Pendente: Dockerfile/compose do frontend, job de CI, READMEs.
+- Dockerfile (Node→nginx, `VITE_*` como build args), serviço `frontend` no compose (`HOST_PORT_FRONTEND=5173`, casa com CORS) e job `frontend` no CI.
 
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
@@ -668,6 +668,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 56 | `4f637a6` | ADR-045: idempotência de activity_events por event_id; conftest movido para tests/unit |
 | 57 | `bce6183` | ADR-046: consumidor Kafka→MQTT fora do escopo (YAGNI, risco de laço) |
 | 58 | este commit | ADR-047: frontend Svelte 5 (mapa, kanban, time, chat, logs, doação pt/en) |
+| 59 | este commit | Dockerfile/compose/CI do frontend e README |
 
 ### O que funciona
 
@@ -678,7 +679,7 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 
 ### Limitações conhecidas
 
-- `move` aplica a matriz papel × estágio; `assign`/`complete` aplicam permissão por papel (ADR-035) e a entidade valida o estágio. Frontend é feito pelo autor.
+- `move` aplica a matriz papel × estágio; `assign`/`complete` aplicam permissão por papel (ADR-035) e a entidade valida o estágio. Frontend feito pelo assistente (ADR-047).
 
 ### Backlog
 

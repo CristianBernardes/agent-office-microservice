@@ -66,6 +66,27 @@ services:
     networks:
       - agent-office-microservice
 
+  frontend:
+    container_name: agent-office-microservice-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:${HOST_PORT_BACKEND}
+        VITE_MQTT_WS_URL: ws://localhost:${HOST_PORT_MQTT_WS}
+        VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE}
+        VITE_PIX_LABEL: ${VITE_PIX_LABEL}
+        VITE_PAYPAL_URL: ${VITE_PAYPAL_URL}
+        VITE_DONATION_REMINDER_DAYS: ${VITE_DONATION_REMINDER_DAYS}
+        VITE_REFRESH_INTERVAL_MS: ${VITE_REFRESH_INTERVAL_MS}
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT_FRONTEND}:80"
+    depends_on:
+      - backend
+    networks:
+      - agent-office-microservice
+
   redis:
     image: redis:7-alpine
     restart: unless-stopped
