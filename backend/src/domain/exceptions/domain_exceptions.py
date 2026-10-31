@@ -40,6 +40,11 @@ class InvalidStateTransitionError(DomainError):
     """Levantada quando uma transição de estado solicitada não é permitida."""
 
 
+# Bloco: papel sem permissão para a ação (ex.: mover um cartão fora da sua responsabilidade).
+class PermissionDeniedError(DomainError):
+    """Levantada quando o papel do ator não pode executar a ação."""
+
+
 # Bloco: violação de invariante de valor.
 # Usada por value objects quando um valor recebido não satisfaz as regras de
 # construção do objeto (ex.: um identificador vazio).

@@ -12,6 +12,16 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.PT: "Tarefa '{title}' está '{status}' e não pode ser concluída — "
         "apenas tarefas 'in_progress' podem ser concluídas.",
     },
+    "task.invalid_move": {
+        Language.EN: "Task '{title}' cannot move from '{from_status}' to '{to_status}'.",
+        Language.PT: "A tarefa '{title}' não pode ir de '{from_status}' para '{to_status}'.",
+    },
+    "task.move_forbidden": {
+        Language.EN: "Role '{role}' is not allowed to move a task "
+        "from '{from_status}' to '{to_status}'.",
+        Language.PT: "O papel '{role}' não pode mover uma tarefa "
+        "de '{from_status}' para '{to_status}'.",
+    },
     "task.not_found": {
         Language.EN: "Task with ID '{task_id}' was not found.",
         Language.PT: "Tarefa com ID '{task_id}' não foi encontrada.",

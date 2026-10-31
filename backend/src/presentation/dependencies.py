@@ -23,6 +23,7 @@ from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
     CreateTaskUseCase,
+    MoveTaskUseCase,
 )
 from src.application.tools.tool_registry import ToolRegistry
 from src.domain.interfaces.agent_repository import IAgentRepository
@@ -223,6 +224,10 @@ def get_complete_task_use_case() -> CompleteTaskUseCase:
         agent_repository=get_agent_repository(),
         message_bus=get_message_bus(),
     )
+
+
+def get_move_task_use_case() -> MoveTaskUseCase:
+    return MoveTaskUseCase(task_repository=get_task_repository(), message_bus=get_message_bus())
 
 
 # Bloco: registro de ferramentas (singleton por processo).

@@ -6,7 +6,8 @@ from uuid import UUID
 
 import asyncpg
 
-from src.domain.entities.task import Priority, Task, TaskStatus
+from src.domain.entities.agent import Role
+from src.domain.entities.task import Priority, Task, TaskStatus, TaskTransition
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.value_objects.identifiers import AgentId, TaskId
 
@@ -18,6 +19,13 @@ ON CONFLICT (task_id) DO UPDATE SET
     title = EXCLUDED.title, description = EXCLUDED.description, status = EXCLUDED.status,
     priority = EXCLUDED.priority, assigned_to = EXCLUDED.assigned_to,
     result = EXCLUDED.result, completed_at = EXCLUDED.completed_at
+"""
+
+# actor_id desconhecido vira NULL (a FK permite) para nunca perder o histórico.
+_TRANSITION_SQL = """
+INSERT INTO task_transitions (task_id, from_status, to_status, actor_id, actor_role, note,
+                              created_at)
+VALUES ($1, $2, $3, (SELECT agent_id FROM agents WHERE agent_id = $4), $5, $6, $7)
 """
 
 
@@ -49,6 +57,41 @@ class PostgresTaskRepository(ITaskRepository):
         """Retorna todas as tarefas, da mais antiga para a mais nova."""
         rows = await self._pool.fetch("SELECT * FROM tasks ORDER BY created_at")
         return [_to_task(row) for row in rows]
+
+    async def add_transition(self, transition: TaskTransition) -> None:
+        """Grava o movimento em ``task_transitions``."""
+        await self._pool.execute(
+            _TRANSITION_SQL,
+            transition.task_id.value,
+            transition.from_status.value if transition.from_status else None,
+            transition.to_status.value,
+            transition.actor_id.value,
+            transition.actor_role.value,
+            transition.note,
+            transition.created_at,
+        )
+
+    async def list_transitions(self, task_id: TaskId) -> list[TaskTransition]:
+        """Histórico da tarefa, do mais antigo ao mais novo."""
+        rows = await self._pool.fetch(
+            "SELECT * FROM task_transitions WHERE task_id = $1 ORDER BY created_at",
+            task_id.value,
+        )
+        return [_to_transition(row) for row in rows]
+
+
+def _to_transition(row: asyncpg.Record) -> TaskTransition:
+    actor: UUID | None = row["actor_id"]
+    origin: str | None = row["from_status"]
+    return TaskTransition(
+        task_id=TaskId(value=row["task_id"]),
+        from_status=None if origin is None else TaskStatus(origin),
+        to_status=TaskStatus(row["to_status"]),
+        actor_id=AgentId(value=actor) if actor else AgentId(value=UUID(int=0)),
+        actor_role=Role(row["actor_role"]),
+        note=row["note"] or "",
+        created_at=row["created_at"],
+    )
 
 
 def _to_task(row: asyncpg.Record) -> Task:

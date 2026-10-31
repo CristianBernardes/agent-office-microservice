@@ -7,7 +7,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from src.domain.entities.agent import Role
-from src.domain.entities.task import Priority, Task, TaskStatus
+from src.domain.entities.task import Priority, Task, TaskStatus, TaskTransition
 
 
 # Bloco: ator que executa a ação (até haver autenticação, informado no corpo).
@@ -28,6 +28,30 @@ class AssignTaskRequest(_ActorMixin):
 
 class CompleteTaskRequest(_ActorMixin):
     result: str = Field(..., min_length=1, max_length=8000)
+
+
+class MoveTaskRequest(_ActorMixin):
+    to_status: TaskStatus
+    note: str = Field(default="", max_length=1000)
+
+
+class TransitionResponse(BaseModel):
+    from_status: TaskStatus | None
+    to_status: TaskStatus
+    actor_id: str
+    actor_role: Role
+    note: str
+
+    @staticmethod
+    def from_entity(transition: TaskTransition) -> TransitionResponse:
+        """Converte o registro de histórico no DTO público."""
+        return TransitionResponse(
+            from_status=transition.from_status,
+            to_status=transition.to_status,
+            actor_id=str(transition.actor_id),
+            actor_role=transition.actor_role,
+            note=transition.note,
+        )
 
 
 class TaskResponse(BaseModel):

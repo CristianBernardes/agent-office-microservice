@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from src.domain.entities.task import Task
+from src.domain.entities.task import Task, TaskTransition
 from src.domain.value_objects.identifiers import TaskId
 
 
@@ -21,3 +21,11 @@ class ITaskRepository(ABC):
     @abstractmethod
     async def list_all(self) -> list[Task]:
         """Lista todas as tarefas persistidas."""
+
+    @abstractmethod
+    async def add_transition(self, transition: TaskTransition) -> None:
+        """Registra um movimento de cartão no histórico."""
+
+    @abstractmethod
+    async def list_transitions(self, task_id: TaskId) -> list[TaskTransition]:
+        """Histórico de movimentos da tarefa, do mais antigo ao mais novo."""

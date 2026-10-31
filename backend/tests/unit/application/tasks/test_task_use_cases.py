@@ -11,10 +11,14 @@ from src.application.tasks.task_use_cases import (
     CompleteTaskUseCase,
     CreateTaskInput,
     CreateTaskUseCase,
+    MoveTaskUseCase,
 )
 from src.domain.entities.agent import Agent, AgentStatus, Personality, Role
 from src.domain.entities.task import Priority, TaskStatus
-from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
+from src.domain.exceptions.domain_exceptions import (
+    InvalidStateTransitionError,
+    PermissionDeniedError,
+)
 from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId, TaskId
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
@@ -128,3 +132,76 @@ class TestComplete:
             await CompleteTaskUseCase(tasks, agents, bus).execute(
                 TaskId.generate(), "x", PO, Role.PRODUCT_OWNER
             )
+
+
+class TestTransitionsAndMove:
+    async def test_history_records_every_stage_with_actor(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        task_id, agent = await _create(tasks, bus), await _agent(agents)
+        await AssignTaskUseCase(tasks, agents, bus).execute(
+            task_id, agent.agent_id, PO, Role.PRODUCT_OWNER
+        )
+        await CompleteTaskUseCase(tasks, agents, bus).execute(
+            task_id, "ok", agent.agent_id, Role.DEV_SENIOR
+        )
+        history = await tasks.list_transitions(task_id)
+        assert [(t.from_status, t.to_status) for t in history] == [
+            (None, TaskStatus.BACKLOG),
+            (TaskStatus.BACKLOG, TaskStatus.IN_PROGRESS),
+            (TaskStatus.IN_PROGRESS, TaskStatus.DONE),
+        ]
+        assert history[-1].actor_role == Role.DEV_SENIOR
+
+    async def test_full_kanban_flow_by_the_right_roles(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, _, bus = world
+        task_id = await _create(tasks, bus)
+        move = MoveTaskUseCase(tasks, bus)
+        steps = [
+            (TaskStatus.TODO, Role.SCRUM_MASTER),
+            (TaskStatus.IN_PROGRESS, Role.DEV_JUNIOR),
+            (TaskStatus.IN_REVIEW, Role.DEV_JUNIOR),
+            (TaskStatus.DONE, Role.QA_ENGINEER),
+        ]
+        for target, role in steps:
+            task = await move.execute(task_id, target, AgentId.generate(), role)
+        assert task.status == TaskStatus.DONE
+        assert task.completed_at is not None
+        assert len(await tasks.list_transitions(task_id)) == 5
+
+    async def test_role_without_permission_is_denied_and_task_untouched(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, _, bus = world
+        task_id = await _create(tasks, bus)
+        with pytest.raises(PermissionDeniedError) as error:
+            await MoveTaskUseCase(tasks, bus).execute(task_id, TaskStatus.TODO, PO, Role.DEV_JUNIOR)
+        assert "não pode mover" in error.value.localized(Language.PT)
+        assert "not allowed to move" in error.value.localized(Language.EN)
+        stored = await tasks.find_by_id(task_id)
+        assert stored is not None and stored.status == TaskStatus.BACKLOG
+
+    async def test_move_outside_matrix_is_invalid(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, _, bus = world
+        with pytest.raises(InvalidStateTransitionError):
+            await MoveTaskUseCase(tasks, bus).execute(
+                await _create(tasks, bus), TaskStatus.DONE, PO, Role.PRODUCT_OWNER
+            )
+
+    async def test_move_unknown_task(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, _, bus = world
+        with pytest.raises(TaskNotFoundError):
+            await MoveTaskUseCase(tasks, bus).execute(
+                TaskId.generate(), TaskStatus.TODO, PO, Role.PRODUCT_OWNER
+            )
+
+    async def test_reviewer_can_send_back_and_move_clears_completion(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, _, bus = world
+        task_id = await _create(tasks, bus)
+        move = MoveTaskUseCase(tasks, bus)
+        for target, role in [
+            (TaskStatus.TODO, Role.PRODUCT_OWNER),
+            (TaskStatus.IN_PROGRESS, Role.DEV_SENIOR),
+            (TaskStatus.IN_REVIEW, Role.DEV_SENIOR),
+            (TaskStatus.IN_PROGRESS, Role.QA_ENGINEER),
+            (TaskStatus.BLOCKED, Role.SCRUM_MASTER),
+        ]:
+            task = await move.execute(task_id, target, PO, role)
+        assert task.status == TaskStatus.BLOCKED and task.completed_at is None

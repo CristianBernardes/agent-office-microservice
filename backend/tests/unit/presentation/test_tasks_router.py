@@ -93,3 +93,34 @@ class TestTasksRoutes:
             f"/tasks/{_create('Outra')}/assign", json={"agent_id": agent_id, **ACTOR}
         )
         assert response.status_code == 409
+
+
+class TestMoveRoute:
+    def _move(self, task_id: str, to: str, role: str, lang: str = "en"):  # type: ignore[no-untyped-def]
+        return client.post(
+            f"/tasks/{task_id}/move",
+            json={"to_status": to, "actor_id": ACTOR["actor_id"], "actor_role": role},
+            headers={"Accept-Language": lang},
+        )
+
+    def test_planner_moves_and_history_is_exposed(self) -> None:
+        task_id = _create()
+        assert self._move(task_id, "todo", "scrum_master").json()["status"] == "todo"
+        history = client.get(f"/tasks/{task_id}/transitions").json()
+        assert [h["to_status"] for h in history] == ["backlog", "todo"]
+        assert history[-1]["actor_role"] == "scrum_master"
+
+    def test_forbidden_role_is_403_localized(self) -> None:
+        task_id = _create()
+        pt = self._move(task_id, "todo", "dev_junior", "pt")
+        en = self._move(task_id, "todo", "dev_junior", "en")
+        assert pt.status_code == en.status_code == 403
+        assert "não pode mover" in pt.json()["detail"]
+        assert "not allowed to move" in en.json()["detail"]
+
+    def test_invalid_move_is_409_and_unknown_is_404(self) -> None:
+        assert self._move(_create(), "done", "product_owner").status_code == 409
+        assert self._move(str(uuid4()), "todo", "product_owner").status_code == 404
+
+    def test_unknown_status_is_422(self) -> None:
+        assert self._move(_create(), "nope", "product_owner").status_code == 422

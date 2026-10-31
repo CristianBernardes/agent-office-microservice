@@ -28,3 +28,18 @@ coordenar trabalho nem a cena do escritório ter o que mostrar.
 
 - Continuam sem handler: `send_message`, `hire_agent`, `start_ceremony` (próximas rodadas).
 - A cena do escritório pode listar tarefas e agentes pela API.
+
+## Adendo — histórico de transições e matriz papel × estágio
+
+- Toda mudança de estágio grava uma linha em `task_transitions` (`from_status`, `to_status`, ator,
+  papel, nota). Criar, atribuir, concluir e mover registram histórico. `ITaskRepository` ganha
+  `add_transition` e `list_transitions`. No Postgres, `actor_id` desconhecido vira `NULL` (a FK
+  permite) para não perder o registro.
+- Novo caso de uso `MoveTaskUseCase` (`POST /tasks/{id}/move`) com política de domínio
+  `task_workflow` (matriz estágio→estágio × papéis). Movimento fora da matriz → 409
+  (`task.invalid_move`); papel sem permissão → 403 (`task.move_forbidden`), ambos pt/en.
+- Matriz: backlog→todo (PO, SM); todo→in_progress (devs, tech lead); in_progress→in_review (devs,
+  tech lead); in_review→done (QA, tech lead, PO); in_review→in_progress (QA, tech lead);
+  qualquer ativo→blocked (SM, tech lead, PO); blocked→todo (SM, PO).
+- `assign` e `complete` seguem como atalhos de fluxo (backlog→in_progress e in_progress→done)
+  sem a matriz, para não quebrar a API da rodada anterior; a matriz vale para `move`.

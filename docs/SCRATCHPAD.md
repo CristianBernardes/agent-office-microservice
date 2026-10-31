@@ -389,3 +389,13 @@ identidade visual sugerida por papel listada acima.
 - Tools `create_task`, `assign_task`, `complete_task` no `ToolRegistry`; chave i18n `task.not_found`.
 - 167 unitários passando; format/lint/mypy limpos.
 - **Próximo:** `task_transitions` + matriz papel×estágio, goals/chat (`send_message`), memória, ADR-019 MQTT.
+
+### Rodada 11 — Histórico de transições e matriz papel × estágio (ADR-016, adendo)
+
+- `task_transitions` gravada em create/assign/complete/move (ator + papel + nota).
+- `MoveTaskUseCase` + `POST /tasks/{id}/move` (403 papel sem permissão, 409 movimento inválido,
+  404) e `GET /tasks/{id}/transitions`; mensagens pt/en.
+- Matriz em `domain/policies/task_workflow.py`; `move_to(DONE)` agora preenche `completed_at`
+  (respeita o CHECK do banco).
+- 188 unitários passando; format/lint/mypy limpos.
+- **Próximo:** goals/sessões + chat (`send_message`), memória (pgvector), MQTT real, autonomia dos agentes.

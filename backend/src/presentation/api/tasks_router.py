@@ -13,8 +13,12 @@ from src.application.tasks.task_use_cases import (
     CompleteTaskUseCase,
     CreateTaskInput,
     CreateTaskUseCase,
+    MoveTaskUseCase,
 )
-from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
+from src.domain.exceptions.domain_exceptions import (
+    InvalidStateTransitionError,
+    PermissionDeniedError,
+)
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId, TaskId
@@ -23,12 +27,15 @@ from src.presentation.api.task_schemas import (
     AssignTaskRequest,
     CompleteTaskRequest,
     CreateTaskRequest,
+    MoveTaskRequest,
     TaskResponse,
+    TransitionResponse,
 )
 from src.presentation.dependencies import (
     get_assign_task_use_case,
     get_complete_task_use_case,
     get_create_task_use_case,
+    get_move_task_use_case,
     get_task_repository,
 )
 
@@ -39,6 +46,8 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 def _http_error(error: Exception, language: Language) -> HTTPException:
     if isinstance(error, TaskNotFoundError | AgentNotFoundError):
         return HTTPException(status.HTTP_404_NOT_FOUND, error.localized(language))
+    if isinstance(error, PermissionDeniedError):
+        return HTTPException(status.HTTP_403_FORBIDDEN, error.localized(language))
     assert isinstance(error, InvalidStateTransitionError)
     return HTTPException(status.HTTP_409_CONFLICT, error.localized(language))
 
@@ -104,3 +113,34 @@ async def complete_task(
     except (TaskNotFoundError, InvalidStateTransitionError) as error:
         raise _http_error(error, language) from error
     return TaskResponse.from_entity(task)
+
+
+@router.post("/{task_id}/move", response_model=TaskResponse)
+async def move_task(
+    task_id: UUID,
+    body: MoveTaskRequest,
+    use_case: MoveTaskUseCase = Depends(get_move_task_use_case),
+    language: Language = Depends(get_request_language),
+) -> TaskResponse:
+    """Move o cartão de estágio (404 inexistente, 409 inválido, 403 sem permissão)."""
+    try:
+        task = await use_case.execute(
+            TaskId(value=task_id),
+            body.to_status,
+            AgentId(value=body.actor_id),
+            body.actor_role,
+            body.note,
+        )
+    except (TaskNotFoundError, InvalidStateTransitionError, PermissionDeniedError) as error:
+        raise _http_error(error, language) from error
+    return TaskResponse.from_entity(task)
+
+
+@router.get("/{task_id}/transitions", response_model=list[TransitionResponse])
+async def list_transitions(
+    task_id: UUID,
+    repository: ITaskRepository = Depends(get_task_repository),
+) -> list[TransitionResponse]:
+    """Histórico de movimentos do cartão."""
+    history = await repository.list_transitions(TaskId(value=task_id))
+    return [TransitionResponse.from_entity(item) for item in history]

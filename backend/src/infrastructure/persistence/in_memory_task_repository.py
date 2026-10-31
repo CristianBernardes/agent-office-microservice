@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from src.domain.entities.task import Task
+from src.domain.entities.task import Task, TaskTransition
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.value_objects.identifiers import TaskId
 
@@ -11,6 +11,7 @@ from src.domain.value_objects.identifiers import TaskId
 class InMemoryTaskRepository(ITaskRepository):
     def __init__(self) -> None:
         self._tasks_by_id: dict[TaskId, Task] = {}
+        self._transitions: list[TaskTransition] = []
 
     async def save(self, task: Task) -> None:
         """Persiste (cria ou atualiza) a tarefa em memória."""
@@ -23,3 +24,11 @@ class InMemoryTaskRepository(ITaskRepository):
     async def list_all(self) -> list[Task]:
         """Retorna todas as tarefas persistidas."""
         return list(self._tasks_by_id.values())
+
+    async def add_transition(self, transition: TaskTransition) -> None:
+        """Acrescenta o movimento ao histórico em memória."""
+        self._transitions.append(transition)
+
+    async def list_transitions(self, task_id: TaskId) -> list[TaskTransition]:
+        """Movimentos da tarefa, na ordem em que ocorreram."""
+        return [t for t in self._transitions if t.task_id == task_id]

@@ -8,10 +8,15 @@ from src.application.agents.fire_agent_use_case import AgentNotFoundError
 from src.application.common.message_envelope import build_message_envelope
 from src.application.tasks.task_errors import TaskNotFoundError
 from src.domain.entities.agent import Role
-from src.domain.entities.task import Priority, Task
+from src.domain.entities.task import Priority, Task, TaskStatus, TaskTransition
+from src.domain.exceptions.domain_exceptions import (
+    InvalidStateTransitionError,
+    PermissionDeniedError,
+)
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
+from src.domain.policies.task_workflow import can_move, is_valid_move
 from src.domain.value_objects.identifiers import AgentId, TaskId
 
 # Bloco: tópico de notificação de atualização de tarefa, conforme a RFC-001.
@@ -33,6 +38,20 @@ async def _publish_task_updated(
         },
     )
     await message_bus.publish(_TASK_UPDATED_TOPIC, envelope, qos=1)
+
+
+# Bloco: registro do histórico de movimentos (DRY entre todos os casos de uso).
+async def _record_transition(
+    repository: ITaskRepository,
+    task: Task,
+    from_status: TaskStatus | None,
+    actor_id: AgentId,
+    actor_role: Role,
+    note: str = "",
+) -> None:
+    await repository.add_transition(
+        TaskTransition(task.task_id, from_status, task.status, actor_id, actor_role, note)
+    )
 
 
 # Bloco: entrada de criação de tarefa.
@@ -59,6 +78,9 @@ class CreateTaskUseCase:
             priority=data.priority,
         )
         await self._task_repository.save(task)
+        await _record_transition(
+            self._task_repository, task, None, data.creator_id, data.creator_role
+        )
         await _publish_task_updated(self._message_bus, task, data.creator_id, data.creator_role)
         return task
 
@@ -86,10 +108,14 @@ class AssignTaskUseCase:
             raise AgentNotFoundError("agent.not_found", agent_id=assignee_id)
 
         # Valida o agente primeiro: se ele estiver ocupado, a tarefa não muda.
+        previous = task.status
         agent.assign_task(task.task_id)
         task.assign(assignee_id)
         await self._agent_repository.save(agent)
         await self._task_repository.save(task)
+        await _record_transition(
+            self._task_repository, task, previous, actor_id, actor_role, f"assigned:{assignee_id}"
+        )
         await _publish_task_updated(self._message_bus, task, actor_id, actor_role)
         return task
 
@@ -113,8 +139,10 @@ class CompleteTaskUseCase:
         if task is None:
             raise TaskNotFoundError("task.not_found", task_id=task_id)
 
+        previous = task.status
         task.complete(result)
         await self._task_repository.save(task)
+        await _record_transition(self._task_repository, task, previous, actor_id, actor_role)
 
         if task.assigned_to is not None:
             agent = await self._agent_repository.find_by_id(task.assigned_to)
@@ -122,5 +150,36 @@ class CompleteTaskUseCase:
                 agent.complete_task()
                 await self._agent_repository.save(agent)
 
+        await _publish_task_updated(self._message_bus, task, actor_id, actor_role)
+        return task
+
+
+# Bloco: caso de uso de movimento de cartão, regido pela matriz papel × estágio.
+class MoveTaskUseCase:
+    def __init__(self, task_repository: ITaskRepository, message_bus: IMessageBus) -> None:
+        self._task_repository = task_repository
+        self._message_bus = message_bus
+
+    async def execute(
+        self,
+        task_id: TaskId,
+        target: TaskStatus,
+        actor_id: AgentId,
+        actor_role: Role,
+        note: str = "",
+    ) -> Task:
+        task = await self._task_repository.find_by_id(task_id)
+        if task is None:
+            raise TaskNotFoundError("task.not_found", task_id=task_id)
+        previous = task.status
+        params = {"title": task.title, "from_status": previous.value, "to_status": target.value}
+        if not is_valid_move(previous, target):
+            raise InvalidStateTransitionError("task.invalid_move", **params)
+        if not can_move(actor_role, previous, target):
+            raise PermissionDeniedError("task.move_forbidden", role=actor_role.value, **params)
+
+        task.move_to(target)
+        await self._task_repository.save(task)
+        await _record_transition(self._task_repository, task, previous, actor_id, actor_role, note)
         await _publish_task_updated(self._message_bus, task, actor_id, actor_role)
         return task

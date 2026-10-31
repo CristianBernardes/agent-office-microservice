@@ -157,3 +157,45 @@ class TestPostgresArtifactRepository:
     async def test_find_by_id_returns_none_when_missing(self) -> None:
         repository = PostgresArtifactRepository(FakePool())  # type: ignore[arg-type]
         assert await repository.find_by_id(ArtifactId.generate()) is None
+
+
+class TestPostgresTaskTransitions:
+    async def test_add_transition_writes_enum_values(self) -> None:
+        from src.domain.entities.agent import Role
+        from src.domain.entities.task import TaskStatus, TaskTransition
+        from src.infrastructure.persistence.postgres_task_repository import PostgresTaskRepository
+
+        pool = FakePool()
+        actor = AgentId(value=uuid4())
+        await PostgresTaskRepository(pool).add_transition(  # type: ignore[arg-type]
+            TaskTransition(
+                TaskId(value=uuid4()), None, TaskStatus.BACKLOG, actor, Role.PRODUCT_OWNER, "n"
+            )
+        )
+        sql, args = pool.executed[0]
+        assert "task_transitions" in sql and "SELECT agent_id FROM agents" in sql
+        assert args[1:6] == (None, "backlog", actor.value, "product_owner", "n")
+
+    async def test_list_transitions_maps_rows_and_null_actor(self) -> None:
+        from datetime import UTC, datetime
+
+        from src.infrastructure.persistence.postgres_task_repository import PostgresTaskRepository
+
+        task_id = uuid4()
+        pool = FakePool(
+            [
+                {
+                    "task_id": task_id,
+                    "from_status": "todo",
+                    "to_status": "in_progress",
+                    "actor_id": None,
+                    "actor_role": "dev_senior",
+                    "note": None,
+                    "created_at": datetime.now(UTC),
+                }
+            ]
+        )
+        [item] = await PostgresTaskRepository(pool).list_transitions(  # type: ignore[arg-type]
+            TaskId(value=task_id)
+        )
+        assert item.from_status.value == "todo" and item.note == ""

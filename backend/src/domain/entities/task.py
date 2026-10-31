@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
 
+from src.domain.entities.agent import Role
 from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
 from src.domain.value_objects.identifiers import AgentId, TaskId
 
@@ -46,6 +47,11 @@ class Task:
     result: str | None = field(default=None)
     completed_at: datetime | None = field(default=None)
 
+    def move_to(self, new_status: TaskStatus) -> None:
+        """Muda o estágio (a permissão é verificada pela política ``task_workflow``)."""
+        self.status = new_status
+        self.completed_at = datetime.now(UTC) if new_status == TaskStatus.DONE else None
+
     def assign(self, agent_id: AgentId) -> None:
         """Atribui a tarefa a um agente, movendo-a para ``IN_PROGRESS``."""
         self.assigned_to = agent_id
@@ -65,3 +71,15 @@ class Task:
         self.result = result
         self.status = TaskStatus.DONE
         self.completed_at = datetime.now(UTC)
+
+
+# Bloco: registro imutável de um movimento de cartão (histórico do Kanban).
+@dataclass(frozen=True, slots=True)
+class TaskTransition:
+    task_id: TaskId
+    from_status: TaskStatus | None
+    to_status: TaskStatus
+    actor_id: AgentId
+    actor_role: Role
+    note: str = ""
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
