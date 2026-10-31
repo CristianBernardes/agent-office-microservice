@@ -40,6 +40,7 @@ export interface ApiClient {
   moveTask(taskId: string, input: MoveTaskInput): Promise<Task>
   createTask(input: CreateTaskInput): Promise<Task>
   hireAgent(input: HireAgentInput): Promise<Agent>
+  listModels(): Promise<string[]>
 }
 
 // Bloco: cliente REST tipado; fetch e idioma são injetados para facilitar testes (DIP).
@@ -72,6 +73,7 @@ export function createApiClient(
     listMessages: (sessionId) => request<ChatMessage[]>(`/sessions/${sessionId}/messages`),
     createGoal: (text) => post<Goal>('/goals', { text }),
     createTask: (input) => post<Task>('/tasks', input),
+    listModels: () => request<string[]>('/models'),
     hireAgent: (input) => post<Agent>('/agents', input),
     moveTask: (taskId, input) => post<Task>(`/tasks/${taskId}/move`, input),
   }

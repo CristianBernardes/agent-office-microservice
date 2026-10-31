@@ -2,7 +2,11 @@
   import { i18n } from '../lib/i18n.svelte'
   import { ROLES, type HireAgentInput, type Role } from '../lib/types'
 
-  let { defaultModel, onsubmit }: { defaultModel: string; onsubmit: (input: HireAgentInput) => Promise<void> } = $props()
+  let {
+    defaultModel,
+    models = [],
+    onsubmit,
+  }: { defaultModel: string; models?: string[]; onsubmit: (input: HireAgentInput) => Promise<void> } = $props()
 
   let name = $state('')
   let role = $state<Role>('dev_senior')
@@ -46,7 +50,13 @@
     <select bind:value={role} aria-label={i18n.t.hireRole}>
       {#each ROLES as r (r)}<option value={r}>{i18n.t.roles[r]}</option>{/each}
     </select>
-    <input bind:value={model} aria-label={i18n.t.hireModel} />
+    {#if models.length > 0}
+      <select bind:value={model} aria-label={i18n.t.hireModel}>
+        {#each models.includes(model) ? models : [model, ...models] as m (m)}<option value={m}>{m}</option>{/each}
+      </select>
+    {:else}
+      <input bind:value={model} aria-label={i18n.t.hireModel} />
+    {/if}
     <button type="submit" disabled={!name.trim() || !model.trim()}>{i18n.t.hireSubmit}</button>
     <button type="button" disabled={!model.trim()} onclick={hireTeam}>{i18n.t.hireTeam}</button>
   </div>

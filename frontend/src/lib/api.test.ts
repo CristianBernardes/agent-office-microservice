@@ -15,6 +15,11 @@ describe('createApiClient', () => {
     expect(init.headers['Accept-Language']).toBe('en')
   })
 
+  it('lista modelos disponíveis', async () => {
+    const api = createApiClient('http://api', () => 'pt', reply(['a', 'b']))
+    expect(await api.listModels()).toEqual(['a', 'b'])
+  })
+
   it('cria objetivo com POST', async () => {
     const fetchMock = reply({ goal_id: 'g' }, 201)
     await createApiClient('http://api', () => 'pt', fetchMock).createGoal('entregar')

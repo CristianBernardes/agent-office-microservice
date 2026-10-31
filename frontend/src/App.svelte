@@ -23,6 +23,7 @@
   i18n.init(config.defaultLanguage, localStorage)
   const api = createApiClient(config.apiUrl, () => i18n.language)
   const store = new OfficeStore()
+  let models = $state<string[]>([])
 
   let showDonation = $state(shouldShowReminder(readLastShown(), new Date(), config.donationReminderDays))
   const lines = $derived(mergeLogs(store.logs, store.activity))
@@ -62,6 +63,7 @@
 
   onMount(() => {
     store.load(api).catch(() => {})
+    api.listModels().then((list) => (models = list)).catch(() => {})
     const stop = connectRealtime(config.mqttWsUrl, {
       onEvent: (event) => store.apply(event),
       onConnection: (connected) => (store.connected = connected),
@@ -90,7 +92,7 @@
     selectedId={store.selectedAgentId}
     onselect={(id) => store.select(id)}
   />
-  <HireForm defaultModel={config.defaultLlmModel} onsubmit={hireAgent} />
+  <HireForm defaultModel={config.defaultLlmModel} {models} onsubmit={hireAgent} />
   <div class="grid">
     <GoalForm onsubmit={createGoal} />
     <TaskForm hasAgents={store.agents.length > 0} onsubmit={createTask} />

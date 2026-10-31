@@ -88,6 +88,15 @@ describe('componentes', () => {
     expect(onsubmit).toHaveBeenCalledWith({ name: 'Ana', role: 'tech_lead', llm_model: 'qwen' })
   })
 
+  it('HireForm oferece seleção quando há modelos disponíveis', async () => {
+    const onsubmit = vi.fn().mockResolvedValue(undefined)
+    render(HireForm, { defaultModel: 'qwen', models: ['llama', 'qwen'], onsubmit })
+    await fireEvent.input(screen.getByLabelText('Nome'), { target: { value: 'Ana' } })
+    await fireEvent.change(screen.getByLabelText('Modelo (Ollama)'), { target: { value: 'llama' } })
+    await fireEvent.click(screen.getByRole('button', { name: 'Contratar' }))
+    expect(onsubmit).toHaveBeenCalledWith({ name: 'Ana', role: 'dev_senior', llm_model: 'llama' })
+  })
+
   it('HireForm contrata o time padrão', async () => {
     const onsubmit = vi.fn().mockResolvedValue(undefined)
     render(HireForm, { defaultModel: 'qwen', onsubmit })
