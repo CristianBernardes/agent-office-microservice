@@ -569,6 +569,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 43 — CI (ADR-040)
 - `.github/workflows/ci.yml`: backend (ruff, mypy, pytest unit) e gateway (go vet/test).
 
+## Rodada 44 — Badge de CI nos READMEs
+- Badge do workflow `ci.yml` em `README.md` e `README.en.md`.
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -600,7 +603,8 @@ identidade visual sugerida por papel listada acima.
 | 40 | `49e54c8` | Curingas no bus em memória; feed por agente (291 unit + 13 integração; ADRs 001–039) |
 | 41 | `7f691e5` | Cobertura do ToolRegistry (293 unit) |
 | 42 | `af24d88` | Factories Postgres + cache da pool (304 unit) |
-| 43 | este commit | CI GitHub Actions (ADR-040; ADRs 001–040) |
+| 43 | `16cc8d9` | CI GitHub Actions (ADR-040; ADRs 001–040) |
+| 44 | este commit | Badge de CI nos READMEs |
 
 ### O que funciona
 

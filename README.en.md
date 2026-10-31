@@ -2,6 +2,8 @@
 
 **🌐 Language:** English · [🇧🇷 Português (BR)](./README.md)
 
+[![CI](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml/badge.svg)](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml)
+
 > An IT office simulated by AI agents — each with its own role, personality and language model,
 > collaborating in real time via MQTT to research, debate, decide and document, exactly like a
 > real product/technology team would.
