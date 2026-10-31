@@ -329,7 +329,7 @@ dentro. O `domain/` nunca importa nada de `infrastructure/`, `application/` ou `
 toda dependência externa (LLM, banco, mensageria, busca web, filesystem) fica atrás de uma
 interface de domínio, permitindo troca de implementação sem alterar regra de negócio.
 
-### Visão completa do produto (estado final planejado)
+### Visão geral do produto
 
 ```
 ┌───────────────────────────────────────────┐
@@ -338,7 +338,7 @@ interface de domínio, permitindo troca de implementação sem alterar regra de 
 │  ├── Painel de controle                    │
 │  ├── Lista e estado dos agentes            │
 │  ├── Logs e notificações                   │
-│  └── Phaser: escritório em Pixel Art       │
+│  └── Escritório em Pixel Art               │
 └───────────────────┬─────────────────────────┘
                     │ WebSocket / HTTP
 ┌───────────────────▼─────────────────────────┐
@@ -364,11 +364,10 @@ interface de domínio, permitindo troca de implementação sem alterar regra de 
 └───────────────────────────────────────────────┘
 ```
 
-O frontend (Svelte + Phaser.js, pixel-art) faz parte da visão completa do produto e ainda não foi
-implementado neste repositório. O gateway Go (MQTT → Kafka com dedupe e DLQ, ver
-[ADR-024](docs/adr/024-gateway-go-mqtt-kafka.md)) já existe em [`gateway/`](gateway/); servir o
-frontend em tempo real ainda é pendente. Ver detalhes em [`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md)
-e no plano de migração em [`docs/migration-plan/fase-8-microservicos/`](docs/migration-plan/fase-8-microservicos/README.md).
+O frontend (Svelte 5 + TypeScript, escritório em pixel art, em pt/en) já está implementado em
+[`frontend/`](frontend/) e consome a API HTTP do backend e recebe eventos em tempo real via MQTT/WebSocket. O gateway Go (MQTT → Kafka com dedupe e
+DLQ, ver [ADR-024](docs/adr/024-gateway-go-mqtt-kafka.md)) também já existe em
+[`gateway/`](gateway/). Ver detalhes em [`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md).
 
 ### Artefatos como cidadãos de primeira classe
 
@@ -417,8 +416,7 @@ Toda decisão arquitetural relevante é documentada antes de ser implementada:
 - **RFCs** (`docs/rfc/`) — contratos que atravessam múltiplos componentes (protocolo de mensagens,
   ciclo de vida de artefatos, ciclo de vida de agentes, contrato da API HTTP)
 - **Design Docs** (`docs/design/`) — visões de arquitetura geral do produto
-- **Plano de Migração** (`docs/migration-plan/`) — todas as fases do roadmap técnico, incluindo as
-  ainda não implementadas
+- **Plano de Migração** (`docs/migration-plan/`) — histórico das fases do roadmap técnico
 
 ## Requisitos
 

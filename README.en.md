@@ -329,7 +329,7 @@ never imports anything from `infrastructure/`, `application/`, or `presentation/
 external dependency (LLM, database, messaging, web search, filesystem) sits behind a domain
 interface, allowing the implementation to be swapped without touching business rules.
 
-### Full product vision (planned end state)
+### Product overview
 
 ```
 ┌───────────────────────────────────────────┐
@@ -338,7 +338,7 @@ interface, allowing the implementation to be swapped without touching business r
 │  ├── Control panel                         │
 │  ├── Agent list and state                  │
 │  ├── Logs and notifications                │
-│  └── Phaser: pixel-art office              │
+│  └── Pixel-art office                      │
 └───────────────────┬─────────────────────────┘
                     │ WebSocket / HTTP
 ┌───────────────────▼─────────────────────────┐
@@ -365,13 +365,11 @@ interface, allowing the implementation to be swapped without touching business r
 └───────────────────────────────────────────────┘
 ```
 
-The frontend (Svelte + Phaser.js, pixel-art) is part of the full product vision and is not
-implemented in this repository yet. The Go gateway (MQTT → Kafka with dedupe and DLQ, see
-[ADR-024](docs/adr/024-gateway-go-mqtt-kafka.md)) already exists in [`gateway/`](gateway/); serving
-the frontend in real time is still pending. See details in
-[`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md) and the full migration
-plan in [`docs/migration-plan/fase-8-microservicos/`](docs/migration-plan/fase-8-microservicos/README.md)
-(both written in Portuguese).
+The frontend (Svelte 5 + TypeScript, pixel-art office, in pt/en) is already implemented in
+[`frontend/`](frontend/) and consumes the backend HTTP API and receives real-time events over MQTT/WebSocket. The Go gateway (MQTT → Kafka with dedupe
+and DLQ, see [ADR-024](docs/adr/024-gateway-go-mqtt-kafka.md)) also already exists in
+[`gateway/`](gateway/). See details in [`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md)
+(written in Portuguese).
 
 ### Artifacts as first-class citizens
 
@@ -419,8 +417,7 @@ Every relevant architectural decision is documented before being implemented:
 - **RFCs** (`docs/rfc/`) — contracts that cross multiple components (message protocol, artifact
   lifecycle, agent lifecycle, HTTP API contract)
 - **Design Docs** (`docs/design/`) — overall product architecture views
-- **Migration Plan** (`docs/migration-plan/`) — every phase of the technical roadmap, including
-  the ones not implemented yet
+- **Migration Plan** (`docs/migration-plan/`) — history of the technical roadmap phases
 
 > All internal documentation (ADRs, RFCs, Design Docs, migration plan, `SCRATCHPAD.md`) is
 > written in Portuguese, since this is the author's native language and this project started as
