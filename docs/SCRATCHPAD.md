@@ -920,6 +920,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 106 | este commit | PayPal (link de doação já usado nos READMEs) incluído no `FUNDING.yml` |
 | 107 | este commit | Vídeo de demonstração do YouTube no topo dos READMEs |
 | 108 | este commit | Tentativa de embed (iframe) do vídeo nos READMEs, com a miniatura clicável como alternativa |
+| 109 | este commit | Iframe removido dos READMEs (GitHub não renderiza); aguardando URL `user-attachments` do vídeo para player inline |
 
 ### O que funciona
 
