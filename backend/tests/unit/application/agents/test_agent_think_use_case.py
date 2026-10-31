@@ -17,6 +17,7 @@ from src.domain.interfaces.llm_adapter import LlmThoughtResponse
 from src.domain.value_objects.identifiers import AgentId
 from src.infrastructure.filesystem.markdown_artifact_writer import MarkdownArtifactWriter
 from src.infrastructure.llm.mock_llm_adapter import MockLlmAdapter
+from src.infrastructure.llm.role_based_llm_adapter_resolver import RoleBasedLlmAdapterResolver
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
 from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
@@ -30,6 +31,12 @@ pytestmark = pytest.mark.unit
 @pytest.fixture
 def neutral_personality() -> Personality:
     return Personality(0.5, 0.5, 0.5, 0.5, 0.5)
+
+
+def _resolver_for(adapter: MockLlmAdapter) -> RoleBasedLlmAdapterResolver:
+    return RoleBasedLlmAdapterResolver(
+        adapter_factory=lambda _model: adapter, default_model="mock-model", role_models={}
+    )
 
 
 def _build_tool_registry(tmp_path: Path, message_bus: InMemoryMessageBus) -> ToolRegistry:
@@ -63,7 +70,7 @@ class TestAgentThinkUseCase:
         )
         message_bus = InMemoryMessageBus()
         use_case = AgentThinkUseCase(
-            llm_adapter=MockLlmAdapter(),
+            llm_adapter_resolver=_resolver_for(MockLlmAdapter()),
             message_bus=message_bus,
             prompt_provider=FilePromptProvider(),
             tool_registry=_build_tool_registry(tmp_path, message_bus),
@@ -85,7 +92,7 @@ class TestAgentThinkUseCase:
         )
         message_bus = InMemoryMessageBus()
         use_case = AgentThinkUseCase(
-            llm_adapter=MockLlmAdapter(),
+            llm_adapter_resolver=_resolver_for(MockLlmAdapter()),
             message_bus=message_bus,
             prompt_provider=FilePromptProvider(),
             tool_registry=_build_tool_registry(tmp_path, message_bus),
@@ -114,7 +121,7 @@ class TestAgentThinkUseCase:
         agent.go_offline()
         message_bus = InMemoryMessageBus()
         use_case = AgentThinkUseCase(
-            llm_adapter=MockLlmAdapter(),
+            llm_adapter_resolver=_resolver_for(MockLlmAdapter()),
             message_bus=message_bus,
             prompt_provider=FilePromptProvider(),
             tool_registry=_build_tool_registry(tmp_path, message_bus),
@@ -150,7 +157,7 @@ class TestAgentThinkUseCase:
         )
         message_bus = InMemoryMessageBus()
         use_case = AgentThinkUseCase(
-            llm_adapter=MockLlmAdapter(responses=[llm_response]),
+            llm_adapter_resolver=_resolver_for(MockLlmAdapter(responses=[llm_response])),
             message_bus=message_bus,
             prompt_provider=FilePromptProvider(),
             tool_registry=_build_tool_registry(tmp_path, message_bus),

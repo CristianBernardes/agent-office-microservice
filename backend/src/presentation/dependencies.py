@@ -20,11 +20,13 @@ from src.application.tools.tool_registry import ToolRegistry
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.artifact_repository import IArtifactRepository
 from src.domain.interfaces.llm_adapter import ILlmAdapter
+from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter
 from src.infrastructure.config.settings import Settings, get_settings
 from src.infrastructure.llm.ollama_adapter import OllamaAdapter
+from src.infrastructure.llm.role_based_llm_adapter_resolver import RoleBasedLlmAdapterResolver
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
 from src.infrastructure.persistence.in_memory_agent_repository import (
     InMemoryAgentRepository,
@@ -85,16 +87,25 @@ def get_message_bus() -> IMessageBus:
     return InMemoryMessageBus()
 
 
-# Bloco: adaptador de LLM (singleton por processo).
-# `OllamaAdapter` é o provedor padrão deste projeto (ver ADR-005 e ADR-009).
+# Bloco: resolvedor de adaptador de LLM por papel (singleton por processo).
+# `OllamaAdapter` é o provedor padrão deste projeto (ver ADR-005 e ADR-009); o
+# modelo de cada papel vem de `.env` (Fase 5).
 @lru_cache
-def get_llm_adapter() -> ILlmAdapter:
-    """Retorna a instância única do adaptador de LLM usado pela aplicação."""
+def get_llm_adapter_resolver() -> ILlmAdapterResolver:
+    """Retorna a instância única do resolvedor de adaptadores de LLM por papel."""
     settings = get_application_settings()
-    return OllamaAdapter(
-        base_url=settings.ollama_base_url,
-        model=settings.ollama_model,
-        embedding_model=settings.ollama_embedding_model,
+
+    def build_ollama_adapter(model: str) -> ILlmAdapter:
+        return OllamaAdapter(
+            base_url=settings.ollama_base_url,
+            model=model,
+            embedding_model=settings.ollama_embedding_model,
+        )
+
+    return RoleBasedLlmAdapterResolver(
+        adapter_factory=build_ollama_adapter,
+        default_model=settings.ollama_model,
+        role_models=settings.role_models(),
     )
 
 
@@ -161,7 +172,7 @@ def get_tool_registry() -> ToolRegistry:
 def get_agent_think_use_case() -> AgentThinkUseCase:
     """Monta o caso de uso de pensamento do agente com suas dependências."""
     return AgentThinkUseCase(
-        llm_adapter=get_llm_adapter(),
+        llm_adapter_resolver=get_llm_adapter_resolver(),
         message_bus=get_message_bus(),
         prompt_provider=get_prompt_provider(),
         tool_registry=get_tool_registry(),

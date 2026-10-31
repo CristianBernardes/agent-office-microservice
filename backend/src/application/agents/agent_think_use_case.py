@@ -14,7 +14,8 @@ from src.application.common.message_envelope import build_message_envelope
 from src.application.tools.tool_permissions import ToolName
 from src.application.tools.tool_registry import ToolRegistry
 from src.domain.entities.agent import Agent
-from src.domain.interfaces.llm_adapter import ILlmAdapter, LlmThoughtResponse
+from src.domain.interfaces.llm_adapter import LlmThoughtResponse
+from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
 
@@ -31,12 +32,12 @@ _ACTION_TOPIC_TEMPLATE = "office/agents/{agent_id}/action"
 class AgentThinkUseCase:
     def __init__(
         self,
-        llm_adapter: ILlmAdapter,
+        llm_adapter_resolver: ILlmAdapterResolver,
         message_bus: IMessageBus,
         prompt_provider: IPromptProvider,
         tool_registry: ToolRegistry,
     ) -> None:
-        self._llm_adapter = llm_adapter
+        self._llm_adapter_resolver = llm_adapter_resolver
         self._message_bus = message_bus
         self._prompt_provider = prompt_provider
         self._tool_registry = tool_registry
@@ -47,7 +48,8 @@ class AgentThinkUseCase:
         await self._publish_status(agent)
 
         system_prompt = self._prompt_provider.get_system_prompt(agent.role, agent.name)
-        response = await self._llm_adapter.think(system_prompt=system_prompt, context=context)
+        llm_adapter = self._llm_adapter_resolver.resolve(agent.role)
+        response = await llm_adapter.think(system_prompt=system_prompt, context=context)
 
         await self._publish_thought(agent, response)
         await self._publish_action(agent, response)

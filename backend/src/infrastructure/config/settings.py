@@ -13,6 +13,8 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from src.domain.entities.agent import Role
+
 
 # Bloco: definição de todas as configurações do serviço.
 # Agrupa num único ponto todas as variáveis de ambiente consumidas pelo backend,
@@ -34,6 +36,17 @@ class Settings(BaseSettings):
     ollama_model: str = "nemotron-3.5-bolt:latest"
     ollama_embedding_model: str = "nomic-embed-text:latest"
 
+    # Modelo por papel (Fase 5). Vazio = usa `ollama_model`.
+    agent_po_model: str = ""
+    agent_sm_model: str = ""
+    agent_tech_lead_model: str = ""
+    agent_dev_senior_model: str = ""
+    agent_dev_junior_model: str = ""
+    agent_qa_model: str = ""
+    agent_data_model: str = ""
+    agent_hr_model: str = ""
+    agent_consultant_model: str = ""
+
     # Busca web (Tavily) — chave pessoal/paga, sem valor padrão de fábrica
     # (ver ADR-011). Ausente por padrão: só é exigida quando a ferramenta
     # `web_search` é efetivamente usada.
@@ -42,6 +55,21 @@ class Settings(BaseSettings):
     # HTTP da API do backend
     api_host: str = "0.0.0.0"
     api_port: int = 8000
+
+    def role_models(self) -> dict[Role, str]:
+        """Retorna os modelos configurados por papel (apenas os não vazios)."""
+        configured = {
+            Role.PRODUCT_OWNER: self.agent_po_model,
+            Role.SCRUM_MASTER: self.agent_sm_model,
+            Role.TECH_LEAD: self.agent_tech_lead_model,
+            Role.DEV_SENIOR: self.agent_dev_senior_model,
+            Role.DEV_JUNIOR: self.agent_dev_junior_model,
+            Role.QA_ENGINEER: self.agent_qa_model,
+            Role.DATA_ANALYST: self.agent_data_model,
+            Role.HR_MANAGER: self.agent_hr_model,
+            Role.PRODUCT_CONSULTANT: self.agent_consultant_model,
+        }
+        return {role: model for role, model in configured.items() if model}
 
 
 # Bloco: cache de instância única de configuração.

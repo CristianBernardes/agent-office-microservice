@@ -297,3 +297,20 @@ endpoint(s) HTTP ou outro ponto de entrada para o Cristian de fato disparar um o
 para o time pensar (hoje só é possível via teste automatizado ou código Python direto), e o início
 do frontend Svelte (Fase 1 do plano) consumindo os assets já organizados em `offices/`, aplicando a
 identidade visual sugerida por papel listada acima.
+
+### Rodada 4 — Fase 5: modelo de LLM por papel via `.env` (2026-10-31)
+
+- `domain/interfaces/llm_adapter_resolver.py`: porta `ILlmAdapterResolver.resolve(role)`.
+- `infrastructure/llm/role_based_llm_adapter_resolver.py`: resolve papel → modelo (override do
+  `.env` ou `OLLAMA_MODEL` padrão), cria o adaptador via factory injetada e reutiliza adaptadores
+  de papéis que compartilham o mesmo modelo.
+- `Settings`: variáveis `AGENT_*_MODEL` (PO, SM, TECH_LEAD, DEV_SENIOR, DEV_JUNIOR, QA, DATA, HR,
+  CONSULTANT), vazias por padrão (= modelo padrão) + `role_models()`. Documentadas em
+  `.env.example` e `.env`.
+- `AgentThinkUseCase` agora recebe `llm_adapter_resolver` e escolhe o adaptador por `agent.role`;
+  `get_llm_adapter` foi substituído por `get_llm_adapter_resolver` em `presentation/dependencies.py`.
+- Testes: +3 do resolvedor, +1 de `Settings.role_models`; testes do `AgentThinkUseCase` adaptados.
+  `make format`, `lint`, `type-check` limpos; 84 unitários passando. O teste de integração MQTT
+  falha apenas porque o broker não estava no ar (`make up` necessário).
+- **Ainda pendente:** `PostgresArtifactRepository`/`PostgresAgentRepository`, ponto de entrada para
+  o Cristian disparar objetivos, provedor OpenAI-compatible (não decidido), início do frontend Svelte.
