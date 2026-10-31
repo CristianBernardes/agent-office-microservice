@@ -26,6 +26,10 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "Task with ID '{task_id}' was not found.",
         Language.PT: "Tarefa com ID '{task_id}' não foi encontrada.",
     },
+    "chat.session_not_found": {
+        Language.EN: "Session with ID '{session_id}' was not found.",
+        Language.PT: "Sessão com ID '{session_id}' não foi encontrada.",
+    },
     "artifact.cannot_request_review": {
         Language.EN: "Artifact '{title}' is '{status}' and cannot be sent for review — "
         "only 'draft' artifacts can be reviewed.",

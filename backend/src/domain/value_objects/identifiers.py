@@ -56,3 +56,45 @@ class ArtifactId:
 
     def __str__(self) -> str:
         return str(self.value)
+
+
+# Bloco: identificador tipado de objetivo.
+@dataclass(frozen=True, slots=True)
+class GoalId:
+    value: UUID
+
+    @staticmethod
+    def generate() -> GoalId:
+        """Cria um novo identificador de objetivo, aleatório."""
+        return GoalId(value=uuid4())
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+
+# Bloco: identificador tipado de sessão.
+@dataclass(frozen=True, slots=True)
+class SessionId:
+    value: UUID
+
+    @staticmethod
+    def generate() -> SessionId:
+        """Cria um novo identificador de sessão, aleatório."""
+        return SessionId(value=uuid4())
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+
+# Bloco: identificador tipado de mensagem de chat.
+@dataclass(frozen=True, slots=True)
+class MessageId:
+    value: UUID
+
+    @staticmethod
+    def generate() -> MessageId:
+        """Cria um novo identificador de mensagem de chat, aleatório."""
+        return MessageId(value=uuid4())
+
+    def __str__(self) -> str:
+        return str(self.value)

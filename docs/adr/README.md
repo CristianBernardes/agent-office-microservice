@@ -33,3 +33,4 @@
 | [016](./016-tarefas-persistencia-casos-de-uso-e-rotas.md) | Tarefas: persistência, casos de uso, ferramentas e rotas | Aceito |
 | [017](./017-modelo-de-dados-relacional-unificado.md) | Modelo de dados relacional unificado | Aceito |
 | [018](./018-migracoes-estilo-laravel.md) | Migrações de banco estilo Laravel | Aceito |
+| [019](./019-objetivos-sessoes-e-chat.md) | Objetivos, sessões e chat | Aceito |

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 
 from src.application.artifacts.approve_artifact_use_case import ApproveArtifactUseCase
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
+from src.application.chat.chat_use_cases import SessionNotFoundError
 from src.application.tools.tool_permissions import ToolName
 from src.application.tools.tool_registry import (
     ToolNotImplementedError,
@@ -84,9 +86,9 @@ class TestToolRegistry:
 
         with pytest.raises(ToolNotImplementedError):
             await registry.execute(
-                tool_name=ToolName.SEND_MESSAGE,
+                tool_name=ToolName.HIRE_AGENT,
                 requester_id=AgentId.generate(),
-                requester_role=Role.PRODUCT_OWNER,
+                requester_role=Role.HR_MANAGER,
                 arguments={},
             )
 
@@ -121,4 +123,14 @@ class TestToolRegistry:
                 requester_id=AgentId.generate(),
                 requester_role=Role.SCRUM_MASTER,
                 arguments={"query": "qualquer coisa"},
+            )
+
+    async def test_send_message_tool_posts_to_session(self, tmp_path: Path) -> None:
+        registry = _build_registry(tmp_path, MockSearchAdapter())
+        with pytest.raises(SessionNotFoundError):
+            await registry.execute(
+                tool_name=ToolName.SEND_MESSAGE,
+                requester_id=AgentId.generate(),
+                requester_role=Role.PRODUCT_OWNER,
+                arguments={"session_id": str(uuid4()), "content": "oi"},
             )

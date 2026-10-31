@@ -19,6 +19,7 @@ from src.application.artifacts.write_artifact_use_case import (
     WriteArtifactInput,
     WriteArtifactUseCase,
 )
+from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -28,10 +29,11 @@ from src.application.tasks.task_use_cases import (
 from src.application.tools.tool_permissions import ToolName, role_can_use_tool
 from src.domain.entities.agent import Role
 from src.domain.entities.artifact import Artifact, ArtifactType
+from src.domain.entities.chat import ChatMessage, MessageKind
 from src.domain.entities.task import Priority, Task
 from src.domain.exceptions.domain_exceptions import DomainError
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter, WebSearchResult
-from src.domain.value_objects.identifiers import AgentId, ArtifactId, TaskId
+from src.domain.value_objects.identifiers import AgentId, ArtifactId, SessionId, TaskId
 
 
 # Bloco: erro levantado quando o papel solicitante não tem permissão para a
@@ -68,6 +70,7 @@ class ToolRegistry:
         create_task_use_case: CreateTaskUseCase,
         assign_task_use_case: AssignTaskUseCase,
         complete_task_use_case: CompleteTaskUseCase,
+        send_message_use_case: SendMessageUseCase,
     ) -> None:
         self._handlers: dict[ToolName, ToolHandler] = {
             ToolName.WRITE_ARTIFACT: self._make_write_artifact_handler(write_artifact_use_case),
@@ -79,6 +82,7 @@ class ToolRegistry:
             ToolName.CREATE_TASK: self._make_create_task_handler(create_task_use_case),
             ToolName.ASSIGN_TASK: self._make_assign_task_handler(assign_task_use_case),
             ToolName.COMPLETE_TASK: self._make_complete_task_handler(complete_task_use_case),
+            ToolName.SEND_MESSAGE: self._make_send_message_handler(send_message_use_case),
         }
 
     async def execute(
@@ -196,6 +200,26 @@ class ToolRegistry:
                 result=str(arguments["result"]),
                 actor_id=requester_id,
                 actor_role=requester_role,
+            )
+
+        return handler
+
+    @staticmethod
+    def _make_send_message_handler(use_case: SendMessageUseCase) -> ToolHandler:
+        async def handler(
+            requester_id: AgentId, requester_role: Role, arguments: dict[str, object]
+        ) -> ChatMessage:
+            recipient = arguments.get("recipient_id")
+            task = arguments.get("task_id")
+            return await use_case.execute(
+                SendMessageInput(
+                    session_id=SessionId(value=UUID(str(arguments["session_id"]))),
+                    content=str(arguments["content"]),
+                    sender_id=requester_id,
+                    recipient_id=AgentId(value=UUID(str(recipient))) if recipient else None,
+                    task_id=TaskId(value=UUID(str(task))) if task else None,
+                    kind=MessageKind(str(arguments.get("kind", MessageKind.CHAT.value))),
+                )
             )
 
         return handler

@@ -399,3 +399,13 @@ identidade visual sugerida por papel listada acima.
   (respeita o CHECK do banco).
 - 188 unitários passando; format/lint/mypy limpos.
 - **Próximo:** goals/sessões + chat (`send_message`), memória (pgvector), MQTT real, autonomia dos agentes.
+
+### Rodada 12 — Objetivos, sessões e chat (ADR-019)
+
+- Domínio `Session`/`Goal`/`ChatMessage`, `IChatRepository` (em memória + Postgres).
+- `SubmitGoalUseCase` (publica `office/goals/created`; o loop de autonomia futuro consome) e
+  `SendMessageUseCase` (usuário ou agente; publica `office/chat/message`).
+- Rotas `POST/GET /goals`, `POST /messages`, `GET /sessions/{id}/messages`; 404 localizado pt/en.
+- Tool `send_message` no `ToolRegistry`; chave i18n `chat.session_not_found`.
+- 204 unitários passando; format/lint/mypy limpos.
+- **Próximo:** memória (pgvector), MQTT real (ADR-020), autonomia dos agentes, gateway Go/Kafka.

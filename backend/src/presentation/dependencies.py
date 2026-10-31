@@ -19,6 +19,7 @@ from src.application.agents.hire_agent_use_case import HireAgentUseCase
 from src.application.artifacts.approve_artifact_use_case import ApproveArtifactUseCase
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
+from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -28,6 +29,7 @@ from src.application.tasks.task_use_cases import (
 from src.application.tools.tool_registry import ToolRegistry
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.artifact_repository import IArtifactRepository
+from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.llm_adapter import ILlmAdapter
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
 from src.domain.interfaces.message_bus import IMessageBus
@@ -44,11 +46,13 @@ from src.infrastructure.persistence.in_memory_agent_repository import (
 from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
+from src.infrastructure.persistence.in_memory_chat_repository import InMemoryChatRepository
 from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
 from src.infrastructure.persistence.postgres_agent_repository import PostgresAgentRepository
 from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
+from src.infrastructure.persistence.postgres_chat_repository import PostgresChatRepository
 from src.infrastructure.persistence.postgres_task_repository import PostgresTaskRepository
 from src.infrastructure.prompts.file_prompt_provider import FilePromptProvider
 from src.infrastructure.search.tavily_adapter import TavilySearchAdapter
@@ -126,6 +130,15 @@ def get_task_repository() -> ITaskRepository:
     if _use_postgres():
         return PostgresTaskRepository(_require_pool())
     return InMemoryTaskRepository()
+
+
+# Bloco: repositório de chat (singleton por processo), selecionado por PERSISTENCE_BACKEND.
+@lru_cache
+def get_chat_repository() -> IChatRepository:
+    """Retorna a instância única do repositório de chat usado pela aplicação."""
+    if _use_postgres():
+        return PostgresChatRepository(_require_pool())
+    return InMemoryChatRepository()
 
 
 # Bloco: barramento de mensagens (singleton por processo).
@@ -226,6 +239,18 @@ def get_complete_task_use_case() -> CompleteTaskUseCase:
     )
 
 
+def get_submit_goal_use_case() -> SubmitGoalUseCase:
+    return SubmitGoalUseCase(chat_repository=get_chat_repository(), message_bus=get_message_bus())
+
+
+def get_send_message_use_case() -> SendMessageUseCase:
+    return SendMessageUseCase(
+        chat_repository=get_chat_repository(),
+        agent_repository=get_agent_repository(),
+        message_bus=get_message_bus(),
+    )
+
+
 def get_move_task_use_case() -> MoveTaskUseCase:
     return MoveTaskUseCase(task_repository=get_task_repository(), message_bus=get_message_bus())
 
@@ -244,6 +269,7 @@ def get_tool_registry() -> ToolRegistry:
         create_task_use_case=get_create_task_use_case(),
         assign_task_use_case=get_assign_task_use_case(),
         complete_task_use_case=get_complete_task_use_case(),
+        send_message_use_case=get_send_message_use_case(),
     )
 
 
