@@ -578,6 +578,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 47 — CI completo (ADR-041)
 - `fail_under = 85` na cobertura (atual 96,6%); job `integration` no push para `main`; job `docker` verifica o build das imagens.
 
+## Rodada 48 — Início rápido atualizado
+- READMEs pt/en listam todos os modelos Ollama do `.env.example`, a stack completa e `make migrate`.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)

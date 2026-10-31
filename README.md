@@ -248,11 +248,16 @@ cp backend/.env.example backend/.env
 # (opcional) edite TAVILY_API_KEY em backend/.env para habilitar busca web
 
 # 3. Garanta que o Ollama está rodando no seu host
+ollama pull qwen3.6:latest
 ollama pull nemotron-3.5-bolt:latest
+ollama pull nemotron3:latest
+ollama pull gpt-oss:20b
+ollama pull sorc/qwen3.5-claude-4.6-opus:latest
 ollama pull nomic-embed-text:latest
 
-# 4. Suba toda a infraestrutura (Mosquitto + PostgreSQL + Backend)
+# 4. Suba toda a infraestrutura (Mosquitto + PostgreSQL + Redis + Kafka + Gateway + Backend)
 make up
+make migrate   # aplica as migrações do banco
 
 # 5. Acesse
 # API:          http://localhost:7001
