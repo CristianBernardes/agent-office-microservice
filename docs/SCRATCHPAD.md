@@ -927,6 +927,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 113 | este commit | Link simples do YouTube removido dos READMEs (fica só a miniatura clicável) |
 | 114 | este commit | Imagem Agent_Office_2.png como chamada clicável para o vídeo nos READMEs |
 | 115 | este commit | Todas as imagens (badges, vídeo e capturas de tela) centralizadas nos READMEs |
+| 116 | este commit | READMEs: removidas afirmações obsoletas (frontend "não implementado", Phaser, fases pendentes) |
 
 ### O que funciona
 
