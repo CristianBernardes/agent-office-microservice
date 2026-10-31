@@ -31,8 +31,10 @@ arquitetural rigorosa (ADRs, RFCs, Design Docs).
 *Quadro Kanban de 6 colunas: backlog → todo → in_progress → testing → in_review → done.*
 
 ![Alerta de troca de idioma](images/alert.png)
-*Aviso ao trocar o idioma: alterar depois do projeto iniciado pode corromper arquivos já escritos; é preciso confirmar.*
 
+
+![Painel de observabilidade no Grafana](images/grafana.png)
+*Painel do Grafana com métricas do backend, gateway e Kafka.*
 ---
 
 ## 💙 Antes de clonar ou fazer fork — ajude a manter este projeto vivo
