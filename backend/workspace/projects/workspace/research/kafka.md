@@ -1,41 +1,19 @@
 ---
-id: 28350f0f-def4-4fa4-aa68-95635e7bdddb
+id: ef6def2e-96a7-4dd8-9e5c-aeae4701c6e1
 title: Kafka
 type: analysis
 status: draft
-author_id: ca169fee-cf4e-447a-9e9d-7c75581e57ba
-created_at: 2026-10-31T15:08:01.202602+00:00
-updated_at: 2026-10-31T15:08:01.202604+00:00
+author_id: 29fbb5a3-f89e-43f9-95eb-e1b9fddb2f4a
+created_at: 2026-10-31T16:39:26.094712+00:00
+updated_at: 2026-10-31T16:39:26.094715+00:00
 ---
 
-# Kafka: Mensageria de Alta Performance
+# Apache Kafka
 
-**Resumo:**
-Kafka é uma plataforma de mensageria distribuída, tolerante a falhas e de alta escalabilidade, projetada para ingestão de eventos em tempo real e processamento de fluxos de dados. Utiliza um modelo de publicação‑assinatura onde produtores enviam mensagens a tópicos e consumidores leem essas mensagens de forma assíncrona, garantindo durabilidade e ordem.
+## Resumo
 
-## Visão Geral
-- **Arquitetura**: Brokers formam um cluster; os dados são particionados e replicados para alta disponibilidade.
-- **Topicos**: Cada mensagem é atribuída a um tópico; particionamento permite paralelismo e ordem por partição.
-- **Produtores**: Aplicações que publicam mensagens; podem ser síncronas ou assíncronas.
-- **Consumidores**: Aplicações que subscrevem a tópicos; suportam grupos de consumo para balanceamento de carga.
-- **Replicação**: Faturas (replicas) garantem tolerância a falhas e recuperação.
-
-## Principais Componentes
-- **Zookeeper** (ou KRaft nos últimos releases): gerencia metadados do cluster.
-- **Partições**: Dividem tópicos en sub‑segmentos, facilitando escalabilidade horizontal.
-- **Log Segmentado**: Cada mensagem é armazenada em um arquivo log sequencial, permitindo leitura rápida e retenção configurável.
-
-## Vantagens
-- **Alta taxa de throughput**: milhões de mensagens por segundo.
-- **Baixa latência**: ideal para uso em tempo real.
-- **Durabilidade**: mensagens são persistidas em disco.
-- **Escalabilidade**: adicionar brokers ou partições sem interrupção.
-
-## Casos de Uso
-- **Event sourcing** e captura de mudanças de estado.
-- **Pipeline de ingestão** de logs e métricas.
-- **Integração de micro‑serviços** via eventos.
-- **Processamento de streaming** com conectores (Kafka Connect).
+O Apache Kafka é uma plataforma de mensageria distribuída de alta performance, projetada para ingestão em tempo real de fluxos de dados e processamento de streaming. Ele utiliza um modelo de pub/sub baseado em tópicos, onde os dados são organizados em partições para garantir escalabilidade e tolerância a falhas. Produtores enviam mensagens para tópicos, e consumidores leem essas mensagens de forma flexível, suportando semânticas de entrega como at‑most‑once, at‑least‑once e exactly‑once. A arquitetura baseia‑se em brokers que armazenam logs imutáveis, replicados entre nós, permitindo alta disponibilidade. Kafka também oferece streaming de eventos, integração com sistemas de processamento (ex.: Kafka Streams, Connect) e conectores (source/sink) para ecossistemas de big data.
 
 ## Conclusões
-Kafka se consolida como a escolha padrão para sistemas que requerem mensageria robusta, escalável e de alto desempenho. Sua arquitetura baseada em logs sequenciais e modelo de pub/sub oferece flexibilidade para diversos padrões de uso, desde ingestão de eventos até stream processing em tempo real. A adoção de Kafka traz ganhos significativos em confiabilidade e capacidade de processamento, sendo amplamente adotado por empresas de grande porte e startups que precisam de pipelines de dados resilientes.
+
+Kafka se destaca por sua capacidade de lidar com volumes massivos de dados com baixa latência, oferecendo modelo de consumo push‑based e alta taxa de throughput. Sua arquitetura baseada em logs sequenciais garante consistência e replay de eventos, facilitando uso em pipelines de ingestão, processamento em tempo real e integração com sistemas de análise. As principais vantagens incluem escalabilidade horizontal, tolerância a falhas via replicação, e ecossistema rico de ferramentas complementares. Portanto, Kafka é a escolha recomendada para aplicações que requerem ingestão de eventos em tempo real, processamento de fluxos e armazenamento durável de dados de streaming.

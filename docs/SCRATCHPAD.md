@@ -740,6 +740,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Novo serviço `docker-dirs-init` (busybox) cria `prometheus`, `grafana`, `redis`, `kafka` e `mosquitto` com permissão 777 antes dos demais (o `pgdata` fica intocado: o Postgres exige 0700).
 - Volumes nomeados do Prometheus/Grafana removidos; Redis, Kafka e Mosquitto agora persistem em `.docker/`.
 
+## Rodada 89 — artefatos do workspace
+
+- Os 3 `.md` de pesquisa (`clean-architecture`, `kafka`, `tema`) regenerados pelos agentes passam a ser commitados; a partir daqui `git add -A` inclui o `backend/workspace`.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -816,7 +820,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 85 | `1781cfb` | Pendências finais registradas no SCRATCHPAD |
 | 86 | `8bec86a` | ADR-051: idioma do escritório em tempo de execução + trava avisando que trocar pode corromper arquivos |
 | 87 | `2768a1c` | ADR-052: observabilidade completa (Kafka UI, Prometheus, Grafana, exporters, cAdvisor, `/metrics` no backend e no gateway) |
-| 88 | este commit | Todos os volumes do compose movidos para `.docker/` (777 via `docker-dirs-init`) |
+| 88 | `10bb61d` | Todos os volumes do compose movidos para `.docker/` (777 via `docker-dirs-init`) |
+| 89 | este commit | Artefatos `.md` de pesquisa gerados pelos agentes em `backend/workspace` commitados |
 
 ### O que funciona
 
