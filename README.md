@@ -57,6 +57,8 @@ essas dívidas e a manter tempo e energia para continuar desenvolvendo o AgentOf
 Se este projeto te ajudou, te inspirou, ou você simplesmente quer ver essa ideia crescer bem no
 GitHub — considere doar antes de seguir para o clone/fork abaixo:
 
+<div align="center">
+
 <table>
 <tr>
 <td align="center" width="260">
@@ -84,8 +86,14 @@ Para quem está fora do Brasil, doações via PayPal são muito bem-vindas:
 </tr>
 </table>
 
+</div>
+
+<div align="center">
+
 Toda doação, de qualquer valor, ajuda a manter a saúde da minha família e a ideia deste projeto
 viva — obrigado! 🙏
+
+</div>
 
 ---
 

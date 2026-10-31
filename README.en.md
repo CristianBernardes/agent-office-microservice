@@ -56,6 +56,8 @@ pay off these debts and keep the time and energy available to continue developin
 If this project helped you, inspired you, or you simply want to see this idea grow well on
 GitHub — please consider donating before you clone/fork below:
 
+<div align="center">
+
 <table>
 <tr>
 <td align="center" width="260">
@@ -83,8 +85,14 @@ Scan the QR Code with your Brazilian bank app
 </tr>
 </table>
 
+</div>
+
+<div align="center">
+
 Any donation, of any amount, helps keep my family's health covered and this project's idea
 alive — thank you! 🙏
+
+</div>
 
 ---
 

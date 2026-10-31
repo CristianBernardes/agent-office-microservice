@@ -793,6 +793,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - `images/grafana.png` adicionado com legenda nos READMEs pt/en.
 
+### Rodada 100 — Doação centralizada
+
+- Tabela Pix/PayPal e agradecimento dentro de `<div align="center">` nos READMEs pt/en.
+
 ## Estado atual e ponto de retomada (após a Rodada 98)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -880,7 +884,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 96 | `cd39667` | READMEs pt/en: captura `alert.png` e seção de fluxo dos containers com diagramas Mermaid (todos os serviços do compose) |
 | 97 | `76f091c` | Sprite: folha `interagindo_com_objetos` só tem 24 quadros de personagem (o resto é o carrinho de props); pasta `sql/` com as 15 tarefas em pt/en |
 | 98 | `bf8793b` | Postgres + MQTT por padrão (ADR-053), testes isolados do `.env`, títulos de tarefa higienizados (`clean_title`), SCRATCHPAD reescrito |
-| 99 | este commit | `grafana.png` nos READMEs pt/en |
+| 99 | `42dc1d9` | `grafana.png` nos READMEs pt/en |
+| 100 | este commit | Seção de doação centralizada (`div align=center`) nos READMEs |
 
 ### O que funciona
 
