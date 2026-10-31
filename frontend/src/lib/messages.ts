@@ -91,7 +91,8 @@ export const pt: Messages = {
   donationPix: 'Escaneie o QR code com o app do seu banco para doar via Pix.',
   donationPaypal: 'Doe pelo PayPal.',
   donationPaypalButton: 'Doar com PayPal',
-  donationThanks: 'Projeto open source mantido por doações. Obrigado!',
+  donationThanks:
+    'Projeto open source criado por um pai para ajudar a custear a saúde da filha, que tem várias alergias. Qualquer ajuda é muito bem-vinda. Obrigado!',
   donationLater: 'Agora não',
   close: 'Fechar',
   thoughtLabel: 'Pensando',
@@ -177,7 +178,8 @@ export const en: Messages = {
   donationPix: 'Scan the QR code with your bank app to donate via Pix.',
   donationPaypal: 'Donate through PayPal.',
   donationPaypalButton: 'Donate with PayPal',
-  donationThanks: 'Open source project maintained by donations. Thank you!',
+  donationThanks:
+    "Open source project built by a dad to help cover his daughter's healthcare; she has several allergies. Any help is very welcome. Thank you!",
   donationLater: 'Not now',
   close: 'Close',
   thoughtLabel: 'Thinking',

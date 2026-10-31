@@ -672,6 +672,10 @@ Removido texto de debug `wanderIntervalMs=...` que aparecia solto na página (Ap
 
 Reunião/ciclo falhavam com `httpx.ReadTimeout` (120s fixo): agora `OLLAMA_REQUEST_TIMEOUT_SECONDS` (padrão 600) vem do `.env`.
 
+## Rodada 75
+
+Modal de doação passa a contar a história do projeto (chave `donationThanks`, pt/en).
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -734,7 +738,8 @@ Reunião/ciclo falhavam com `httpx.ReadTimeout` (120s fixo): agora `OLLAMA_REQUE
 | 71 | este commit | Sprint planning conduzido por PO/SM, divisão de tarefas, ADR-049 |
 | 72 | este commit | Refatoração SRP/DRY (task_splitter, _speak), RFC-005 e design doc do ciclo |
 | 73 | este commit | Remove texto de debug `wanderIntervalMs` solto no App.svelte |
-| 74 | este commit | Timeout do Ollama via .env (`OLLAMA_REQUEST_TIMEOUT_SECONDS`) |
+| 74 | f66141a | Timeout do Ollama via .env (`OLLAMA_REQUEST_TIMEOUT_SECONDS`) |
+| 75 | este commit | Modal de doação com a história do projeto (pt/en) |
 
 ### O que funciona
 
