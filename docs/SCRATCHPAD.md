@@ -734,6 +734,12 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Compose: kafka-ui, prometheus, grafana (dashboard provisionado), postgres/redis/kafka exporters e cAdvisor; portas e credenciais no `.env`.
 - Validado: todos os alvos do Prometheus `up`; Kafka UI 200; Grafana no ar. Testes: backend 356 unit, gateway ok.
 
+## Rodada 88 — volumes sempre em `.docker/`
+
+- Regra: todo volume do compose é bind mount dentro de `./.docker/` (ignorado pelo git). Nada de volumes nomeados/anônimos.
+- Novo serviço `docker-dirs-init` (busybox) cria `prometheus`, `grafana`, `redis`, `kafka` e `mosquitto` com permissão 777 antes dos demais (o `pgdata` fica intocado: o Postgres exige 0700).
+- Volumes nomeados do Prometheus/Grafana removidos; Redis, Kafka e Mosquitto agora persistem em `.docker/`.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -809,7 +815,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 84 | 8d87e88 | Personagens vivos (pausas de descanso/reflexão) + modal de gráficos Kaizen |
 | 85 | `1781cfb` | Pendências finais registradas no SCRATCHPAD |
 | 86 | `8bec86a` | ADR-051: idioma do escritório em tempo de execução + trava avisando que trocar pode corromper arquivos |
-| 87 | este commit | ADR-052: observabilidade completa (Kafka UI, Prometheus, Grafana, exporters, cAdvisor, `/metrics` no backend e no gateway) |
+| 87 | `2768a1c` | ADR-052: observabilidade completa (Kafka UI, Prometheus, Grafana, exporters, cAdvisor, `/metrics` no backend e no gateway) |
+| 88 | este commit | Todos os volumes do compose movidos para `.docker/` (777 via `docker-dirs-init`) |
 
 ### O que funciona
 

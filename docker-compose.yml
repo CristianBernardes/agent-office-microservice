@@ -1,4 +1,13 @@
 services:
+  # Cria (com permissão 777) os diretórios de volume em ./.docker (ADR-052).
+  docker-dirs-init:
+    image: busybox:stable
+    volumes:
+      - ./.docker:/docker
+    command: ["sh", "-c", "mkdir -p /docker/prometheus /docker/grafana /docker/redis /docker/kafka /docker/mosquitto && chmod -R 777 /docker/prometheus /docker/grafana /docker/redis /docker/kafka /docker/mosquitto"]
+    networks:
+      - agent-office-microservice
+
 
   mosquitto:
     container_name: agent-office-microservice-mosquitto
@@ -9,6 +18,10 @@ services:
       - "${HOST_PORT_MQTT_WS}:3000"
     volumes:
       - ./ops/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./.docker/mosquitto:/mosquitto/data
+    depends_on:
+      docker-dirs-init:
+        condition: service_completed_successfully
     networks:
       - agent-office-microservice
   
@@ -98,6 +111,11 @@ services:
     restart: unless-stopped
     ports:
       - "${HOST_PORT_REDIS}:6379"
+    volumes:
+      - ./.docker/redis:/data
+    depends_on:
+      docker-dirs-init:
+        condition: service_completed_successfully
     networks:
       - agent-office-microservice
 
@@ -115,6 +133,11 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "${HOST_PORT_KAFKA}:9092"
+    volumes:
+      - ./.docker/kafka:/var/lib/kafka/data
+    depends_on:
+      docker-dirs-init:
+        condition: service_completed_successfully
     networks:
       - agent-office-microservice
 
@@ -212,7 +235,10 @@ services:
     restart: unless-stopped
     volumes:
       - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
+      - ./.docker/prometheus:/prometheus
+    depends_on:
+      docker-dirs-init:
+        condition: service_completed_successfully
     ports:
       - "${HOST_PORT_PROMETHEUS}:9090"
     networks:
@@ -227,17 +253,16 @@ services:
     volumes:
       - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
-      - grafana-data:/var/lib/grafana
+      - ./.docker/grafana:/var/lib/grafana
     ports:
       - "${HOST_PORT_GRAFANA}:3000"
     depends_on:
-      - prometheus
+      docker-dirs-init:
+        condition: service_completed_successfully
+      prometheus:
+        condition: service_started
     networks:
       - agent-office-microservice
-
-volumes:
-  prometheus-data:
-  grafana-data:
 
 networks:
   agent-office-microservice:
