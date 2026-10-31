@@ -17,7 +17,13 @@ const SHEETS: Record<AgentStatus, SpriteSheet> = {
   offline: { file: 'agente_inativo_por_muito_tempo', frames: 13 },
 }
 
-export function spriteFor(role: Role, status: AgentStatus): SpriteSheet & { url: string } {
-  const sheet = SHEETS[status]
+const WALKING: SpriteSheet = { file: 'deslocamento_entre_salas', frames: 24 }
+
+export function spriteFor(
+  role: Role,
+  status: AgentStatus,
+  walking = false,
+): SpriteSheet & { url: string } {
+  const sheet = walking ? WALKING : SHEETS[status]
   return { ...sheet, url: `/images/sprites/${role}/${sheet.file}.png` }
 }

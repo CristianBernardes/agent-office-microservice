@@ -21,6 +21,7 @@ from src.application.artifacts.approve_artifact_use_case import ApproveArtifactU
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
+from src.application.autonomy.work_loop_use_case import WorkLoopUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
 from src.application.layout.layout_use_cases import GetLayoutUseCase, SaveLayoutUseCase
 from src.application.meetings.meeting_use_cases import (
@@ -446,6 +447,20 @@ def get_research_use_case() -> ResearchTopicUseCase:
         llm_resolver=get_llm_adapter_resolver(),
         web_search=get_web_search_adapter(),
         write_artifact=get_write_artifact_use_case(),
+        language=get_settings().language(),
+    )
+
+
+def get_work_loop_use_case() -> WorkLoopUseCase:
+    return WorkLoopUseCase(
+        agent_repository=get_agent_repository(),
+        task_repository=get_task_repository(),
+        assign_task=get_assign_task_use_case(),
+        move_task=get_move_task_use_case(),
+        dispatch_goal=get_dispatch_goal_use_case(),
+        send_message=get_send_message_use_case(),
+        write_artifact=get_write_artifact_use_case(),
+        message_bus=get_message_bus(),
         language=get_settings().language(),
     )
 

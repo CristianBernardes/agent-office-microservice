@@ -10,6 +10,7 @@ const base = {
   VITE_PAYPAL_URL: 'https://paypal.me/x',
   VITE_DONATION_REMINDER_DAYS: '7',
   VITE_REFRESH_INTERVAL_MS: '5000',
+  VITE_WANDER_INTERVAL_MS: '8000',
 }
 
 describe('loadConfig', () => {
@@ -23,6 +24,7 @@ describe('loadConfig', () => {
       paypalUrl: 'https://paypal.me/x',
       donationReminderDays: 7,
       refreshIntervalMs: 5000,
+      wanderIntervalMs: 8000,
     })
   })
 

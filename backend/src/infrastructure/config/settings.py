@@ -42,6 +42,7 @@ class Settings(BaseSettings):
 
     # Autonomia: agentes reagem a objetivos criados (ADR-022)
     autonomy_enabled: bool = False
+    work_loop_interval_seconds: float = Field(default=0, ge=0)
     meeting_rounds: int = Field(default=1, ge=1, le=5)
 
     # Ollama — sempre externo ao Docker Compose deste projeto (ver ADR-009)

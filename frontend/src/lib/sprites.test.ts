@@ -8,6 +8,12 @@ describe('spriteFor', () => {
     expect(s.frames).toBe(12)
   })
 
+  it('usa a folha de deslocamento ao andar', () => {
+    const s = spriteFor('dev_junior', 'idle', true)
+    expect(s.url).toBe('/images/sprites/dev_junior/deslocamento_entre_salas.png')
+    expect(s.frames).toBe(24)
+  })
+
   it('usa a tira longa quando ocioso', () => {
     expect(spriteFor('tech_lead', 'idle').frames).toBe(24)
   })

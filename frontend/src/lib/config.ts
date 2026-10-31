@@ -9,6 +9,7 @@ export interface AppConfig {
   paypalUrl: string
   donationReminderDays: number
   refreshIntervalMs: number
+  wanderIntervalMs: number
 }
 
 type Env = Record<string, string | undefined>
@@ -40,5 +41,6 @@ export function loadConfig(env: Env): AppConfig {
     paypalUrl: env.VITE_PAYPAL_URL ?? '',
     donationReminderDays: nonNegativeInt(env, 'VITE_DONATION_REMINDER_DAYS'),
     refreshIntervalMs: nonNegativeInt(env, 'VITE_REFRESH_INTERVAL_MS'),
+    wanderIntervalMs: nonNegativeInt(env, 'VITE_WANDER_INTERVAL_MS'),
   }
 }

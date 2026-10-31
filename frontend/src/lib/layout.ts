@@ -27,7 +27,12 @@ export interface Placement {
   agent: Agent
   left: number
   top: number
+  variant: number
 }
+
+// Bloco: giro de matiz do sprite por ordem dentro do papel, para colegas do mesmo cargo serem distintos.
+export const HUE_STEP_DEGREES = 75
+export const hueFor = (variant: number): number => (variant * HUE_STEP_DEGREES) % 360
 
 // Bloco: agentes do mesmo papel ficam lado a lado; retorna % do mapa para posicionar via CSS.
 export function placeAgents(agents: readonly Agent[]): Placement[] {
@@ -40,6 +45,31 @@ export function placeAgents(agents: readonly Agent[]): Placement[] {
       agent,
       left: ((seat.x + index * SPREAD_PX) / MAP_WIDTH) * 100,
       top: (seat.y / MAP_HEIGHT) * 100,
+      variant: index,
     }
   })
+}
+
+export interface Meeting {
+  walker: string
+  target: string
+}
+
+// Bloco: escolhe quem anda até quem; só agentes ativos e livres participam.
+export function pickMeeting(
+  agents: readonly Agent[],
+  busy: ReadonlySet<string>,
+  random: () => number,
+): Meeting | null {
+  const free = agents.filter((a) => a.status !== 'offline' && !busy.has(a.agent_id))
+  if (free.length < 2) return null
+  const walker = free[Math.floor(random() * free.length)]
+  const others = free.filter((a) => a !== walker)
+  const target = others[Math.floor(random() * others.length)]
+  return { walker: walker.agent_id, target: target.agent_id }
+}
+
+// Bloco: ponto de encontro ao lado do colega, em % do mapa.
+export function meetingPoint(left: number, top: number): { left: number; top: number } {
+  return { left: left + (60 / MAP_WIDTH) * 100, top }
 }

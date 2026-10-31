@@ -622,6 +622,11 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 - Formulário "Contratar agente" (`POST /agents`, modelo padrão `VITE_DEFAULT_LLM_MODEL`); verificado no navegador contra a stack local: agentes sentam nas mesas certas, sprites ok. Imagem antiga do backend causava CORS — rebuild resolveu.
 - Dockerfile (Node→nginx, `VITE_*` como build args), serviço `frontend` no compose (`HOST_PORT_FRONTEND=5173`, casa com CORS) e job `frontend` no CI.
 
+## Rodada 64 — Escritório vivo
+
+- Backend: `WorkLoopUseCase` (ADR-048) move tarefas backlog→todo→in_progress→in_review→done sozinho; `WORK_LOOP_INTERVAL_SECONDS` (0 = desligado).
+- Frontend: agentes andam até colegas (folha `deslocamento_entre_salas`), conversam e voltam; `VITE_WANDER_INTERVAL_MS`; matiz distinto por índice dentro do cargo; cargo exibido no rótulo.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -674,6 +679,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 61 | este commit | Botão "Contratar time padrão" (criar tarefa exige agentes) |
 | 62 | este commit | `GET /models` (Ollama) e seleção do modelo de IA ao contratar |
 | 63 | este commit | Idioma por objetivo (Accept-Language → reunião/prompts) e `/models` sem embeddings |
+| 64 | este commit | ciclo de trabalho autônomo (ADR-048) + escritório vivo no mapa: caminhadas, conversas, sprites distintos, cargo no rótulo |
 
 ### O que funciona
 

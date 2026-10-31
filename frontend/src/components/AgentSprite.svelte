@@ -2,8 +2,9 @@
   import { FRAME_HEIGHT, FRAME_WIDTH, spriteFor } from '../lib/sprites'
   import type { Agent } from '../lib/types'
 
-  let { agent }: { agent: Agent } = $props()
-  const sheet = $derived(spriteFor(agent.role, agent.status))
+  let { agent, walking = false, hue = 0 }: { agent: Agent; walking?: boolean; hue?: number } =
+    $props()
+  const sheet = $derived(spriteFor(agent.role, agent.status, walking))
 </script>
 
 <span
@@ -14,6 +15,7 @@
   style:--frames={sheet.frames}
   style:--w={`${FRAME_WIDTH}px`}
   style:--h={`${FRAME_HEIGHT}px`}
+  style:filter={hue ? `hue-rotate(${hue}deg)` : undefined}
 ></span>
 
 <style>

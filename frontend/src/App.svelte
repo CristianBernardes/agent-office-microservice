@@ -90,6 +90,7 @@
     agents={store.agents}
     thoughts={store.thoughts}
     selectedId={store.selectedAgentId}
+    wanderIntervalMs={config.wanderIntervalMs}
     onselect={(id) => store.select(id)}
   />
   <HireForm defaultModel={config.defaultLlmModel} {models} onsubmit={hireAgent} />
@@ -99,6 +100,7 @@
   </div>
   <div class="grid">
     <TeamBoard agents={store.agents} tasks={store.tasks} selectedId={store.selectedAgentId} onselect={(id) => store.select(id)} />
+    wanderIntervalMs={config.wanderIntervalMs}
     <ChatPanel messages={store.messages} agents={store.agents} />
     <LogPanel {lines} agents={store.agents} />
   </div>

@@ -1,7 +1,8 @@
 <script lang="ts">
   import AgentSprite from './AgentSprite.svelte'
   import { i18n } from '../lib/i18n.svelte'
-  import { MAP_HEIGHT, MAP_WIDTH, placeAgents } from '../lib/layout'
+  import { onMount } from 'svelte'
+  import { MAP_HEIGHT, MAP_WIDTH, hueFor, meetingPoint, pickMeeting, placeAgents } from '../lib/layout'
   import type { Agent } from '../lib/types'
 
   let {
@@ -9,32 +10,82 @@
     thoughts,
     selectedId,
     onselect,
+    wanderIntervalMs = 0,
+    walkMs = 3000,
+    chatMs = 5000,
   }: {
     agents: Agent[]
     thoughts: Record<string, string>
     selectedId: string | null
     onselect: (agentId: string) => void
+    wanderIntervalMs?: number
+    walkMs?: number
+    chatMs?: number
   } = $props()
   const placements = $derived(placeAgents(agents))
+
+  // Bloco: caminhadas — um agente vai até um colega, conversa e volta à sua mesa.
+  type Trip = { left: number; top: number; phase: 'walking' | 'chatting' | 'returning' }
+  let trips = $state<Record<string, Trip>>({})
+  const timers = new Set<ReturnType<typeof setTimeout>>()
+  const later = (fn: () => void, ms: number) => {
+    const t = setTimeout(() => {
+      timers.delete(t)
+      fn()
+    }, ms)
+    timers.add(t)
+  }
+
+  function startMeeting() {
+    const meeting = pickMeeting(agents, new Set(Object.keys(trips)), Math.random)
+    if (!meeting) return
+    const dest = placements.find((p) => p.agent.agent_id === meeting.target)
+    if (!dest) return
+    const point = meetingPoint(dest.left, dest.top)
+    const { walker } = meeting
+    trips[walker] = { ...point, phase: 'walking' }
+    later(() => (trips[walker] = { ...point, phase: 'chatting' }), walkMs)
+    later(() => {
+      const seat = placements.find((p) => p.agent.agent_id === walker)
+      if (seat) trips[walker] = { left: seat.left, top: seat.top, phase: 'returning' }
+    }, walkMs + chatMs)
+    later(() => delete trips[walker], 2 * walkMs + chatMs)
+  }
+
+  onMount(() => {
+    const interval = wanderIntervalMs > 0 ? setInterval(startMeeting, wanderIntervalMs) : undefined
+    return () => {
+      clearInterval(interval)
+      timers.forEach(clearTimeout)
+    }
+  })
 </script>
 
 <section class="map-wrap" aria-label={i18n.t.office}>
   <div class="map" style:aspect-ratio={`${MAP_WIDTH} / ${MAP_HEIGHT}`}>
-    {#each placements as { agent, left, top } (agent.agent_id)}
+    {#each placements as { agent, left, top, variant } (agent.agent_id)}
+      {@const trip = trips[agent.agent_id]}
       <button
         type="button"
         class="agent"
         class:selected={selectedId === agent.agent_id}
-        style:left={`${left}%`}
-        style:top={`${top}%`}
-        title={`${agent.name} — ${i18n.t.agentStatus[agent.status]}`}
+        class:moving={!!trip}
+        style:--walk={`${walkMs}ms`}
+        style:left={`${trip?.left ?? left}%`}
+        style:top={`${trip?.top ?? top}%`}
+        title={`${agent.name} — ${i18n.t.roles[agent.role]} — ${i18n.t.agentStatus[agent.status]}`}
         onclick={() => onselect(agent.agent_id)}
       >
         {#if thoughts[agent.agent_id]}
           <span class="bubble" role="status">{thoughts[agent.agent_id]}</span>
         {/if}
-        <AgentSprite {agent} />
+        <AgentSprite
+          agent={trip?.phase === 'chatting' ? { ...agent, status: 'talking' } : agent}
+          walking={trip?.phase === 'walking' || trip?.phase === 'returning'}
+          hue={hueFor(variant)}
+        />
         <span class="name">{agent.name}</span>
+        <span class="role">{i18n.t.roles[agent.role]}</span>
       </button>
     {/each}
   </div>
@@ -55,6 +106,8 @@
     display: flex; flex-direction: column; align-items: center;
     background: none; border: 0; padding: 0; color: inherit; cursor: pointer;
   }
+  .agent.moving { transition: left var(--walk) linear, top var(--walk) linear; z-index: 2; }
+  .role { font-size: 10px; background: rgba(0, 0, 0, 0.55); color: #ddd; padding: 0 5px; border-radius: 4px; white-space: nowrap; }
   .agent.selected .name { background: var(--accent); }
   .name {
     font-size: 12px; background: rgba(0, 0, 0, 0.7); color: #fff; padding: 1px 6px;

@@ -1,0 +1,119 @@
+"""Testes unitários do ciclo de trabalho autônomo (ADR-048)."""
+
+from __future__ import annotations
+
+from types import SimpleNamespace
+from typing import Any
+
+import pytest
+
+from src.application.autonomy.work_loop_use_case import WorkLoopUseCase
+from src.application.tasks.task_use_cases import AssignTaskUseCase, MoveTaskUseCase
+from src.domain.entities.agent import Agent, AgentStatus, Personality, Role
+from src.domain.entities.task import Task, TaskStatus
+from src.domain.localization.language import Language
+from src.domain.value_objects.identifiers import AgentId, TaskId
+from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
+from src.infrastructure.persistence.in_memory_agent_repository import InMemoryAgentRepository
+from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
+
+pytestmark = pytest.mark.unit
+
+
+class _Dispatch:
+    def __init__(self) -> None:
+        self.prompts: list[str] = []
+        self.languages: list[Any] = []
+
+    async def execute(self, agent_id: AgentId, context: str, language: Any = None) -> Any:
+        self.prompts.append(context)
+        self.languages.append(language)
+        return SimpleNamespace(thought="ok")
+
+
+class _Sink:
+    def __init__(self) -> None:
+        self.calls: list[Any] = []
+
+    async def execute(self, data: Any) -> None:
+        self.calls.append(data)
+
+
+def _agent(role: Role) -> Agent:
+    return Agent(
+        agent_id=AgentId.generate(),
+        name=role.value,
+        role=role,
+        personality=Personality(0.5, 0.5, 0.5, 0.5, 0.5),
+        llm_model="m",
+    )
+
+
+async def _build(
+    roles: list[Role], language: Language = Language.EN
+) -> tuple[WorkLoopUseCase, InMemoryTaskRepository, InMemoryAgentRepository, _Dispatch, _Sink]:
+    agents, tasks, bus = InMemoryAgentRepository(), InMemoryTaskRepository(), InMemoryMessageBus()
+    for role in roles:
+        await agents.save(_agent(role))
+    await tasks.save(Task(task_id=TaskId.generate(), title="T", description="d"))
+    dispatch, chat, artifacts = _Dispatch(), _Sink(), _Sink()
+    loop = WorkLoopUseCase(
+        agents,
+        tasks,
+        AssignTaskUseCase(tasks, agents, bus),
+        MoveTaskUseCase(tasks, bus),
+        dispatch,  # type: ignore[arg-type]
+        chat,  # type: ignore[arg-type]
+        artifacts,  # type: ignore[arg-type]
+        bus,
+        language,
+    )
+    return loop, tasks, agents, dispatch, artifacts
+
+
+async def _status(tasks: InMemoryTaskRepository) -> TaskStatus:
+    return (await tasks.list_all())[0].status
+
+
+_TEAM = [Role.PRODUCT_OWNER, Role.DEV_SENIOR, Role.QA_ENGINEER]
+
+
+async def test_task_walks_the_whole_kanban_across_ticks() -> None:
+    loop, tasks, agents, _, artifacts = await _build(_TEAM)
+    await loop.tick()
+    expected = [TaskStatus.IN_PROGRESS, TaskStatus.IN_REVIEW, TaskStatus.DONE]
+    for status in expected:
+        await loop.tick()
+        assert await _status(tasks) == status
+    assert len(artifacts.calls) == 1
+    assert all(a.status == AgentStatus.IDLE for a in await agents.list_all())
+
+
+async def test_task_waits_without_workers() -> None:
+    loop, tasks, _, _, _ = await _build([Role.PRODUCT_OWNER])
+    await loop.tick()
+    assert await _status(tasks) == TaskStatus.TODO
+
+
+async def test_review_waits_without_reviewer() -> None:
+    loop, tasks, _, _, _ = await _build([Role.PRODUCT_OWNER, Role.DEV_SENIOR])
+    for _ in range(4):
+        await loop.tick()
+    assert await _status(tasks) == TaskStatus.IN_REVIEW
+
+
+async def test_prompts_use_the_office_language() -> None:
+    loop, _, _, dispatch, _ = await _build(_TEAM, Language.PT)
+    for _ in range(4):
+        await loop.tick()
+    assert dispatch.languages == [Language.PT, Language.PT]
+    assert "Você está trabalhando" in dispatch.prompts[0]
+    assert "Revise" in dispatch.prompts[1]
+
+
+async def test_newly_hired_worker_picks_up_waiting_task() -> None:
+    loop, tasks, agents, _, _ = await _build([Role.PRODUCT_OWNER])
+    await loop.tick()
+    await agents.save(_agent(Role.DEV_JUNIOR))
+    await loop.tick()
+    assert await _status(tasks) == TaskStatus.IN_PROGRESS

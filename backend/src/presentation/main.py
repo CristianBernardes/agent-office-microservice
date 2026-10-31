@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.application.activity.activity_feed import register_activity_feed
 from src.application.autonomy.goal_meeting_use_case import register_goal_autonomy
+from src.application.autonomy.work_loop_use_case import start_work_loop, stop_work_loop
 from src.infrastructure.config.settings import Settings, get_settings
 from src.infrastructure.persistence.migrator import migrate
 from src.infrastructure.persistence.postgres_connection import create_postgres_pool
@@ -31,6 +32,7 @@ from src.presentation.dependencies import (
     get_activity_repository,
     get_goal_meeting_use_case,
     get_message_bus,
+    get_work_loop_use_case,
     set_database_pool,
 )
 
@@ -46,10 +48,17 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     await register_activity_feed(bus, get_activity_repository)()
     if settings.autonomy_enabled:
         await register_goal_autonomy(bus, get_goal_meeting_use_case)()
+    loop = (
+        start_work_loop(get_work_loop_use_case, settings.work_loop_interval_seconds)
+        if settings.work_loop_interval_seconds > 0
+        else None
+    )
     try:
         async with _database(settings):
             yield
     finally:
+        if loop is not None:
+            await stop_work_loop(loop)
         await bus.disconnect()
 
 
