@@ -513,6 +513,12 @@ identidade visual sugerida por papel listada acima.
 - Corrigidos dois testes de integração que estavam obsoletos (`Role.QA`, FK do autor do artefato).
 - Repos Postgres de relacionamento/reunião/layout/atividade agora validados contra banco real. Também validados: chat/goal/mensagens, tarefa e memória com busca pgvector (10 testes de integração no total). Pendente de integração real: Kafka, Redis e o gateway Go.
 
+## Rodada 28 — gateway Go validado ponta a ponta
+
+- `docker compose build gateway` OK; stack kafka+redis+kafka-init+gateway sobe.
+- MQTT → gateway → Kafka verificado: envelope válido chega em `office.events`; duplicata (mesmo `event_id`) descartada pelo Redis; envelope inválido vai para `office.events.dlq`.
+- Bug corrigido: o gateway subia antes dos tópicos existirem (`Unknown Topic Or Partition`); agora `depends_on: kafka-init: service_completed_successfully`.
+
 ## Estado atual e ponto de retomada (após a Rodada 27)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -541,7 +547,6 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–032.
 
 - Só `move` aplica a matriz papel × estágio.
 - Upsert Postgres de goals só funciona para goals criados `open`.
-- Kafka, Redis e `docker build` do gateway Go nunca foram executados de ponta a ponta.
 - Relacionamentos e reuniões só têm rotas de leitura; feed exclui tópicos por agente (bus em memória sem curinga).
 - Mock de embedding tem 8 dimensões; coluna é `vector(768)`.
 
@@ -549,7 +554,7 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–032.
 
 1. Agentes pesquisando e escrevendo `.md` em `workspace/projects/`.
 2. Rota HTTP para iniciar cerimônia; RFCs/Design Docs faltantes.
-3. Validar gateway Go com Kafka/Redis reais.
+3. (feito na Rodada 28) gateway validado.
 4. Frontend (feito pelo autor).
 
 ### Regras a lembrar
