@@ -203,3 +203,34 @@ class TestMeetingPersistence:
         assert meeting.kind is MeetingKind.PLANNING
         assert meeting.status is MeetingStatus.DONE
         assert meeting.participants == tuple(t.agent.agent_id for t in turns)
+
+
+class TestDebateRounds:
+    async def test_each_role_speaks_once_per_round(self) -> None:
+        roles = [Role.PRODUCT_OWNER, Role.TECH_LEAD]
+        use_case, dispatch, chat, *_ = await _build(roles)
+        use_case._rounds = 2
+
+        turns = await use_case.execute(_input())
+
+        assert [t.agent.role for t in turns] == [Role.PRODUCT_OWNER, Role.TECH_LEAD] * 2
+        assert len(chat.calls) == 4
+        assert "Debate round 2" in dispatch.contexts[2]
+        assert "Debate round" not in dispatch.contexts[0]
+
+    async def test_debate_is_localized(self) -> None:
+        use_case, dispatch, *_ = await _build([Role.PRODUCT_OWNER], Language.PT)
+        use_case._rounds = 2
+        await use_case.execute(_input())
+        assert "Rodada 2 de debate" in dispatch.contexts[1]
+
+    async def test_backlog_has_one_task_per_agent(self) -> None:
+        use_case, *_ = await _build([Role.PRODUCT_OWNER, Role.TECH_LEAD, Role.QA_ENGINEER])
+        use_case._rounds = 3
+        await use_case.execute(_input())
+        assert len(_TASKS[-1].calls) == 2
+
+    async def test_rounds_never_below_one(self) -> None:
+        use_case, *_ = await _build([Role.PRODUCT_OWNER])
+        use_case._rounds = max(1, 0)
+        assert len(await use_case.execute(_input())) == 1

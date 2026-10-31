@@ -12,6 +12,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Literal
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from src.domain.entities.agent import Role
@@ -41,6 +42,7 @@ class Settings(BaseSettings):
 
     # Autonomia: agentes reagem a objetivos criados (ADR-022)
     autonomy_enabled: bool = False
+    meeting_rounds: int = Field(default=1, ge=1, le=5)
 
     # Ollama — sempre externo ao Docker Compose deste projeto (ver ADR-009)
     ollama_base_url: str = "http://172.17.0.1:11434"

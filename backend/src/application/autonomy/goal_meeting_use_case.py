@@ -50,12 +50,16 @@ _LABELS = {
         "goal": "Objetivo do time",
         "minutes": "Ata da reunião até agora",
         "turn": "Sua vez de falar, como {role}. Contribua com o seu papel.",
+        "debate": "Rodada {round} de debate, como {role}. Responda aos colegas, concorde ou "
+        "discorde com argumentos e refine a proposta.",
         "title": "Ata da reunião — {goal}",
     },
     Language.EN: {
         "goal": "Team goal",
         "minutes": "Meeting minutes so far",
         "turn": "Your turn to speak, as {role}. Contribute from your role.",
+        "debate": "Debate round {round}, as {role}. Reply to your colleagues, agree or "
+        "disagree with arguments and refine the proposal.",
         "title": "Meeting minutes — {goal}",
     },
 }
@@ -86,7 +90,9 @@ class GoalMeetingUseCase:
         create_task: CreateTaskUseCase | None = None,
         record_interaction: RecordInteractionUseCase | None = None,
         meeting_repository: IMeetingRepository | None = None,
+        rounds: int = 1,
     ) -> None:
+        self._rounds = max(1, rounds)
         self._meeting_repository = meeting_repository
         self._record_interaction = record_interaction
         self._create_task = create_task
@@ -103,10 +109,11 @@ class GoalMeetingUseCase:
             logger.warning("Nenhum agente disponível para a reunião do objetivo %s", data.goal_id)
             return []
         turns: list[MeetingTurn] = []
-        for agent in participants:
-            turn = await self._take_turn(agent, data, turns)
-            if turn is not None:
-                turns.append(turn)
+        for round_number in range(1, self._rounds + 1):
+            for agent in participants:
+                turn = await self._take_turn(agent, data, turns, round_number)
+                if turn is not None:
+                    turns.append(turn)
         if turns:
             await self._write_minutes(data, turns)
             await self._create_backlog(turns, data.goal_id)
@@ -122,11 +129,11 @@ class GoalMeetingUseCase:
         return [by_role[role] for role in MEETING_ORDER if role in by_role]
 
     async def _take_turn(
-        self, agent: Agent, data: GoalMeetingInput, turns: list[MeetingTurn]
+        self, agent: Agent, data: GoalMeetingInput, turns: list[MeetingTurn], round_number: int = 1
     ) -> MeetingTurn | None:
         try:
             response = await self._dispatch.execute(
-                agent.agent_id, self._context(agent, data, turns)
+                agent.agent_id, self._context(agent, data, turns, round_number)
             )
             await self._send_message.execute(
                 SendMessageInput(
@@ -147,12 +154,15 @@ class GoalMeetingUseCase:
             return None
         return MeetingTurn(agent, response.thought)
 
-    def _context(self, agent: Agent, data: GoalMeetingInput, turns: list[MeetingTurn]) -> str:
+    def _context(
+        self, agent: Agent, data: GoalMeetingInput, turns: list[MeetingTurn], round_number: int = 1
+    ) -> str:
         minutes = "\n".join(f"- {t.agent.name} ({t.agent.role.value}): {t.thought}" for t in turns)
         parts = [f"{self._labels['goal']}: {data.text}"]
         if minutes:
             parts.append(f"{self._labels['minutes']}:\n{minutes}")
-        parts.append(self._labels["turn"].format(role=agent.role.value))
+        key = "turn" if round_number == 1 else "debate"
+        parts.append(self._labels[key].format(role=agent.role.value, round=round_number))
         return "\n\n".join(parts)
 
     # Bloco: guarda a reunião como `Meeting` concluída (ADR-028); falha aqui não derruba o fluxo.
@@ -161,7 +171,7 @@ class GoalMeetingUseCase:
             return
         try:
             now = datetime.now(UTC)
-            ids = tuple(t.agent.agent_id for t in turns)
+            ids = tuple(dict.fromkeys(t.agent.agent_id for t in turns))
             await self._meeting_repository.save(
                 Meeting(
                     meeting_id=MeetingId.generate(),
@@ -183,7 +193,9 @@ class GoalMeetingUseCase:
         if self._record_interaction is None:
             return
         try:
-            await self._record_interaction.record_group([t.agent.agent_id for t in turns])
+            await self._record_interaction.record_group(
+                list(dict.fromkeys(t.agent.agent_id for t in turns))
+            )
         except Exception:
             logger.exception("Falha ao registrar relacionamentos da reunião")
 
@@ -191,7 +203,9 @@ class GoalMeetingUseCase:
         owner = next((t.agent for t in turns if t.agent.role == Role.PRODUCT_OWNER), None)
         if owner is None or self._create_task is None:
             return
-        for turn in turns:
+        # Com várias rodadas, cada agente vira uma tarefa só: a sua última fala (a mais refinada).
+        final_turns = {t.agent.agent_id: t for t in turns}.values()
+        for turn in final_turns:
             if turn.agent.role == Role.PRODUCT_OWNER:
                 continue
             first_line = turn.thought.strip().splitlines()[0] if turn.thought.strip() else ""

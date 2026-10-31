@@ -437,4 +437,5 @@ def get_goal_meeting_use_case() -> GoalMeetingUseCase:
         create_task=get_create_task_use_case(),
         record_interaction=get_record_interaction_use_case(),
         meeting_repository=get_meeting_repository(),
+        rounds=get_settings().meeting_rounds,
     )

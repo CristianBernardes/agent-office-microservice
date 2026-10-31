@@ -500,6 +500,13 @@ identidade visual sugerida por papel listada acima.
 - 264 testes unitários, ruff e mypy limpos.
 - Próximo: debate multi-rodada, testes de integração, RFCs/Design Docs, refresh do "Estado atual".
 
+## Rodada 26 — debate multi-rodada (ADR-032)
+
+- `MEETING_ROUNDS` (1–5, padrão 1) em settings e `.env.example`; `GoalMeetingUseCase(rounds=)`.
+- Rodadas ≥2 usam o rótulo "debate" (pt/en) com a ata acumulada; backlog = 1 tarefa por agente (última fala); vínculos e `Meeting` com participantes únicos.
+- 268 testes unitários, ruff e mypy limpos.
+- Próximo: agentes pesquisando/escrevendo `.md`, testes de integração (Postgres/Mosquitto), RFCs/Design Docs, refresh do "Estado atual".
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)
