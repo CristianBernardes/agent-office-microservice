@@ -581,6 +581,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 48 — Início rápido atualizado
 - READMEs pt/en listam todos os modelos Ollama do `.env.example`, a stack completa e `make migrate`.
 
+## Rodada 49 — E2E PO → Dev → QA
+- `backend/tests/e2e/test_po_dev_qa_flow.py`: fluxo completo pela API (aprovação, rejeição do QA, dev não aprova o próprio trabalho). 309 unit/e2e.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
