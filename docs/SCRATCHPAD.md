@@ -614,6 +614,13 @@ ADR-045. `ON CONFLICT (event_id) DO NOTHING` em activity_events; teste de integr
 
 ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evolução futura.
 
+## Rodada 58 — Frontend Svelte 5 (ADR-047)
+
+- Frontend completo em `frontend/` (Svelte 5 + TS + Vite, Vitest + Testing Library): mapa do escritório com sprites animados por status, quadro Kanban, time e tarefas atribuídas (andamento), conversas do time, logs em tempo real (MQTT/WS + atividade), formulário de objetivo e de nova tarefa (agentes quebram em subtarefas e escrevem os `.md` via tools), i18n pt/en.
+- Doação: Pix (QR) em português, PayPal em inglês (`VITE_PAYPAL_URL`, opcional); popup na primeira visita e a cada `VITE_DONATION_REMINDER_DAYS` dias; botão "Apoiar" sempre no cabeçalho. QR copiado de `frontend/images/` no `predev`/`prebuild` (original intacto).
+- Configuração só por `VITE_*` (`frontend/.env.example`). 41 testes, `svelte-check` e build limpos.
+- Pendente: Dockerfile/compose do frontend, job de CI, READMEs.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -659,7 +666,8 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 54 | `c85e6ba` | MQTT do backend movido do compose para backend/.env.example (valores de container) |
 | 55 | `dd3d2cc` | README: Quick Start copia os três .env.example |
 | 56 | `4f637a6` | ADR-045: idempotência de activity_events por event_id; conftest movido para tests/unit |
-| 57 | este commit | ADR-046: consumidor Kafka→MQTT fora do escopo (YAGNI, risco de laço) |
+| 57 | `bce6183` | ADR-046: consumidor Kafka→MQTT fora do escopo (YAGNI, risco de laço) |
+| 58 | este commit | ADR-047: frontend Svelte 5 (mapa, kanban, time, chat, logs, doação pt/en) |
 
 ### O que funciona
 

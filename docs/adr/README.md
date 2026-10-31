@@ -61,3 +61,4 @@
 | [044](./044-settings-sem-defaults-de-infraestrutura.md) | Settings sem defaults de infraestrutura | Aceito |
 | [045](./045-idempotencia-de-eventos-no-postgres.md) | Idempotência de eventos no Postgres | Aceito |
 | [046](./046-consumidor-kafka-mqtt-fora-do-escopo.md) | Consumidor Kafka→MQTT fora do escopo | Aceito |
+| [047](./047-frontend-svelte-construido-pelo-assistente.md) | Frontend Svelte 5 construído neste repositório | Aceito |
