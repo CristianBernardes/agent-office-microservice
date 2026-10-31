@@ -424,3 +424,61 @@ identidade visual sugerida por papel listada acima.
 - Listener MQTT agora casa curingas (`+`, `#`) via `topic_matches`.
 - Contrato de tópicos documentado na ADR-021; testes com cliente falso (sem broker).
 - **Próximo:** loop de autonomia dos agentes (consome `office/goals/created`), gateway Go/Kafka.
+
+## Estado atual e ponto de retomada (2026-10-31, após a Rodada 14)
+
+### Commits por rodada (branch `develop`)
+
+| Rodada | Commit | Tema |
+|---|---|---|
+| 4 | `1c3b64c` | Modelo de LLM por papel (Fase 5) |
+| 5 | `99c66f3` | i18n pt/en (ADR-012) |
+| 6 | `8267f46` | `POST /agents/{id}/think` (ADR-013) |
+| 7 | `78f92d3` | Repositórios PostgreSQL (ADR-014) |
+| 8 | `a03127a`, `89e4f15`, `929253b` | ADR-017, `GET /agents` + CORS (ADR-015), esqueleto do frontend |
+| 9 | `ecb1a25` | Migrações estilo Laravel (ADR-018) |
+| 10 | `871db6c` | Tarefas (ADR-016) |
+| 11 | `d35c14e` | Transições + matriz papel × estágio |
+| 12 | `fe1a4c5` | Objetivos, sessões e chat (ADR-019) |
+| 13 | `6066d20` | Memória semântica (ADR-020) |
+| 14 | `25fa799` | MQTT real + contrato de tópicos (ADR-021) |
+
+Tudo até a Rodada 13 está no remoto; a Rodada 14 está commitada localmente (push pendente de aprovação).
+
+### O que já funciona (222 testes unitários; format/lint/mypy limpos)
+
+- **API:** `/health`, `/agents` (CRUD parcial + `think`), `/tasks` (criar, atribuir, concluir, mover,
+  transições), `/goals`, `/messages`, `/sessions/{id}/messages`, `/agents/{id}/memories` (+ `recall`).
+  Erros localizados pt/en via `Accept-Language`; fallback em `OFFICE_LANGUAGE`.
+- **Persistência:** `PERSISTENCE_BACKEND=memory|postgres`; 9 migrações validadas em Postgres+pgvector.
+- **Mensageria:** `MESSAGE_BUS_BACKEND=memory|mqtt`, envelope da RFC-001, curingas MQTT.
+- **Agentes:** 9 papéis com prompts/permissões, `ToolRegistry` (create/assign/complete_task,
+  send_message, artefatos, busca web), LLM por papel (Ollama externo, ADR-009), embeddings.
+- **ADRs:** 001–021 (índice em `docs/adr/README.md`).
+
+### Limitações conhecidas
+
+- Só `move` aplica a matriz papel × estágio; ator nulo em transição vira `AgentId(UUID(int=0))`
+  (workaround a revisar).
+- Upsert Postgres de goals só funciona para goals criados `open`.
+- Tools sem handler: `HIRE_AGENT` e `START_CEREMONY`.
+- A query pgvector e o `MqttMessageBus` só foram testados com fakes; falta integração real.
+- Mock de embedding tem 8 dimensões; a coluna é `vector(768)` (apenas Ollama real grava no Postgres).
+- Ainda não há loop de autonomia: `office/goals/created` é publicado, mas ninguém consome.
+
+### Backlog ordenado (um commit por item, ADR antes do código, testes pt/en)
+
+1. Autonomia dos agentes: ADR + loop que consome `office/goals/created`, reuniões, pesquisa e
+   artefatos `.md` em `workspace/projects/` (gitignored).
+2. `goal_id`/revisor/`position` em tasks, `relationships`, `meetings` (`start_ceremony`),
+   handler `hire_agent`, `office_layout` (`GET/PUT /layout`, semente a partir de `planta_baixa.png`),
+   `activity_events`.
+3. Testes de integração contra Postgres e Mosquitto reais; RFCs e Design Docs faltantes.
+4. Gateway Go (Fase 8): ADR, `gateway/` com Dockerfile próprio, Kafka (KRaft) + Redis no compose,
+   tópico `office.events` + DLQ, dedupe por `event_id`.
+5. Frontend (feito pelo autor) consumindo API, MQTT e imagens de `frontend/images/sprites/office/`.
+
+### Regras a lembrar
+
+ADR antes do código; `make format` a cada mudança; SCRATCHPAD atualizado **em todo commit**;
+sem trailer do Copilot; commits frequentes; perguntar antes do push; responder em português.
