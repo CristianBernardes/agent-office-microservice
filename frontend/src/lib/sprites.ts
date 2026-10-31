@@ -29,7 +29,7 @@ const SHEETS: Record<AgentStatus, SpriteSheet> = {
 
 // Bloco: poses alternativas, para o escritório usar todas as folhas de cada personagem.
 const ALT_SHEETS: Partial<Record<AgentStatus, SpriteSheet>> = {
-  idle: { file: 'interagindo_com_objetos', frames: 48, dirs: 4 },
+  idle: { file: 'interagindo_com_objetos', frames: 24, total: 48, dirs: 4 },
   thinking: { file: 'outra_postura_de_trabalho', frames: 12, dirs: 2 },
   working: { file: 'outra_postura_de_trabalho', frames: 12, dirs: 2 },
 }

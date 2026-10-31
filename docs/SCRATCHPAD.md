@@ -777,6 +777,11 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - `images/alert.png` adicionada às capturas de `README.md` e `README.en.md`.
 - Nova seção "Fluxo dos containers" / "Container flow" com um fluxograma Mermaid de todos os serviços do `docker-compose.yml` (docker-dirs-init, frontend, backend, mosquitto, gateway, kafka, kafka-init, redis, postgres, kafka-ui, exporters, cadvisor, prometheus, grafana, mais o Ollama externo), um diagrama de sequência do caminho de um objetivo e uma tabela de funções.
 
+## Rodada 97 — Sprite do carrinho e SQL de tarefas
+
+- Bug: a pose alternativa de `idle` (`interagindo_com_objetos`, 48 quadros) tratava a folha como 4 direções × 12, então a direção "frente" apontava para os quadros 36–47 (carrinho de props), mostrando uma fatia estranha no lugar do personagem. Os 24 primeiros quadros são as 4 direções × 6; os 24 últimos são o carrinho. Corrigido com `frames: 24, total: 48`; teste de regressão em `sprites.test.ts`.
+- Nova pasta `sql/` (`tasks.pt.sql`, `tasks.en.sql`, `clear_tasks.sql`, `README.md`) para criar as 15 tarefas de uma vez no Postgres; testada em banco temporário com as migrações.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -861,7 +866,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 93 | `96488a8` | Texto de doação transparente (dívida com saúde da filha, sem apelo emocional) no modal e nos READMEs |
 | 94 | `b04ff45` | Modal de confirmação profissional (`ConfirmModal`) no lugar do `window.confirm` na troca de idioma |
 | 95 | `d31ab04` | Correção de sprites: animação limitada a uma direção da folha (antes girava) e direção de caminhada pelo trajeto |
-| 96 | este commit | READMEs pt/en: captura `alert.png` e seção de fluxo dos containers com diagramas Mermaid (todos os serviços do compose) |
+| 96 | `cd39667` | READMEs pt/en: captura `alert.png` e seção de fluxo dos containers com diagramas Mermaid (todos os serviços do compose) |
+| 97 | este commit | Sprite: folha `interagindo_com_objetos` só tem 24 quadros de personagem (o resto é o carrinho de props); pasta `sql/` com as 15 tarefas em pt/en |
 
 ### O que funciona
 

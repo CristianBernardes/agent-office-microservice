@@ -21,6 +21,9 @@ describe('spriteFor', () => {
   it('usa as poses alternativas', () => {
     expect(spriteFor('qa_engineer', 'idle', false, true).url).toContain('interagindo_com_objetos')
     expect(spriteFor('qa_engineer', 'idle', false, true).total).toBe(48)
+    // Bloco: os 24 últimos quadros da folha são o carrinho de props, nunca o personagem.
+    const front = spriteFor('qa_engineer', 'idle', false, true, 'down')
+    expect(front.start + front.count).toBeLessThanOrEqual(24)
     expect(spriteFor('qa_engineer', 'working', false, true).url).toContain('outra_postura_de_trabalho')
     expect(spriteFor('qa_engineer', 'talking', false, true).url).toContain('participando_de_reunioes')
   })
@@ -31,7 +34,7 @@ describe('spriteFor', () => {
     const right = spriteFor('qa_engineer', 'idle', true, false, 'right')
     expect([right.start, right.count]).toEqual([0, 6])
     expect(spriteFor('qa_engineer', 'idle', true, false, 'left').start).toBe(12)
-    expect(spriteFor('qa_engineer', 'idle', false, true).count).toBe(12)
+    expect(spriteFor('qa_engineer', 'idle', false, true).count).toBe(6)
     expect(spriteFor('qa_engineer', 'working', false, false, 'left').start).toBe(6)
   })
 })
