@@ -791,6 +791,23 @@ files = [
 ]
 
 [[package]]
+name = "prometheus-client"
+version = "0.26.0"
+description = "Python client for the Prometheus monitoring system."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "prometheus_client-0.26.0-py3-none-any.whl", hash = "sha256:fa93d06737aa02bacd05794768508bb97d2fbee28cb3bca04eaae92f0ca953d6"},
+    {file = "prometheus_client-0.26.0.tar.gz", hash = "sha256:04a91bcf94e2cf74a44a1a874d651a2e853ed354b6e822f3b7487751465d5c2b"},
+]
+
+[package.extras]
+aiohttp = ["aiohttp"]
+django = ["django"]
+twisted = ["twisted"]
+
+[[package]]
 name = "pydantic"
 version = "2.14.2"
 description = "Data validation using Python type hints"
@@ -1583,4 +1600,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "774060d4eab847599ffa05883e6b6fdf980983112078a250651595eb63ece9d3"
+content-hash = "3885697e0b799f3708248b120bbfdc928f3f563c81e59a30c777f6c0f7bcac00"

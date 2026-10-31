@@ -282,6 +282,9 @@ Todas as portas externas (host) deste projeto seguem a convenção de prefixo `7
 | PostgreSQL | `7034` |
 | Kafka | `7092` |
 | Redis | `7079` |
+| Kafka UI | `7080` |
+| Prometheus | `7090` |
+| Grafana (dashboard "Agent Office") | `7030` (usuário/senha no `.env`) |
 
 ## Desenvolvimento
 

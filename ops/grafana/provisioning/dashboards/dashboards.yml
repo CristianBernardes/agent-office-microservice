@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: agent-office
+    folder: Agent Office
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards

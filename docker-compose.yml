@@ -152,6 +152,93 @@ services:
     networks:
       - agent-office-microservice
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    restart: unless-stopped
+    environment:
+      KAFKA_CLUSTERS_0_NAME: agent-office
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    ports:
+      - "${HOST_PORT_KAFKA_UI}:8080"
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    networks:
+      - agent-office-microservice
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    restart: unless-stopped
+    command: ["--kafka.server=kafka:9092"]
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    networks:
+      - agent-office-microservice
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
+    depends_on:
+      - postgres
+    networks:
+      - agent-office-microservice
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    restart: unless-stopped
+    environment:
+      REDIS_ADDR: redis://redis:6379
+    depends_on:
+      - redis
+    networks:
+      - agent-office-microservice
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - agent-office-microservice
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "${HOST_PORT_PROMETHEUS}:9090"
+    networks:
+      - agent-office-microservice
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${HOST_PORT_GRAFANA}:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - agent-office-microservice
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
 networks:
   agent-office-microservice:
     driver: bridge

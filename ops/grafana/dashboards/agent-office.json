@@ -1,0 +1,65 @@
+{
+  "title": "Agent Office",
+  "uid": "agent-office",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Tasks / Tarefas por status",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "office_tasks", "legendFormat": "{{status}}" }]
+    },
+    {
+      "id": 2, "type": "stat", "title": "Agents / Agentes por papel",
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "office_agents", "legendFormat": "{{role}}" }]
+    },
+    {
+      "id": 3, "type": "timeseries", "title": "HTTP req/s",
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum by (route) (rate(office_http_requests_total[1m]))", "legendFormat": "{{route}}" }]
+    },
+    {
+      "id": 4, "type": "timeseries", "title": "HTTP p95 latency (s)",
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "histogram_quantile(0.95, sum by (le, route) (rate(office_http_request_duration_seconds_bucket[5m])))", "legendFormat": "{{route}}" }]
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "Gateway MQTT→Kafka (msg/s)",
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "sum(rate(gateway_mqtt_received_total[1m]))", "legendFormat": "received" },
+        { "expr": "sum(rate(gateway_produced_total[1m]))", "legendFormat": "produced" },
+        { "expr": "sum(rate(gateway_produce_errors_total[1m]))", "legendFormat": "errors" }
+      ]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "Kafka messages by topic",
+      "gridPos": { "x": 0, "y": 13, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum by (topic) (kafka_topic_partition_current_offset)", "legendFormat": "{{topic}}" }]
+    },
+    {
+      "id": 7, "type": "timeseries", "title": "Containers CPU",
+      "gridPos": { "x": 12, "y": 13, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[1m]))", "legendFormat": "{{name}}" }]
+    },
+    {
+      "id": 8, "type": "timeseries", "title": "Postgres connections / Redis clients",
+      "gridPos": { "x": 0, "y": 20, "w": 24, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "sum(pg_stat_activity_count)", "legendFormat": "postgres" },
+        { "expr": "redis_connected_clients", "legendFormat": "redis" }
+      ]
+    }
+  ]
+}

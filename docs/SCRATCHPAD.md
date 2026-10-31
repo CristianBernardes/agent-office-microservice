@@ -727,6 +727,13 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Frontend envia o idioma ao carregar e ao trocar; `LanguageSwitcher` pede confirmação (aviso de possível corrupção de `.md` já escritos).
 - Testes: backend 354 unit, frontend 62.
 
+## Rodada 87 — observabilidade (ADR-052)
+
+- Backend `GET /metrics` (prometheus_client): HTTP por rota/status/latência + gauges `office_tasks` e `office_agents`.
+- Gateway Go `:9100/metrics` (`METRICS_ADDR`): recebidas/produzidas/erros por tópico.
+- Compose: kafka-ui, prometheus, grafana (dashboard provisionado), postgres/redis/kafka exporters e cAdvisor; portas e credenciais no `.env`.
+- Validado: todos os alvos do Prometheus `up`; Kafka UI 200; Grafana no ar. Testes: backend 356 unit, gateway ok.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -801,7 +808,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 83 | 8d87e88 | Workspace fixo (nunca criado em runtime, 777) + `.gitkeep` |
 | 84 | 8d87e88 | Personagens vivos (pausas de descanso/reflexão) + modal de gráficos Kaizen |
 | 85 | `1781cfb` | Pendências finais registradas no SCRATCHPAD |
-| 86 | este commit | ADR-051: idioma do escritório em tempo de execução + trava avisando que trocar pode corromper arquivos |
+| 86 | `8bec86a` | ADR-051: idioma do escritório em tempo de execução + trava avisando que trocar pode corromper arquivos |
+| 87 | este commit | ADR-052: observabilidade completa (Kafka UI, Prometheus, Grafana, exporters, cAdvisor, `/metrics` no backend e no gateway) |
 
 ### O que funciona
 

@@ -24,6 +24,8 @@ from src.presentation.api.chat_router import router as chat_router
 from src.presentation.api.health_router import router as health_router
 from src.presentation.api.layout_router import router as layout_router
 from src.presentation.api.memory_router import router as memory_router
+from src.presentation.api.metrics_router import metrics_middleware
+from src.presentation.api.metrics_router import router as metrics_router
 from src.presentation.api.models_router import router as models_router
 from src.presentation.api.office_router import router as office_router
 from src.presentation.api.research_router import router as research_router
@@ -94,7 +96,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.middleware("http")(metrics_middleware)
 app.include_router(health_router)
+app.include_router(metrics_router)
 app.include_router(office_router)
 app.include_router(agents_router)
 app.include_router(tasks_router)

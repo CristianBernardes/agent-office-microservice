@@ -66,3 +66,4 @@
 | [049](./049-cerimonia-de-planejamento-sprint.md) | Cerimônia de planejamento: ninguém fica ocioso | Aceito |
 | [050](./050-etapa-de-teste-antes-da-revisao.md) | Etapa de teste (QA) antes da revisão | Aceito |
 | [051](./051-idioma-do-escritorio-em-tempo-de-execucao.md) | Idioma do escritório em tempo de execução | Aceito |
+| [052](./052-observabilidade-prometheus-grafana-kafka-ui.md) | Observabilidade: Prometheus, Grafana e Kafka UI | Aceito |

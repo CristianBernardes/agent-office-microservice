@@ -284,6 +284,9 @@ All external (host) ports of this project follow the `70` prefix convention — 
 | PostgreSQL | `7034` |
 | Kafka | `7092` |
 | Redis | `7079` |
+| Kafka UI | `7080` |
+| Prometheus | `7090` |
+| Grafana ("Agent Office" dashboard) | `7030` (user/password in `.env`) |
 
 ## Development
 

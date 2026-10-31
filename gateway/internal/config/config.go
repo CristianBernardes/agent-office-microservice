@@ -23,6 +23,7 @@ type Config struct {
 	RedisAddr      string
 	DedupeTTL      time.Duration
 	DedupePrefix   string
+	MetricsAddr    string
 }
 
 // LoadDotEnv lê KEY=VALUE de um arquivo e exporta o que ainda não estiver no ambiente.
@@ -72,6 +73,7 @@ func Load() (Config, error) {
 		KafkaTopicDLQ:  get("KAFKA_TOPIC_DLQ"),
 		RedisAddr:      get("REDIS_ADDR"),
 		DedupePrefix:   get("DEDUPE_KEY_PREFIX"),
+		MetricsAddr:    get("METRICS_ADDR"),
 	}
 	brokers, qos, ttl := get("KAFKA_BROKERS"), get("MQTT_QOS"), get("DEDUPE_TTL")
 	if len(missing) > 0 {
