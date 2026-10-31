@@ -349,3 +349,16 @@ identidade visual sugerida por papel listada acima.
   por env, lifespan, setting inválida; integração real em `make test-integration`.
   `make format`/`lint`/`type-check` limpos; 134 unitários passando.
 - **Pendente:** OpenAI-compatible (não decidido), frontend Svelte (pt/en).
+
+### Rodada 8 — Desenho do banco e do fluxo de trabalho (2026-10-31)
+
+- ADR-017 (Aceito): modelo relacional unificado orientado a objetivos: `goals`, `tasks` (Kanban por
+  `status` + revisor), `task_transitions` (ator por etapa), `meetings`, `messages`, `memories`
+  (pgvector 768), `relationships`, `tool_invocations`, `activity_events`, `office_layout`; `event_id`
+  para idempotência (Fase 8). Matriz de responsabilidade por papel/etapa definida.
+- ADR-015: frontend Svelte descartado nesta fase (o cenário/front serão feitos pelo autor; ativos em
+  `images/sprites/office/`); mantidos `GET /agents` e CORS configurável.
+- ADR-016 (Tarefas): código parcial (repositórios) ainda NAO commitado; será refeito sobre o
+  schema do ADR-017.
+- **Próximo:** migrações + base genérica Postgres; Tarefas/goals/transições; chat; memória; ADR-018
+  (contrato MQTT); ADR de autonomia; Fase 8 (Go + Kafka); frontend.
