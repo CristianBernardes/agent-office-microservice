@@ -70,6 +70,7 @@ class GoalMeetingInput:
     goal_id: GoalId
     session_id: SessionId
     text: str
+    language: Language | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,7 +102,7 @@ class GoalMeetingUseCase:
         self._send_message = send_message
         self._remember = remember
         self._write_artifact = write_artifact
-        self._labels = _LABELS[language]
+        self._language = language
 
     async def execute(self, data: GoalMeetingInput) -> list[MeetingTurn]:
         participants = await self._participants()
@@ -133,7 +134,7 @@ class GoalMeetingUseCase:
     ) -> MeetingTurn | None:
         try:
             response = await self._dispatch.execute(
-                agent.agent_id, self._context(agent, data, turns, round_number)
+                agent.agent_id, self._context(agent, data, turns, round_number), data.language
             )
             await self._send_message.execute(
                 SendMessageInput(
@@ -157,12 +158,13 @@ class GoalMeetingUseCase:
     def _context(
         self, agent: Agent, data: GoalMeetingInput, turns: list[MeetingTurn], round_number: int = 1
     ) -> str:
+        labels = _LABELS[data.language or self._language]
         minutes = "\n".join(f"- {t.agent.name} ({t.agent.role.value}): {t.thought}" for t in turns)
-        parts = [f"{self._labels['goal']}: {data.text}"]
+        parts = [f"{labels['goal']}: {data.text}"]
         if minutes:
-            parts.append(f"{self._labels['minutes']}:\n{minutes}")
+            parts.append(f"{labels['minutes']}:\n{minutes}")
         key = "turn" if round_number == 1 else "debate"
-        parts.append(self._labels[key].format(role=agent.role.value, round=round_number))
+        parts.append(labels[key].format(role=agent.role.value, round=round_number))
         return "\n\n".join(parts)
 
     # Bloco: guarda a reunião como `Meeting` concluída (ADR-028); falha aqui não derruba o fluxo.
@@ -224,7 +226,7 @@ class GoalMeetingUseCase:
                 logger.exception("Falha ao criar tarefa de %s", turn.agent.name)
 
     async def _write_minutes(self, data: GoalMeetingInput, turns: list[MeetingTurn]) -> None:
-        title = self._labels["title"].format(goal=data.text)
+        title = _LABELS[data.language or self._language]["title"].format(goal=data.text)
         body = "\n\n".join(
             f"## {t.agent.name} — {t.agent.role.value}\n\n{t.thought}" for t in turns
         )
@@ -255,10 +257,12 @@ def register_goal_autonomy(
         if not isinstance(payload, dict):
             return
         try:
+            raw_language = payload.get("language")
             data = GoalMeetingInput(
                 goal_id=GoalId(value=UUID(str(payload["goal_id"]))),
                 session_id=SessionId(value=UUID(str(payload["session_id"]))),
                 text=str(payload["text"]),
+                language=Language.parse(str(raw_language)) if raw_language else None,
             )
         except (KeyError, ValueError):
             logger.warning("Evento de objetivo inválido descartado")

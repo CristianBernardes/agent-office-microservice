@@ -45,13 +45,15 @@ class AgentThinkUseCase:
         self._tool_registry = tool_registry
         self._language = language
 
-    async def execute(self, agent: Agent, context: str) -> LlmThoughtResponse:
+    async def execute(
+        self, agent: Agent, context: str, language: Language | None = None
+    ) -> LlmThoughtResponse:
         """Move o agente para `THINKING`, consulta o LLM e publica pensamento/ação."""
         agent.start_thinking()
         await publish_agent_status(self._message_bus, agent)
 
         system_prompt = self._prompt_provider.get_system_prompt(
-            agent.role, agent.name, self._language
+            agent.role, agent.name, language or self._language
         )
         llm_adapter = self._llm_adapter_resolver.resolve(agent.role)
         response = await llm_adapter.think(system_prompt=system_prompt, context=context)

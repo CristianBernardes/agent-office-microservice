@@ -25,7 +25,13 @@ def _patch_transport(monkeypatch: pytest.MonkeyPatch, handler: httpx.MockTranspo
 
 class TestModelsRoute:
     def test_lists_sorted_models(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        payload = {"models": [{"name": "b:latest"}, {"name": "a:latest"}]}
+        payload = {
+            "models": [
+                {"name": "b:latest"},
+                {"name": "nomic-embed-text:latest"},
+                {"name": "a:latest"},
+            ]
+        }
         _patch_transport(
             monkeypatch, httpx.MockTransport(lambda r: httpx.Response(200, json=payload))
         )

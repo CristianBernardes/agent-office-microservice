@@ -11,6 +11,7 @@ from src.domain.exceptions.domain_exceptions import DomainError
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.message_bus import IMessageBus
+from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId, GoalId, MessageId, SessionId, TaskId
 
 _GOAL_CREATED_TOPIC = "office/goals/created"
@@ -45,6 +46,7 @@ async def _publish_message(bus: IMessageBus, message: ChatMessage, sender_role: 
 class SubmitGoalInput:
     text: str
     session_id: SessionId | None = None
+    language: Language | None = None
 
 
 # Bloco: o usuário entrega um objetivo; os agentes o consomem via MQTT.
@@ -68,6 +70,7 @@ class SubmitGoalUseCase:
                     "goal_id": str(goal.goal_id),
                     "session_id": str(goal.session_id),
                     "text": goal.text,
+                    "language": data.language.value if data.language else None,
                 },
             ),
             qos=1,

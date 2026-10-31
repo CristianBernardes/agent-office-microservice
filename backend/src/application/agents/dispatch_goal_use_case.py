@@ -8,6 +8,7 @@ from src.application.common.agent_status_publisher import publish_agent_status
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.llm_adapter import LlmThoughtResponse
 from src.domain.interfaces.message_bus import IMessageBus
+from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId
 
 
@@ -23,13 +24,15 @@ class DispatchGoalUseCase:
         self._agent_think_use_case = agent_think_use_case
         self._message_bus = message_bus
 
-    async def execute(self, agent_id: AgentId, goal: str) -> LlmThoughtResponse:
+    async def execute(
+        self, agent_id: AgentId, goal: str, language: Language | None = None
+    ) -> LlmThoughtResponse:
         agent = await self._agent_repository.find_by_id(agent_id)
         if agent is None:
             raise AgentNotFoundError("agent.not_found", agent_id=agent_id)
 
         try:
-            return await self._agent_think_use_case.execute(agent, goal)
+            return await self._agent_think_use_case.execute(agent, goal, language)
         finally:
             # Falhas do LLM não podem deixar o agente preso em THINKING.
             if agent.is_thinking():

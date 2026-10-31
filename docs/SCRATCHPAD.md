@@ -673,6 +673,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 60 | este commit | Frontend: formulário de contratação, `VITE_DEFAULT_LLM_MODEL`, verificação visual |
 | 61 | este commit | Botão "Contratar time padrão" (criar tarefa exige agentes) |
 | 62 | este commit | `GET /models` (Ollama) e seleção do modelo de IA ao contratar |
+| 63 | este commit | Idioma por objetivo (Accept-Language → reunião/prompts) e `/models` sem embeddings |
 
 ### O que funciona
 

@@ -48,7 +48,9 @@ async def submit_goal(
     """Entrega um objetivo aos agentes (cria a sessão se não informada)."""
     session_id = SessionId(value=body.session_id) if body.session_id else None
     try:
-        goal = await use_case.execute(SubmitGoalInput(text=body.text, session_id=session_id))
+        goal = await use_case.execute(
+            SubmitGoalInput(text=body.text, session_id=session_id, language=language)
+        )
     except SessionNotFoundError as error:
         raise _not_found(error, language) from error
     return GoalResponse.from_entity(goal)

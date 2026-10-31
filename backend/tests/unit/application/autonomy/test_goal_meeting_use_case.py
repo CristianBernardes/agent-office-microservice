@@ -26,12 +26,14 @@ pytestmark = pytest.mark.unit
 class _Dispatch:
     def __init__(self, failing: set[AgentId] | None = None) -> None:
         self.contexts: list[str] = []
+        self.languages: list[Any] = []
         self._failing = failing or set()
 
-    async def execute(self, agent_id: AgentId, context: str) -> Any:
+    async def execute(self, agent_id: AgentId, context: str, language: Any = None) -> Any:
         if agent_id in self._failing:
             raise ConnectionError("llm down")
         self.contexts.append(context)
+        self.languages.append(language)
         return SimpleNamespace(thought=f"fala-{len(self.contexts)}")
 
 
@@ -94,6 +96,15 @@ def _input() -> GoalMeetingInput:
 
 
 class TestGoalMeeting:
+    async def test_goal_language_overrides_office_default(self) -> None:
+        use_case, dispatch, *_ = await _build([Role.PRODUCT_OWNER], language=Language.EN)
+        data = GoalMeetingInput(GoalId.generate(), SessionId.generate(), "Vender", Language.PT)
+
+        await use_case.execute(data)
+
+        assert dispatch.languages == [Language.PT]
+        assert "Objetivo do time" in dispatch.contexts[0]
+
     async def test_speaks_in_fixed_order_and_writes_minutes(self) -> None:
         roles = [Role.QA_ENGINEER, Role.PRODUCT_OWNER, Role.TECH_LEAD]
         use_case, dispatch, chat, memory, artifact = await _build(roles)
