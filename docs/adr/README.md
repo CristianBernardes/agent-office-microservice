@@ -48,3 +48,4 @@
 | [031](./031-feed-de-atividades.md) | Feed de atividades | Aceito |
 | [032](./032-debate-multi-rodada.md) | Debate em várias rodadas | Aceito |
 | [033](./033-rotas-de-escrita-de-reunioes.md) | Rotas de escrita de reuniões | Aceito |
+| [034](./034-pesquisa-de-agentes.md) | Pesquisa de agentes que gera artefatos | Aceito |

@@ -523,6 +523,11 @@ identidade visual sugerida por papel listada acima.
 - `POST /meetings` (inicia cerimônia) e `POST /meetings/{id}/finish` (encerra), localizadas pt/en.
 - 272 testes unitários, ruff e mypy limpos.
 
+## Rodada 30 — Pesquisa de agentes (ADR-034)
+- `ResearchTopicUseCase`: busca web → LLM do papel redige relatório (JSON `thought`=Markdown) → artefato `analysis` em `workspace/research/<slug>.md`, fontes anexadas.
+- `POST /research`. Falha na busca não aborta. pt/en.
+- 279 testes unitários, ruff e mypy limpos.
+
 ## Estado atual e ponto de retomada (após a Rodada 27)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)

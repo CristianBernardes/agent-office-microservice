@@ -23,6 +23,7 @@ from src.presentation.api.chat_router import router as chat_router
 from src.presentation.api.health_router import router as health_router
 from src.presentation.api.layout_router import router as layout_router
 from src.presentation.api.memory_router import router as memory_router
+from src.presentation.api.research_router import router as research_router
 from src.presentation.api.social_router import router as social_router
 from src.presentation.api.tasks_router import router as tasks_router
 from src.presentation.dependencies import (
@@ -90,3 +91,4 @@ app.include_router(memory_router)
 app.include_router(social_router)
 app.include_router(layout_router)
 app.include_router(activity_router)
+app.include_router(research_router)

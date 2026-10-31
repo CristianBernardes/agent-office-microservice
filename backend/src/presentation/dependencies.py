@@ -33,6 +33,7 @@ from src.application.relationships.relationship_use_cases import (
     ListRelationshipsUseCase,
     RecordInteractionUseCase,
 )
+from src.application.research.research_use_case import ResearchTopicUseCase
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -431,6 +432,16 @@ def get_dispatch_goal_use_case() -> DispatchGoalUseCase:
         agent_repository=get_agent_repository(),
         agent_think_use_case=get_agent_think_use_case(),
         message_bus=get_message_bus(),
+    )
+
+
+def get_research_use_case() -> ResearchTopicUseCase:
+    return ResearchTopicUseCase(
+        agent_repository=get_agent_repository(),
+        llm_resolver=get_llm_adapter_resolver(),
+        web_search=get_web_search_adapter(),
+        write_artifact=get_write_artifact_use_case(),
+        language=get_settings().language(),
     )
 
 
