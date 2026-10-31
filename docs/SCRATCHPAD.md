@@ -917,6 +917,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 103 | `19b9668` | `FUNDING.yml`, badges de licença/doação e rascunhos de divulgação (`docs/divulgacao/`) |
 | 104 | `b95cfb6` | GitHub Sponsors (`CristianBernardes`) no `FUNDING.yml` e nos READMEs |
 | 105 | este commit | `develop` mesclada na `master` (botão Sponsor ativo); Mermaid dos READMEs segue sem validação por renderização (instalação não autorizada) |
+| 106 | este commit | PayPal (link de doação já usado nos READMEs) incluído no `FUNDING.yml` |
 
 ### O que funciona
 
