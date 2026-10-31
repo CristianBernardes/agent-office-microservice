@@ -98,3 +98,17 @@ class MessageId:
 
     def __str__(self) -> str:
         return str(self.value)
+
+
+# Bloco: identificador tipado de memória de agente.
+@dataclass(frozen=True, slots=True)
+class MemoryId:
+    value: UUID
+
+    @staticmethod
+    def generate() -> MemoryId:
+        """Cria um novo identificador de memória, aleatório."""
+        return MemoryId(value=uuid4())
+
+    def __str__(self) -> str:
+        return str(self.value)

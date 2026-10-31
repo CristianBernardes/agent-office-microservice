@@ -409,3 +409,11 @@ identidade visual sugerida por papel listada acima.
 - Tool `send_message` no `ToolRegistry`; chave i18n `chat.session_not_found`.
 - 204 unitários passando; format/lint/mypy limpos.
 - **Próximo:** memória (pgvector), MQTT real (ADR-020), autonomia dos agentes, gateway Go/Kafka.
+
+### Rodada 13 — Memória semântica (ADR-020)
+
+- Domínio `Memory`/`MemoryType`, `IMemoryRepository` (em memória + Postgres com pgvector `<=>`).
+- `RememberUseCase` e `RecallMemoryUseCase` vetorizam com o LLM do papel do agente.
+- Rotas `POST/GET /agents/{id}/memories` e `POST .../recall`; 404 localizado pt/en, 422 na validação.
+- 212 unitários passando; format/lint/mypy limpos.
+- **Próximo:** MQTT real (ADR-021), autonomia dos agentes, gateway Go/Kafka.

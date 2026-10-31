@@ -73,3 +73,39 @@ class TestPostgresChat:
         }
         msgs = await PostgresChatRepository(FakePool([msg_row])).list_messages(SessionId(sid))  # type: ignore[arg-type]
         assert msgs[0].kind is MessageKind.THOUGHT
+
+
+class TestPostgresMemory:
+    async def test_save_and_reads(self) -> None:
+        from datetime import UTC, datetime
+
+        from src.domain.entities.memory import Memory, MemoryType
+        from src.domain.value_objects.identifiers import AgentId, MemoryId
+        from src.infrastructure.persistence.postgres_memory_repository import (
+            PostgresMemoryRepository,
+        )
+
+        pool = FakePool()
+        agent_id = AgentId.generate()
+        repo = PostgresMemoryRepository(pool)  # type: ignore[arg-type]
+        await repo.save(Memory(MemoryId.generate(), agent_id, "x", embedding=(0.5, 1.0)))
+        assert pool.executed[0][1][6] == "[0.5,1.0]"
+
+        row = {
+            "memory_id": uuid4(),
+            "agent_id": agent_id.value,
+            "session_id": None,
+            "content": "c",
+            "memory_type": "decision",
+            "importance": 0.7,
+            "created_at": datetime.now(UTC),
+            "embedding": "[0.1,0.2]",
+            "distance": 0.3,
+        }
+        recalled = await PostgresMemoryRepository(FakePool([row])).recall(agent_id, [1.0], 3)  # type: ignore[arg-type]
+        assert recalled[0].memory_type is MemoryType.DECISION
+        assert recalled[0].embedding == (0.1, 0.2)
+        recent = await PostgresMemoryRepository(FakePool([{**row, "embedding": None}])).list_recent(
+            agent_id, 1
+        )  # type: ignore[arg-type]
+        assert recent[0].embedding == ()

@@ -20,6 +20,7 @@ from src.application.artifacts.approve_artifact_use_case import ApproveArtifactU
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
+from src.application.memory.memory_use_cases import RecallMemoryUseCase, RememberUseCase
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -32,6 +33,7 @@ from src.domain.interfaces.artifact_repository import IArtifactRepository
 from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.llm_adapter import ILlmAdapter
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
+from src.domain.interfaces.memory_repository import IMemoryRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
 from src.domain.interfaces.task_repository import ITaskRepository
@@ -47,12 +49,18 @@ from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
 from src.infrastructure.persistence.in_memory_chat_repository import InMemoryChatRepository
+from src.infrastructure.persistence.in_memory_memory_repository import (
+    InMemoryMemoryRepository,
+)
 from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
 from src.infrastructure.persistence.postgres_agent_repository import PostgresAgentRepository
 from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
 from src.infrastructure.persistence.postgres_chat_repository import PostgresChatRepository
+from src.infrastructure.persistence.postgres_memory_repository import (
+    PostgresMemoryRepository,
+)
 from src.infrastructure.persistence.postgres_task_repository import PostgresTaskRepository
 from src.infrastructure.prompts.file_prompt_provider import FilePromptProvider
 from src.infrastructure.search.tavily_adapter import TavilySearchAdapter
@@ -139,6 +147,15 @@ def get_chat_repository() -> IChatRepository:
     if _use_postgres():
         return PostgresChatRepository(_require_pool())
     return InMemoryChatRepository()
+
+
+# Bloco: repositório de memórias (singleton por processo), selecionado por PERSISTENCE_BACKEND.
+@lru_cache
+def get_memory_repository() -> IMemoryRepository:
+    """Retorna a instância única do repositório de memórias dos agentes."""
+    if _use_postgres():
+        return PostgresMemoryRepository(_require_pool())
+    return InMemoryMemoryRepository()
 
 
 # Bloco: barramento de mensagens (singleton por processo).
@@ -248,6 +265,22 @@ def get_send_message_use_case() -> SendMessageUseCase:
         chat_repository=get_chat_repository(),
         agent_repository=get_agent_repository(),
         message_bus=get_message_bus(),
+    )
+
+
+def get_remember_use_case() -> RememberUseCase:
+    return RememberUseCase(
+        memory_repository=get_memory_repository(),
+        agent_repository=get_agent_repository(),
+        llm_resolver=get_llm_adapter_resolver(),
+    )
+
+
+def get_recall_memory_use_case() -> RecallMemoryUseCase:
+    return RecallMemoryUseCase(
+        memory_repository=get_memory_repository(),
+        agent_repository=get_agent_repository(),
+        llm_resolver=get_llm_adapter_resolver(),
     )
 
 

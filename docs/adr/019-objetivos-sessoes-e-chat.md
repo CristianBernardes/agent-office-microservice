@@ -26,7 +26,7 @@ frontend não consegue exibir a caixa de mensagens e os agentes não "falam".
 - Tool `send_message` no `ToolRegistry` (já permitida por papel em `tool_permissions`).
 - O objetivo **não** dispara o LLM aqui: o loop de autonomia (ADR futura) consome
   `office/goals/created`. Isto mantém o caso de uso síncrono e testável (YAGNI).
-- A numeração do contrato de tópicos MQTT passa a ser a ADR-020.
+- A numeração do contrato de tópicos MQTT passa a ser a ADR-021.
 
 ## Consequências
 
