@@ -645,6 +645,11 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 
 - `interagindo_com_objetos.png` tem 48 quadros, mas só os 24 primeiros são o personagem (o resto é um carrinho). `SpriteSheet.total` separa quadros animados de quadros da folha.
 
+## Rodada 69 — Reset e time
+
+- Banco (`.docker/pgdata`) e `workspace/` zerados; 11 agentes contratados (todos os cargos) e 12 tarefas de backlog criadas via API pelo PO.
+- Os `.md` gerados (ata, tarefas, pesquisa) seguem `OFFICE_LANGUAGE` / idioma do objetivo.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -702,6 +707,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 66 | este commit | Poses alternativas dos sprites (interagindo_com_objetos, outra_postura_de_trabalho) |
 | 67 | este commit | Cargos traduzidos nas atas |
 | 68 | este commit | Correção do sprite bugado (interagindo_com_objetos) |
+| 69 | este commit | Reset do banco/workspace, time completo contratado e backlog inicial |
 
 ### O que funciona
 
