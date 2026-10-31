@@ -13,17 +13,7 @@ import json
 import aiomqtt
 
 from src.domain.interfaces.message_bus import IMessageBus, MessageHandler
-
-
-# Bloco: casamento de tópico MQTT com curingas (`+` um nível, `#` o restante).
-def topic_matches(pattern: str, topic: str) -> bool:
-    pattern_parts, topic_parts = pattern.split("/"), topic.split("/")
-    for index, part in enumerate(pattern_parts):
-        if part == "#":
-            return True
-        if index >= len(topic_parts) or (part != "+" and part != topic_parts[index]):
-            return False
-    return len(pattern_parts) == len(topic_parts)
+from src.infrastructure.messaging.topic_matching import topic_matches
 
 
 # Bloco: barramento de mensagens MQTT real.

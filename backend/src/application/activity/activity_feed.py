@@ -18,6 +18,8 @@ FEED_TOPICS = (
     "office/artifacts/created",
     "office/artifacts/updated",
     "office/chat/message",
+    "office/agents/+/thought",
+    "office/agents/+/action",
 )
 
 

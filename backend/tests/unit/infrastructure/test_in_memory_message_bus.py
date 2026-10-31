@@ -45,3 +45,16 @@ class TestInMemoryMessageBus:
 
         created_messages = bus.get_published_messages("office/tasks/created")
         assert created_messages == [{"title": "Tarefa 1"}]
+
+    async def test_wildcard_subscription_matches_agent_topics(self) -> None:
+        bus = InMemoryMessageBus()
+        topics: list[str] = []
+
+        async def handler(topic: str, payload: dict[str, object]) -> None:
+            topics.append(topic)
+
+        await bus.subscribe("office/agents/+/thought", handler)
+        await bus.publish("office/agents/a1/thought", {})
+        await bus.publish("office/agents/a1/action", {})
+
+        assert topics == ["office/agents/a1/thought"]

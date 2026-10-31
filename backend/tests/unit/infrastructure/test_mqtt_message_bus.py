@@ -10,7 +10,8 @@ import pytest
 
 from src.infrastructure.config.settings import Settings
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
-from src.infrastructure.messaging.mqtt_message_bus import MqttMessageBus, topic_matches
+from src.infrastructure.messaging.mqtt_message_bus import MqttMessageBus
+from src.infrastructure.messaging.topic_matching import topic_matches
 from src.presentation import dependencies
 
 pytestmark = pytest.mark.unit

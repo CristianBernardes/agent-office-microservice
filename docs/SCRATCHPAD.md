@@ -556,6 +556,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 39 — Mock de embedding com 768 dimensões
 - `MockLlmAdapter.embed` agora gera 768 dimensões (igual a `vector(768)`).
 
+## Rodada 40 — Curingas no bus em memória e feed por agente (ADR-039)
+- `topic_matches` compartilhado; feed assina `office/agents/+/thought|action`.
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -581,7 +584,10 @@ identidade visual sugerida por papel listada acima.
 | 34 | `10d2688` | README: seção API HTTP |
 | 35 | `9c07a79` | Ferramenta research (ADR-037) |
 | 36 | `60776a8` | POST /relationships/interactions (ADR-038) |
-| 37 | ver `git log` | Integração gateway Kafka (2 testes) |
+| 37 | `b20afc7` | Integração gateway Kafka (2 testes) |
+| 38 | `06bdecf` | Fix closed_at de goal já concluída |
+| 39 | `c2f8042` | Embedding mock 768 dims |
+| 40 | este commit | Curingas no bus em memória; feed por agente (291 unit + 13 integração; ADRs 001–039) |
 
 ### O que funciona
 
@@ -593,7 +599,6 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 ### Limitações conhecidas
 
 - Só `move` aplica a matriz papel × estágio.
-- Feed exclui tópicos por agente (bus em memória sem curinga).
 
 ### Backlog
 

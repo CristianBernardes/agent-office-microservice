@@ -9,13 +9,12 @@ envolvida.
 from __future__ import annotations
 
 from src.domain.interfaces.message_bus import IMessageBus, MessageHandler
+from src.infrastructure.messaging.topic_matching import topic_matches
 
 
 # Bloco: barramento de mensagens em memória.
-# Mantém um registro de handlers por tópico exato. Não implementa wildcards MQTT
-# (`+`, `#`) propositalmente — essa semântica pertence ao `MqttMessageBus` real;
-# replicá-la aqui adicionaria complexidade sem benefício para os testes que este
-# fake atende (princípio YAGNI).
+# Mantém handlers por padrão de tópico, com os mesmos curingas MQTT (`+`, `#`) do
+# `MqttMessageBus`, via `topic_matches` compartilhado (ADR-039).
 class InMemoryMessageBus(IMessageBus):
     def __init__(self) -> None:
         self._handlers_by_topic: dict[str, list[MessageHandler]] = {}
@@ -39,11 +38,13 @@ class InMemoryMessageBus(IMessageBus):
     ) -> None:
         """Registra a mensagem publicada e notifica os handlers assinantes do tópico."""
         self._published_messages.append((topic, payload))
-        for handler in self._handlers_by_topic.get(topic, []):
-            await handler(topic, payload)
+        for pattern, handlers in list(self._handlers_by_topic.items()):
+            if topic_matches(pattern, topic):
+                for handler in handlers:
+                    await handler(topic, payload)
 
     async def subscribe(self, topic: str, handler: MessageHandler) -> None:
-        """Registra um handler para um tópico exato."""
+        """Registra um handler para um tópico ou padrão com curingas."""
         self._handlers_by_topic.setdefault(topic, []).append(handler)
 
     def get_published_messages(self, topic: str) -> list[dict[str, object]]:
