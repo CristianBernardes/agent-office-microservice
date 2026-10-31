@@ -13,7 +13,7 @@
 
 ▶️ **Watch the demo video:**
 
-[![Watch the video](images/Agent_Office_2.png)](https://youtu.be/sAiGLPTWMv4)
+[![Watch the video](images/Agent_Office_2.png)](https://youtu.be/eq40fTZwJrc)
 
 </div>
 
