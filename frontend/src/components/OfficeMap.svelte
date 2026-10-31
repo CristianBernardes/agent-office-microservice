@@ -52,10 +52,15 @@
     later(() => delete trips[walker], 2 * walkMs + chatMs)
   }
 
+  // Bloco: a cada ciclo cada agente alterna entre a pose padrão e a alternativa (defasado por agente).
+  let poseTick = $state(0)
+
   onMount(() => {
     const interval = wanderIntervalMs > 0 ? setInterval(startMeeting, wanderIntervalMs) : undefined
+    const poses = wanderIntervalMs > 0 ? setInterval(() => poseTick++, wanderIntervalMs) : undefined
     return () => {
       clearInterval(interval)
+      clearInterval(poses)
       timers.forEach(clearTimeout)
     }
   })
@@ -83,6 +88,7 @@
           agent={trip?.phase === 'chatting' ? { ...agent, status: 'talking' } : agent}
           walking={trip?.phase === 'walking' || trip?.phase === 'returning'}
           hue={hueFor(variant)}
+          alt={(poseTick + variant) % 2 === 1}
         />
         <span class="name">{agent.name}</span>
         <span class="role">{i18n.t.roles[agent.role]}</span>

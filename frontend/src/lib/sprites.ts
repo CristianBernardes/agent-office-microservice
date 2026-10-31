@@ -17,13 +17,21 @@ const SHEETS: Record<AgentStatus, SpriteSheet> = {
   offline: { file: 'agente_inativo_por_muito_tempo', frames: 13 },
 }
 
+// Bloco: poses alternativas, para o escritório usar todas as folhas de cada personagem.
+const ALT_SHEETS: Partial<Record<AgentStatus, SpriteSheet>> = {
+  idle: { file: 'interagindo_com_objetos', frames: 48 },
+  thinking: { file: 'outra_postura_de_trabalho', frames: 12 },
+  working: { file: 'outra_postura_de_trabalho', frames: 12 },
+}
+
 const WALKING: SpriteSheet = { file: 'deslocamento_entre_salas', frames: 24 }
 
 export function spriteFor(
   role: Role,
   status: AgentStatus,
   walking = false,
+  alt = false,
 ): SpriteSheet & { url: string } {
-  const sheet = walking ? WALKING : SHEETS[status]
+  const sheet = walking ? WALKING : ((alt && ALT_SHEETS[status]) || SHEETS[status])
   return { ...sheet, url: `/images/sprites/${role}/${sheet.file}.png` }
 }

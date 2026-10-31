@@ -2,9 +2,9 @@
   import { FRAME_HEIGHT, FRAME_WIDTH, spriteFor } from '../lib/sprites'
   import type { Agent } from '../lib/types'
 
-  let { agent, walking = false, hue = 0 }: { agent: Agent; walking?: boolean; hue?: number } =
+  let { agent, walking = false, hue = 0, alt = false }: { agent: Agent; walking?: boolean; hue?: number; alt?: boolean } =
     $props()
-  const sheet = $derived(spriteFor(agent.role, agent.status, walking))
+  const sheet = $derived(spriteFor(agent.role, agent.status, walking, alt))
 </script>
 
 <span

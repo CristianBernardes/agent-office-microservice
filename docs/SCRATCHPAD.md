@@ -633,6 +633,10 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 - `FilePromptProvider` anexa diretiva final de idioma (pt/en) a todo prompt de sistema; atas antigas em inglês são anteriores à correção.
 - Testes: TestOwnerRule, diretiva de idioma, ajustes em e2e/rotas.
 
+## Rodada 66 — Todos os sprites em uso
+
+- `spriteFor(..., alt)`: idle→`interagindo_com_objetos`, thinking/working→`outra_postura_de_trabalho`; `OfficeMap` alterna a pose por agente a cada `VITE_WANDER_INTERVAL_MS`. Agora as 8 folhas de cada cargo são usadas.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -687,6 +691,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 63 | este commit | Idioma por objetivo (Accept-Language → reunião/prompts) e `/models` sem embeddings |
 | 64 | este commit | ciclo de trabalho autônomo (ADR-048) + escritório vivo no mapa: caminhadas, conversas, sprites distintos, cargo no rótulo |
 | 65 | este commit | Responsável obrigatório fora do backlog + diretiva de idioma nos prompts |
+| 66 | este commit | Poses alternativas dos sprites (interagindo_com_objetos, outra_postura_de_trabalho) |
 
 ### O que funciona
 

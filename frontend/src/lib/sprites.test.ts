@@ -17,4 +17,11 @@ describe('spriteFor', () => {
   it('usa a tira longa quando ocioso', () => {
     expect(spriteFor('tech_lead', 'idle').frames).toBe(24)
   })
+
+  it('usa as poses alternativas', () => {
+    expect(spriteFor('qa_engineer', 'idle', false, true).url).toContain('interagindo_com_objetos')
+    expect(spriteFor('qa_engineer', 'idle', false, true).frames).toBe(48)
+    expect(spriteFor('qa_engineer', 'working', false, true).url).toContain('outra_postura_de_trabalho')
+    expect(spriteFor('qa_engineer', 'talking', false, true).url).toContain('participando_de_reunioes')
+  })
 })
