@@ -13,8 +13,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.infrastructure.config.settings import get_settings
+from src.infrastructure.persistence.migrator import migrate
 from src.infrastructure.persistence.postgres_connection import create_postgres_pool
-from src.infrastructure.persistence.postgres_schema import apply_schema
 from src.presentation.api.agents_router import router as agents_router
 from src.presentation.api.health_router import router as health_router
 from src.presentation.dependencies import set_database_pool
@@ -31,7 +31,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         return
     pool = await create_postgres_pool(settings.database_url)
     try:
-        await apply_schema(pool)
+        await migrate(pool)
         set_database_pool(pool)
         yield
     finally:

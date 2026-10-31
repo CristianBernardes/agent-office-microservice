@@ -52,6 +52,7 @@ class TestAgentsRoutes:
         blocked = client.get("/health", headers={"Origin": "http://evil.example"})
         assert allowed.headers.get("access-control-allow-origin") == "http://localhost:5173"
         assert "access-control-allow-origin" not in blocked.headers
+
     def test_hire_agent_returns_created_agent(self) -> None:
         response = client.post(
             "/agents",

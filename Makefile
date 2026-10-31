@@ -14,6 +14,7 @@ POETRY      := poetry
 
 .PHONY: help install run up down restart logs ps \
         test test-unit test-integration coverage \
+        migrate migrate-rollback migrate-status migrate-fresh make-migration \
         lint format type-check check \
         clean check-poetry
 
@@ -117,6 +118,26 @@ test-unit: check-poetry
 ## test-integration: Roda os testes de integração — requer 'make up' previamente.
 test-integration: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run pytest -m integration -v
+
+## migrate: Aplica as migrações pendentes (ADR-018).
+migrate: check-poetry
+	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator migrate
+
+## migrate-rollback: Desfaz o último batch de migrações.
+migrate-rollback: check-poetry
+	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator rollback
+
+## migrate-status: Lista migrações aplicadas e pendentes.
+migrate-status: check-poetry
+	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator status
+
+## migrate-fresh: DESTRUTIVO — recria o schema e reaplica todas as migrações.
+migrate-fresh: check-poetry
+	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator fresh
+
+## make-migration: Cria um par de migração vazio (uso: make make-migration name=create_x_table).
+make-migration: check-poetry
+	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator make $(name)
 
 ## coverage: Roda os testes unitários com relatório de cobertura no terminal.
 coverage: check-poetry

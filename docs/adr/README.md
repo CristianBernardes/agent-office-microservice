@@ -32,3 +32,4 @@
 | [015](./015-frontend-svelte-i18n-e-suporte-backend.md) | Frontend Svelte (pt/en) e suporte de backend | Aceito |
 | [016](./016-tarefas-persistencia-casos-de-uso-e-rotas.md) | Tarefas: persistência, casos de uso, ferramentas e rotas | Aceito |
 | [017](./017-modelo-de-dados-relacional-unificado.md) | Modelo de dados relacional unificado | Aceito |
+| [018](./018-migracoes-estilo-laravel.md) | Migrações de banco estilo Laravel | Aceito |

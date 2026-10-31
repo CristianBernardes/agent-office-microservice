@@ -12,12 +12,12 @@ from src.domain.entities.artifact import Artifact, ArtifactType
 from src.domain.value_objects.identifiers import AgentId, ArtifactId
 from src.infrastructure.config.settings import get_settings
 from src.infrastructure.filesystem.markdown_artifact_writer import MarkdownArtifactWriter
+from src.infrastructure.persistence.migrator import fresh
 from src.infrastructure.persistence.postgres_agent_repository import PostgresAgentRepository
 from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
 from src.infrastructure.persistence.postgres_connection import create_postgres_pool
-from src.infrastructure.persistence.postgres_schema import apply_schema
 
 pytestmark = pytest.mark.integration
 
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.integration
 @pytest.fixture
 async def pool() -> AsyncIterator[object]:
     created = await create_postgres_pool(get_settings().database_url)
-    await apply_schema(created)
+    await fresh(created)
     yield created
     await created.close()
 

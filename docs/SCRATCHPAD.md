@@ -366,3 +366,17 @@ identidade visual sugerida por papel listada acima.
 - Convenção: **um Dockerfile por microserviço** (`backend/Dockerfile`, futuramente `frontend/Dockerfile`,
   `gateway/Dockerfile`), nunca um Dockerfile único na raiz. Ativos de arte agora em `frontend/images/`
   (esqueleto do frontend).
+
+### Rodada 9 — Migrações estilo Laravel e schema completo (2026-10-31)
+
+- ADR-018 (Aceito): pares `AAAA_MM_DD_HHMMSS_nome.up.sql/.down.sql`, tabela `migrations` com batch,
+  transação por migração. CLI `migrator` + `make migrate|migrate-rollback|migrate-status|migrate-fresh|
+  make-migration name=`. `lifespan` roda `migrate`; `schema.sql`/`apply_schema` removidos;
+  `ops/postgres/init.sql` só com extensões (`vector`, `pg_trgm`).
+- 9 migrações cobrindo o ADR-017 (agents com "vida", sessions/goals, tasks+dependências+transições,
+  meetings, messages, artifacts, memories+relationships, tool_invocations/activity_events/office_layout).
+  Validadas em Postgres real (pgvector): up e down de todas.
+- Testes do migrador (ordem, batch, falha não registrada, rollback, nome inválido, par up/down).
+  152 unitários passando; format/lint/mypy limpos. Bancos de dev antigos: `make migrate-fresh`.
+- Também entra o código parcial de Tarefas (ADR-016: repositórios); casos de uso/rotas a seguir.
+- **Próximo:** Tarefas (casos de uso, transições, rotas, tools), goals/chat, memória, ADR-019 MQTT.

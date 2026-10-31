@@ -80,7 +80,7 @@ class TestLifespan:
         async with main.lifespan(FastAPI()):
             pass
 
-    async def test_postgres_backend_applies_schema_and_closes_pool(
+    async def test_postgres_backend_migrates_and_closes_pool(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setenv("PERSISTENCE_BACKEND", "postgres")
@@ -89,8 +89,15 @@ class TestLifespan:
         async def fake_create(_: str) -> FakeClosablePool:
             return pool
 
+        migrated: list[object] = []
+
+        async def fake_migrate(received: object) -> list[str]:
+            migrated.append(received)
+            return []
+
         monkeypatch.setattr(main, "create_postgres_pool", fake_create)
+        monkeypatch.setattr(main, "migrate", fake_migrate)
         async with main.lifespan(FastAPI()):
             assert isinstance(dependencies.get_agent_repository(), PostgresAgentRepository)
         assert pool.closed
-        assert "CREATE TABLE IF NOT EXISTS agents" in pool.executed[0]
+        assert migrated == [pool]

@@ -17,7 +17,6 @@ from src.infrastructure.persistence.postgres_agent_repository import PostgresAge
 from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
-from src.infrastructure.persistence.postgres_schema import apply_schema
 
 pytestmark = pytest.mark.unit
 
@@ -158,12 +157,3 @@ class TestPostgresArtifactRepository:
     async def test_find_by_id_returns_none_when_missing(self) -> None:
         repository = PostgresArtifactRepository(FakePool())  # type: ignore[arg-type]
         assert await repository.find_by_id(ArtifactId.generate()) is None
-
-
-class TestApplySchema:
-    async def test_executes_idempotent_schema(self) -> None:
-        pool = FakePool()
-        await apply_schema(pool)  # type: ignore[arg-type]
-        sql = pool.executed[0][0]
-        assert "CREATE TABLE IF NOT EXISTS agents" in sql
-        assert "CREATE TABLE IF NOT EXISTS artifacts" in sql

@@ -32,8 +32,8 @@ em JSON texto. Um banco com integridade declarativa elimina validação e códig
      persistia no banco; o backend só guarda e serve o JSON (o cenário é feito no frontend).
 3. **Idempotência (Fase 8) desde já**: `event_id UUID UNIQUE NULL` em `tasks`, `artifacts`,
    `messages`, `memories`; evita `ALTER` posterior.
-4. **Schema versionado**: `schema.sql` vira arquivos ordenados em `persistence/migrations/NNN_*.sql`,
-   aplicados de forma idempotente por `apply_schema` e registrados em `schema_migrations`.
+4. **Schema versionado**: migrações estilo Laravel em `persistence/migrations/` (ADR-018),
+   registradas na tabela `migrations`.
 5. **Menos código**: repositórios Postgres compartilham uma base genérica
    (`PostgresRepository`: upsert/`find_by_id`/`list_all` por metadados de tabela); cada repositório
    concreto só declara tabela, colunas e mapeamento entidade↔linha.
