@@ -21,6 +21,7 @@ from src.application.artifacts.review_artifact_use_case import ReviewArtifactUse
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
+from src.application.meetings.meeting_use_cases import StartCeremonyUseCase
 from src.application.memory.memory_use_cases import RecallMemoryUseCase, RememberUseCase
 from src.application.relationships.relationship_use_cases import RecordInteractionUseCase
 from src.application.tasks.task_use_cases import (
@@ -35,6 +36,7 @@ from src.domain.interfaces.artifact_repository import IArtifactRepository
 from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.llm_adapter import ILlmAdapter
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
+from src.domain.interfaces.meeting_repository import IMeetingRepository
 from src.domain.interfaces.memory_repository import IMemoryRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
@@ -53,6 +55,9 @@ from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
 from src.infrastructure.persistence.in_memory_chat_repository import InMemoryChatRepository
+from src.infrastructure.persistence.in_memory_meeting_repository import (
+    InMemoryMeetingRepository,
+)
 from src.infrastructure.persistence.in_memory_memory_repository import (
     InMemoryMemoryRepository,
 )
@@ -65,6 +70,9 @@ from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
 from src.infrastructure.persistence.postgres_chat_repository import PostgresChatRepository
+from src.infrastructure.persistence.postgres_meeting_repository import (
+    PostgresMeetingRepository,
+)
 from src.infrastructure.persistence.postgres_memory_repository import (
     PostgresMemoryRepository,
 )
@@ -178,6 +186,18 @@ def get_relationship_repository() -> IRelationshipRepository:
 
 def get_record_interaction_use_case() -> RecordInteractionUseCase:
     return RecordInteractionUseCase(get_relationship_repository())
+
+
+# Bloco: reuniões e cerimônias (ADR-028).
+@lru_cache
+def get_meeting_repository() -> IMeetingRepository:
+    if _use_postgres():
+        return PostgresMeetingRepository(_require_pool())
+    return InMemoryMeetingRepository()
+
+
+def get_start_ceremony_use_case() -> StartCeremonyUseCase:
+    return StartCeremonyUseCase(get_meeting_repository())
 
 
 # Bloco: barramento de mensagens (singleton por processo).
@@ -329,6 +349,7 @@ def get_tool_registry() -> ToolRegistry:
         send_message_use_case=get_send_message_use_case(),
         hire_agent_use_case=get_hire_agent_use_case(),
         default_llm_model=get_settings().ollama_model,
+        start_ceremony_use_case=get_start_ceremony_use_case(),
     )
 
 

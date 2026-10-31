@@ -21,6 +21,10 @@ from src.application.artifacts.write_artifact_use_case import (
     WriteArtifactUseCase,
 )
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
+from src.application.meetings.meeting_use_cases import (
+    StartCeremonyInput,
+    StartCeremonyUseCase,
+)
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -31,10 +35,17 @@ from src.application.tools.tool_permissions import ToolName, role_can_use_tool
 from src.domain.entities.agent import Personality, Role
 from src.domain.entities.artifact import Artifact, ArtifactType
 from src.domain.entities.chat import ChatMessage, MessageKind
+from src.domain.entities.meeting import MeetingKind
 from src.domain.entities.task import Priority, Task
 from src.domain.exceptions.domain_exceptions import DomainError
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter, WebSearchResult
-from src.domain.value_objects.identifiers import AgentId, ArtifactId, SessionId, TaskId
+from src.domain.value_objects.identifiers import (
+    AgentId,
+    ArtifactId,
+    GoalId,
+    SessionId,
+    TaskId,
+)
 
 
 # Bloco: erro levantado quando o papel solicitante não tem permissão para a
@@ -74,6 +85,7 @@ class ToolRegistry:
         send_message_use_case: SendMessageUseCase,
         hire_agent_use_case: HireAgentUseCase | None = None,
         default_llm_model: str = "",
+        start_ceremony_use_case: StartCeremonyUseCase | None = None,
     ) -> None:
         self._handlers: dict[ToolName, ToolHandler] = {
             ToolName.WRITE_ARTIFACT: self._make_write_artifact_handler(write_artifact_use_case),
@@ -90,6 +102,10 @@ class ToolRegistry:
         if hire_agent_use_case is not None:
             self._handlers[ToolName.HIRE_AGENT] = self._make_hire_agent_handler(
                 hire_agent_use_case, default_llm_model
+            )
+        if start_ceremony_use_case is not None:
+            self._handlers[ToolName.START_CEREMONY] = self._make_start_ceremony_handler(
+                start_ceremony_use_case
             )
 
     async def execute(
@@ -242,6 +258,28 @@ class ToolRegistry:
                     role=Role(str(arguments["role"])),
                     personality=Personality(0.5, 0.5, 0.5, 0.5, 0.5),
                     llm_model=str(arguments.get("llm_model") or default_model),
+                )
+            )
+
+        return handler
+
+    @staticmethod
+    def _make_start_ceremony_handler(use_case: StartCeremonyUseCase) -> ToolHandler:
+        async def handler(
+            requester_id: AgentId, requester_role: Role, arguments: dict[str, object]
+        ) -> object:
+            raw_participants = arguments.get("participants") or []
+            goal = arguments.get("goal_id")
+            return await use_case.execute(
+                StartCeremonyInput(
+                    kind=MeetingKind(str(arguments["kind"])),
+                    title=str(arguments["title"]),
+                    organizer_id=requester_id,
+                    participants=tuple(
+                        AgentId(value=UUID(str(p)))
+                        for p in (raw_participants if isinstance(raw_participants, list) else [])
+                    ),
+                    goal_id=GoalId(value=UUID(str(goal))) if goal else None,
                 )
             )
 

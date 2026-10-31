@@ -85,6 +85,20 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "Role '{role}' is not allowed to use tool '{tool}'.",
         Language.PT: "O papel '{role}' não tem permissão para usar a ferramenta '{tool}'.",
     },
+    "meeting.not_found": {
+        Language.EN: "Meeting with ID '{meeting_id}' was not found.",
+        Language.PT: "Reunião com ID '{meeting_id}' não foi encontrada.",
+    },
+    "meeting.cannot_finish": {
+        Language.EN: "Meeting '{title}' is '{status}' and cannot be finished — "
+        "only 'in_progress' meetings can be finished.",
+        Language.PT: "A reunião '{title}' está '{status}' e não pode ser encerrada — "
+        "apenas reuniões 'in_progress' podem ser encerradas.",
+    },
+    "meeting.no_participants": {
+        Language.EN: "A meeting needs at least one participant.",
+        Language.PT: "Uma reunião precisa de pelo menos um participante.",
+    },
     "tool.not_implemented": {
         Language.EN: "Tool '{tool}' does not have a handler implemented yet in this round.",
         Language.PT: "A ferramenta '{tool}' ainda não possui um handler implementado "

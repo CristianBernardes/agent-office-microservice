@@ -156,3 +156,26 @@ class TestToolRegistry:
 
         assert agent.llm_model == "m1"  # type: ignore[attr-defined]
         assert len(await repo.list_all()) == 1
+
+
+async def test_scrum_master_can_start_ceremony(tmp_path: Path) -> None:
+    from src.application.meetings.meeting_use_cases import StartCeremonyUseCase
+    from src.infrastructure.persistence.in_memory_meeting_repository import (
+        InMemoryMeetingRepository,
+    )
+
+    repo = InMemoryMeetingRepository()
+    registry = _build_registry(tmp_path, MockSearchAdapter())
+    registry._handlers[ToolName.START_CEREMONY] = registry._make_start_ceremony_handler(
+        StartCeremonyUseCase(repo)
+    )
+    organizer = AgentId.generate()
+
+    meeting = await registry.execute(
+        ToolName.START_CEREMONY,
+        organizer,
+        Role.SCRUM_MASTER,
+        {"kind": "daily", "title": "Daily"},
+    )
+
+    assert meeting.participants == (organizer,)  # type: ignore[attr-defined]

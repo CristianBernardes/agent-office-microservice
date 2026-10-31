@@ -112,3 +112,17 @@ class MemoryId:
 
     def __str__(self) -> str:
         return str(self.value)
+
+
+# Bloco: identificador tipado de reunião.
+@dataclass(frozen=True, slots=True)
+class MeetingId:
+    value: UUID
+
+    @staticmethod
+    def generate() -> MeetingId:
+        """Cria um novo identificador de reunião, aleatório."""
+        return MeetingId(value=uuid4())
+
+    def __str__(self) -> str:
+        return str(self.value)

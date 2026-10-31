@@ -469,6 +469,14 @@ identidade visual sugerida por papel listada acima.
 - PO e Tech Lead: `qwen3.6`; Dev Sênior e Analista de Dados: `nemotron-3.5-bolt`; SM, Dev Júnior e RH: `gpt-oss:20b`; QA e Consultor: `sorc/qwen3.5-claude-4.6-opus`. Embeddings: `nomic-embed-text`.
 - Só configuração (o `.env` é ignorado pelo git; o `.env.example` é versionado).
 
+### Rodada 22 — Reuniões e `start_ceremony` (ADR-028)
+
+- Domínio `Meeting` (`MeetingKind`, `MeetingStatus`, `finish`), `MeetingId`, porta `IMeetingRepository`, repositórios em memória e Postgres (upsert + participantes em transação).
+- Casos de uso `StartCeremonyUseCase`, `FinishMeetingUseCase`, `ListMeetingsUseCase`; handler `start_ceremony` no `ToolRegistry` (Scrum Master & cia) e wiring em `dependencies.py`.
+- Mensagens pt/en: `meeting.not_found`, `meeting.cannot_finish`, `meeting.no_participants`.
+- 252 testes unitários, ruff e mypy limpos.
+- Pendente: `GoalMeetingUseCase` ainda não persiste suas reuniões como `Meeting`; sem rota HTTP; repo Postgres de reuniões sem teste de integração.
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)

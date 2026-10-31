@@ -42,3 +42,4 @@
 | [025](./025-tarefas-vinculadas-a-objetivo-e-revisor.md) | Tarefas vinculadas a objetivo e revisor | Aceito |
 | [026](./026-handler-hire-agent.md) | Handler da ferramenta hire_agent | Aceito |
 | [027](./027-relacionamentos-entre-agentes.md) | Relacionamentos entre agentes | Aceito |
+| [028](./028-reunioes-e-cerimonias.md) | Reuniões e cerimônias (`start_ceremony`) | Aceito |
