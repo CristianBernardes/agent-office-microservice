@@ -131,7 +131,8 @@ async def test_planning_splits_work_so_nobody_is_idle() -> None:
     assert all(t.status == TaskStatus.TODO for t in all_tasks)
     assert len({t.assigned_to for t in all_tasks}) == 3
     assert "(1/3)" in all_tasks[0].title or any("(1/3)" in t.title for t in all_tasks)
-    assert "planning" in dispatch.prompts[0].lower()
+    assert "subtasks" in dispatch.prompts[0].lower()
+    assert any("sprint planning" in p.lower() for p in dispatch.prompts)
     assert artifacts.calls[0].path.startswith("planning/")
 
 
@@ -139,3 +140,17 @@ async def test_planning_is_led_by_a_planner_role() -> None:
     loop, tasks, agents, dispatch, _ = await _build([Role.DEV_SENIOR, Role.SCRUM_MASTER])
     await loop.tick()
     assert await _status(tasks) == TaskStatus.TODO
+
+
+@pytest.mark.parametrize(
+    ("language", "title"),
+    [(Language.PT, "Planejamento da sprint"), (Language.EN, "Sprint planning")],
+)
+async def test_planning_artifact_follows_the_office_language(
+    language: Language, title: str
+) -> None:
+    loop, _, _, _, artifacts = await _build([Role.PRODUCT_OWNER, Role.DEV_SENIOR], language)
+    await loop.tick()
+    planning = next(c for c in artifacts.calls if c.path.startswith("planning/"))
+    assert planning.title == title
+    assert planning.content.startswith(f"# {title}")

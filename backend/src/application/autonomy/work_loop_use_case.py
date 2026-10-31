@@ -23,7 +23,11 @@ from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.localization.language import Language
-from src.domain.services.task_splitter import distribute_extra_parts, split_task
+from src.domain.services.task_splitter import (
+    distribute_extra_parts,
+    parse_subtasks,
+    split_task,
+)
 from src.domain.value_objects.identifiers import SessionId, TaskId
 
 logger = logging.getLogger(__name__)
@@ -41,6 +45,10 @@ _PROMPTS = {
         "planning": "Você conduz a cerimônia de planejamento (sprint planning) do time.\n"
         "Tarefas: {tasks}\nTime: {team}\n"
         "Explique em poucas linhas como o trabalho será dividido para que ninguém fique ocioso.",
+        "planning_title": "Planejamento da sprint",
+        "breakdown": "Divida a tarefa «{title}» em {count} subtarefas distintas.\n"
+        "Descrição: {description}\n"
+        "Responda SOMENTE com {count} linhas no formato: Título curto | O que deve ser entregue.",
         "part": "Parte {index} de {total} da tarefa «{title}».",
         "work": "Você está trabalhando na tarefa «{title}».\nDetalhes: {description}\n"
         "Escreva o resultado do seu trabalho em poucas linhas (um rascunho em markdown).",
@@ -51,6 +59,10 @@ _PROMPTS = {
         "planning": "You lead the team's sprint planning ceremony.\n"
         "Tasks: {tasks}\nTeam: {team}\n"
         "Explain in a few lines how the work will be split so nobody stays idle.",
+        "planning_title": "Sprint planning",
+        "breakdown": "Split the task «{title}» into {count} distinct, non-overlapping subtasks.\n"
+        "Description: {description}\n"
+        "Answer ONLY with {count} lines in the format: Short title | What must be delivered.",
         "part": "Part {index} of {total} of the task «{title}».",
         "work": "You are working on the task «{title}».\nDetails: {description}\n"
         "Write the outcome of your work in a few lines (a markdown draft).",
@@ -129,11 +141,27 @@ class WorkLoopUseCase:
         note = _PROMPTS[self._language]["part"]
         result: list[Task] = []
         for task, more in zip(backlog, distribute_extra_parts(len(backlog), missing), strict=True):
-            for part in split_task(task, more + 1, note):
+            subtasks = await self._breakdown(task, more + 1) if more else None
+            for part in split_task(task, more + 1, note, subtasks):
                 if more:
                     await self._tasks.save(part)
                 result.append(part)
         return result
+
+    async def _breakdown(self, task: Task, count: int) -> list[tuple[str, str]]:
+        """Pede ao planejador subtarefas distintas; vazio se o LLM falhar."""
+        planner = await self._first(_PLANNERS)
+        if planner is None:
+            return []
+        prompt = _PROMPTS[self._language]["breakdown"].format(
+            title=task.title, description=task.description, count=count
+        )
+        try:
+            text = await self._speak(planner, prompt, task.task_id)
+        except Exception:
+            logger.exception("Falha ao detalhar a tarefa %s", task.title)
+            return []
+        return parse_subtasks(text, count)
 
     async def _speak(self, speaker: Agent, prompt: str, task_id: TaskId | None = None) -> str:
         """Pede ao agente uma fala via LLM e a publica no chão do escritório."""
@@ -154,10 +182,11 @@ class WorkLoopUseCase:
             team=", ".join(f"{w.name} ({w.role.value})" for w in workers),
         )
         plan = await self._speak(planner, prompt)
+        title = _PROMPTS[self._language]["planning_title"]
         await self._write.execute(
             WriteArtifactInput(
-                title="Sprint planning",
-                content=f"# Sprint planning\n\n{plan}\n",
+                title=title,
+                content=f"# {title}\n\n{plan}\n",
                 artifact_type=ArtifactType.SPRINT_PLANNING,
                 path=f"planning/{uuid4()}.md",
                 author_id=planner.agent_id,

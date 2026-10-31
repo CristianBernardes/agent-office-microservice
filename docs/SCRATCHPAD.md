@@ -676,6 +676,10 @@ Reunião/ciclo falhavam com `httpx.ReadTimeout` (120s fixo): agora `OLLAMA_REQUE
 
 Modal de doação passa a contar a história do projeto (chave `donationThanks`, pt/en).
 
+## Rodada 76
+
+O planejador pede ao LLM `Título | Entregável` por subtarefa (`parse_subtasks`); sem linhas suficientes, mantém a numeração mecânica. O título/cabeçalho do artefato de planejamento agora segue o idioma (`planning_title`).
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -740,6 +744,7 @@ Modal de doação passa a contar a história do projeto (chave `donationThanks`,
 | 73 | este commit | Remove texto de debug `wanderIntervalMs` solto no App.svelte |
 | 74 | f66141a | Timeout do Ollama via .env (`OLLAMA_REQUEST_TIMEOUT_SECONDS`) |
 | 75 | este commit | Modal de doação com a história do projeto (pt/en) |
+| 76 | este commit | Planejamento gera subtarefas distintas (título + entregável) via LLM; título do `.md` de planejamento no idioma do escritório |
 
 ### O que funciona
 

@@ -1,7 +1,11 @@
 import pytest
 
 from src.domain.entities.task import Task
-from src.domain.services.task_splitter import distribute_extra_parts, split_task
+from src.domain.services.task_splitter import (
+    distribute_extra_parts,
+    parse_subtasks,
+    split_task,
+)
 from src.domain.value_objects.identifiers import TaskId
 
 pytestmark = pytest.mark.unit
@@ -30,3 +34,21 @@ def test_split_into_one_returns_task_untouched() -> None:
     task = _task()
     assert split_task(task, 1, "x") == [task]
     assert task.title == "T"
+
+
+def test_parse_subtasks_extracts_distinct_lines() -> None:
+    text = (
+        "1. Pesquisar | Relatório\n- **Criar** | Protótipo\nlinha sem pipe\nPesquisar | Duplicada"
+    )
+    assert parse_subtasks(text, 5) == [("Pesquisar", "Relatório"), ("Criar", "Protótipo")]
+
+
+def test_parse_subtasks_respects_limit() -> None:
+    assert len(parse_subtasks("a | 1\nb | 2\nc | 3", 2)) == 2
+
+
+def test_split_task_uses_distinct_subtasks_when_enough() -> None:
+    task = Task(task_id=TaskId.generate(), title="Base", description="d")
+    parts = split_task(task, 2, "n", [("A", "faz A"), ("B", "faz B")])
+    assert [p.title for p in parts] == ["A", "B"]
+    assert [p.description for p in parts] == ["faz A", "faz B"]
