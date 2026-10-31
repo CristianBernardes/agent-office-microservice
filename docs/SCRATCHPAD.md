@@ -929,6 +929,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 115 | este commit | Todas as imagens (badges, vídeo e capturas de tela) centralizadas nos READMEs |
 | 116 | este commit | READMEs: removidas afirmações obsoletas (frontend "não implementado", Phaser, fases pendentes) |
 | 117 | este commit | Verificação final: backend 363 unit, frontend 64 testes verdes; estado atual atualizado. Pendências só do autor: Stripe/Sponsors, conta Apoia-se (trocar [LINK-APOIA-SE] no artigo), publicar divulgação, validar Mermaid |
+| 118 | este commit | Makefile: alvos lint-go, test-go, build-go, lint-frontend, test-frontend, build-frontend, install-frontend e check-all | `make lint-go`, `make lint-frontend` e `make test-go` | `Makefile`, `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 
