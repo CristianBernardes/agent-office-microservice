@@ -1,48 +1,56 @@
-import { describe, expect, it } from 'vitest'
-import { loadConfig } from './config'
+import { describe, expect, it } from "vitest";
+import { loadConfig } from "./config";
 
 const base = {
-  VITE_API_URL: 'http://api:1/',
-  VITE_MQTT_WS_URL: 'ws://mq:2',
-  VITE_DEFAULT_LANGUAGE: 'en',
-  VITE_PIX_LABEL: 'Pix',
-  VITE_DEFAULT_LLM_MODEL: 'qwen3.6:latest',
-  VITE_PAYPAL_URL: 'https://paypal.me/x',
-  VITE_DONATION_REMINDER_DAYS: '7',
-  VITE_REFRESH_INTERVAL_MS: '5000',
-  VITE_WANDER_INTERVAL_MS: '8000',
-  VITE_WIP_LIMIT_TODO: '0',
-  VITE_WIP_LIMIT_IN_PROGRESS: '5',
-  VITE_WIP_LIMIT_TESTING: '3',
-  VITE_WIP_LIMIT_IN_REVIEW: '3',
-}
+  VITE_API_URL: "http://api:1/",
+  VITE_MQTT_WS_URL: "ws://mq:2",
+  VITE_DEFAULT_LANGUAGE: "en",
+  VITE_PIX_LABEL: "Pix",
+  VITE_DEFAULT_LLM_MODEL: "qwen3.6:latest",
+  VITE_PAYPAL_URL: "https://paypal.me/x",
+  VITE_DONATION_REMINDER_DAYS: "7",
+  VITE_REFRESH_INTERVAL_MS: "5000",
+  VITE_WANDER_INTERVAL_MS: "8000",
+  VITE_WIP_LIMIT_TODO: "0",
+  VITE_WIP_LIMIT_IN_PROGRESS: "5",
+  VITE_WIP_LIMIT_TESTING: "3",
+  VITE_WIP_LIMIT_IN_REVIEW: "3",
+};
 
-describe('loadConfig', () => {
-  it('lê o ambiente e remove a barra final da URL', () => {
+describe("loadConfig", () => {
+  it("lê o ambiente e remove a barra final da URL", () => {
     expect(loadConfig(base)).toEqual({
-      apiUrl: 'http://api:1',
-      mqttWsUrl: 'ws://mq:2',
-      defaultLanguage: 'en',
-      pixLabel: 'Pix',
-      defaultLlmModel: 'qwen3.6:latest',
-      paypalUrl: 'https://paypal.me/x',
+      apiUrl: "http://api:1",
+      mqttWsUrl: "ws://mq:2",
+      defaultLanguage: "en",
+      pixLabel: "Pix",
+      defaultLlmModel: "qwen3.6:latest",
+      paypalUrl: "https://paypal.me/x",
       donationReminderDays: 7,
       refreshIntervalMs: 5000,
       wanderIntervalMs: 8000,
       wipLimits: { todo: 0, in_progress: 5, testing: 3, in_review: 3 },
-    })
-  })
+    });
+  });
 
-  it('falha quando falta variável', () => {
-    expect(() => loadConfig({ ...base, VITE_API_URL: '' })).toThrow('VITE_API_URL')
-  })
+  it("falha quando falta variável", () => {
+    expect(() => loadConfig({ ...base, VITE_API_URL: "" })).toThrow(
+      "VITE_API_URL",
+    );
+  });
 
-  it('PayPal é opcional e o intervalo deve ser inteiro não negativo', () => {
-    expect(loadConfig({ ...base, VITE_PAYPAL_URL: undefined }).paypalUrl).toBe('')
-    expect(() => loadConfig({ ...base, VITE_DONATION_REMINDER_DAYS: '-1' })).toThrow('non-negative')
-  })
+  it("PayPal é opcional e o intervalo deve ser inteiro não negativo", () => {
+    expect(loadConfig({ ...base, VITE_PAYPAL_URL: undefined }).paypalUrl).toBe(
+      "",
+    );
+    expect(() =>
+      loadConfig({ ...base, VITE_DONATION_REMINDER_DAYS: "-1" }),
+    ).toThrow("non-negative");
+  });
 
-  it('rejeita idioma inválido', () => {
-    expect(() => loadConfig({ ...base, VITE_DEFAULT_LANGUAGE: 'fr' })).toThrow('pt')
-  })
-})
+  it("rejeita idioma inválido", () => {
+    expect(() => loadConfig({ ...base, VITE_DEFAULT_LANGUAGE: "fr" })).toThrow(
+      "pt",
+    );
+  });
+});

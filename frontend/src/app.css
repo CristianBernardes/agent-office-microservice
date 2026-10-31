@@ -6,6 +6,18 @@
   color-scheme: dark;
   font-family: system-ui, sans-serif;
 }
-body { margin: 0; background: var(--bg); color: #e6e8ee; }
-.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-.panel h2 { font-size: 15px; margin: 0 0 8px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: #e6e8ee;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+.panel h2 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
