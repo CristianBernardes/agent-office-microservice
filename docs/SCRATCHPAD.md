@@ -450,6 +450,11 @@ identidade visual sugerida por papel listada acima.
 - `Task.goal_id` e `Task.reviewer_id` persistidos no Postgres; a reunião vincula o backlog ao objetivo.
 - 231 testes unitários. **Próximo:** relationships, meetings/hire_agent, layout, testes de integração.
 
+### Rodada 19 — Handler `hire_agent` (ADR-026)
+
+- RH/PO/Tech Lead contratam agentes pela ferramenta (personalidade neutra, modelo padrão do Ollama). `start_ceremony` segue sem handler.
+- 232 testes unitários. **Próximo:** relationships, meetings, layout, testes de integração.
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)

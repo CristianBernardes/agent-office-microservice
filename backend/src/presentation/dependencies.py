@@ -307,6 +307,8 @@ def get_tool_registry() -> ToolRegistry:
         assign_task_use_case=get_assign_task_use_case(),
         complete_task_use_case=get_complete_task_use_case(),
         send_message_use_case=get_send_message_use_case(),
+        hire_agent_use_case=get_hire_agent_use_case(),
+        default_llm_model=get_settings().ollama_model,
     )
 
 

@@ -134,3 +134,25 @@ class TestToolRegistry:
                 requester_role=Role.PRODUCT_OWNER,
                 arguments={"session_id": str(uuid4()), "content": "oi"},
             )
+
+    async def test_hr_can_hire_agent_when_use_case_injected(self, tmp_path: Path) -> None:
+        from src.application.agents.hire_agent_use_case import HireAgentUseCase
+        from src.infrastructure.persistence.in_memory_agent_repository import (
+            InMemoryAgentRepository,
+        )
+
+        repo = InMemoryAgentRepository()
+        registry = _build_registry(tmp_path, MockSearchAdapter())
+        registry._handlers[ToolName.HIRE_AGENT] = registry._make_hire_agent_handler(
+            HireAgentUseCase(repo), "m1"
+        )
+
+        agent = await registry.execute(
+            ToolName.HIRE_AGENT,
+            AgentId.generate(),
+            Role.HR_MANAGER,
+            {"name": "Ana", "role": "dev_junior"},
+        )
+
+        assert agent.llm_model == "m1"  # type: ignore[attr-defined]
+        assert len(await repo.list_all()) == 1
