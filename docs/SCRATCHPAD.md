@@ -616,7 +616,12 @@ identidade visual sugerida por papel listada acima.
 | 41 | `7f691e5` | Cobertura do ToolRegistry (293 unit) |
 | 42 | `af24d88` | Factories Postgres + cache da pool (304 unit) |
 | 43 | `16cc8d9` | CI GitHub Actions (ADR-040; ADRs 001–040) |
-| 44 | este commit | Badge de CI nos READMEs |
+| 44 | `b8c1cd4` | Badge de CI nos READMEs |
+| 45 | `7f964ec` | Testes de prompt sem mapeamento e Tavily close (306 unit) |
+| 46 | `c1c8a5e` | Limitações e backlog revisados |
+| 47 | `85246fb` | Cobertura mínima 85% + jobs integration/docker no CI (ADR-041) |
+| 48 | `583fd26` | Início rápido dos READMEs atualizado |
+| 49 | `4927af8` | E2E PO → Dev → QA (309 testes) |
 
 ### O que funciona
 
