@@ -553,6 +553,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 38 — Upsert de goals já fechados no Postgres
 - `closed_at` agora é preenchido no INSERT quando o status não é `open` (antes violava o CHECK). Teste de integração novo (13 no total).
 
+## Rodada 39 — Mock de embedding com 768 dimensões
+- `MockLlmAdapter.embed` agora gera 768 dimensões (igual a `vector(768)`).
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -591,7 +594,6 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 
 - Só `move` aplica a matriz papel × estágio.
 - Feed exclui tópicos por agente (bus em memória sem curinga).
-- Mock de embedding tem 8 dimensões; coluna é `vector(768)`.
 
 ### Backlog
 

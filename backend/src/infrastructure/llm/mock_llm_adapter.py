@@ -13,9 +13,9 @@ from src.domain.interfaces.llm_adapter import (
 )
 
 # Bloco: dimensão padrão do vetor de embedding gerado pelo mock.
-# Escolhida para corresponder à dimensão mínima usada em testes de integração
-# futuros com pgvector, sem representar nenhum modelo real.
-_MOCK_EMBEDDING_DIMENSIONS = 8
+# Igual à coluna vector(768) da tabela memories (nomic-embed-text), para que o
+# mock funcione também contra o Postgres real.
+_MOCK_EMBEDDING_DIMENSIONS = 768
 
 
 # Bloco: adaptador de LLM mock.
