@@ -22,8 +22,12 @@
 │          GATEWAY DE COMUNICAÇÃO           │
 │                                           │
 │  Go                                        │
-│  ├── Distribuição de eventos               │
-│  └── API e conexões em tempo real          │
+│  ├── API e conexões em tempo real          │
+│  │   com o frontend                        │
+│  └── PONTE entre MQTT e o Backend Python:  │
+│      roteia MQTT ⇄ Kafka, com              │
+│      idempotência (Redis) e ordenação      │
+│      por agente — ver Fase 8               │
 └───────────────────┬───────────────────────┘
                     │
 ┌───────────────────▼───────────────────────┐
@@ -33,17 +37,23 @@
 │  ├── Eventos dos agentes                  │
 │  ├── Mudanças de estado                   │
 │  └── Notificações de tarefas               │
-└──────────────┬──────────────┬─────────────┘
-               │              │
-┌──────────────▼──────┐ ┌─────▼─────────────┐
-│ BACKEND PYTHON      │ │ SERVIÇOS GO       │
-│                     │ │                   │
-│ Execução de IA      │ │ Coordenação       │
-│ Orquestração        │ │ Concorrência      │
-│ Ferramentas         │ │ Serviços de apoio │
-│ Processamento       │ │ Integrações       │
-└─────────────────────┘ └───────────────────┘
+└───────────────────┬────────────────────────┘
+                    │
+┌───────────────────▼───────────────────────┐
+│          BACKEND PYTHON                   │
+│                                           │
+│  Execução de IA                           │
+│  Orquestração                             │
+│  Ferramentas                              │
+│  Processamento                            │
+└─────────────────────────────────────────────┘
 ```
+
+O Go não é um serviço paralelo e desconectado do Python — ele é a **ponte de roteamento** entre o
+broker MQTT e o backend Python (e entre o MQTT e o frontend). Toda mensagem publicada pelo Python
+via MQTT passa pelo Go Gateway antes de ser roteada (com garantias de idempotência e ordenação via
+Kafka/Redis) de volta ao MQTT para outros consumidores — ver detalhes completos em
+[`docs/migration-plan/fase-8-microservicos/README.md`](docs/migration-plan/fase-8-microservicos/README.md).
 
 ## Fluxo de Dependência (Clean Architecture)
 

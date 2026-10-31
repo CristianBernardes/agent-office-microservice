@@ -149,28 +149,32 @@ interface de domínio, permitindo troca de implementação sem alterar regra de 
                     │ WebSocket / HTTP
 ┌───────────────────▼─────────────────────────┐
 │          GATEWAY DE COMUNICAÇÃO (Go)        │
-│  ├── Distribuição de eventos                │
-│  └── API e conexões em tempo real           │
+│  ├── API e conexões em tempo real           │
+│  │   com o frontend                         │
+│  └── PONTE entre MQTT e o Backend Python:   │
+│      roteia MQTT ⇄ Kafka, com idempotência  │
+│      (Redis) e ordenação por agente         │
 │  (sem autenticação — projeto open source,    │
 │   mantido por doações, sem dados sensíveis)  │
 └───────────────────┬─────────────────────────┘
                     │
 ┌───────────────────▼─────────────────────────┐
 │                MQTT (Mosquitto)             │
-└──────────────┬──────────────┬────────────────┘
-               │              │
-┌──────────────▼──────┐ ┌─────▼─────────────┐
-│ BACKEND PYTHON       │ │ SERVIÇOS GO       │
-│ Execução de IA        │ │ Coordenação       │
-│ Orquestração          │ │ Concorrência      │
-│ Ferramentas           │ │ Serviços de apoio │
-└───────────────────────┘ └───────────────────┘
+└───────────────────┬──────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│          BACKEND PYTHON                     │
+│  Execução de IA                             │
+│  Orquestração                               │
+│  Ferramentas                                │
+└───────────────────────────────────────────────┘
 ```
 
-O frontend (Svelte + Phaser.js, pixel-art) e o gateway Go fazem parte da visão completa do produto
-e ainda não foram implementados neste repositório — ver detalhes em
-[`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md) e no plano de migração em
-[`docs/migration-plan/`](docs/migration-plan/).
+O frontend (Svelte + Phaser.js, pixel-art) e o gateway Go — responsável por servir o frontend em
+tempo real **e** por rotear, com garantias de entrega e idempotência, as mensagens MQTT trocadas
+pelo backend Python — fazem parte da visão completa do produto e ainda não foram implementados
+neste repositório. Ver detalhes em [`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md)
+e no plano de migração em [`docs/migration-plan/fase-8-microservicos/`](docs/migration-plan/fase-8-microservicos/README.md).
 
 ### Artefatos como cidadãos de primeira classe
 

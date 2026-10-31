@@ -148,28 +148,35 @@ interface, allowing the implementation to be swapped without touching business r
                     │ WebSocket / HTTP
 ┌───────────────────▼─────────────────────────┐
 │          COMMUNICATION GATEWAY (Go)         │
-│  ├── Event distribution                     │
-│  └── Real-time API and connections          │
+│  ├── Real-time API and connections          │
+│  │   with the frontend                      │
+│  └── BRIDGE between MQTT and the Python     │
+│      backend: routes MQTT ⇄ Kafka, with     │
+│      idempotency (Redis) and per-agent      │
+│      ordering                                │
 │  (no authentication — open source project,   │
 │   funded by donations, no sensitive data)    │
 └───────────────────┬─────────────────────────┘
                     │
 ┌───────────────────▼─────────────────────────┐
 │                MQTT (Mosquitto)             │
-└──────────────┬──────────────┬────────────────┘
-               │              │
-┌──────────────▼──────┐ ┌─────▼─────────────┐
-│ PYTHON BACKEND        │ │ GO SERVICES       │
-│ AI execution           │ │ Coordination      │
-│ Orchestration          │ │ Concurrency       │
-│ Tools                  │ │ Supporting svcs   │
-└───────────────────────┘ └───────────────────┘
+└───────────────────┬──────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│          PYTHON BACKEND                     │
+│  AI execution                               │
+│  Orchestration                              │
+│  Tools                                      │
+└───────────────────────────────────────────────┘
 ```
 
-The frontend (Svelte + Phaser.js, pixel-art) and the Go gateway are part of the full product
-vision and have not been implemented in this repository yet — see details in
+The frontend (Svelte + Phaser.js, pixel-art) and the Go gateway — responsible for serving the
+frontend in real time **and** for routing, with delivery and idempotency guarantees, the MQTT
+messages exchanged by the Python backend — are part of the full product vision and have not been
+implemented in this repository yet. See details in
 [`docs/design/arquitetura-geral.md`](docs/design/arquitetura-geral.md) and the full migration
-plan in [`docs/migration-plan/`](docs/migration-plan/) (both written in Portuguese).
+plan in [`docs/migration-plan/fase-8-microservicos/`](docs/migration-plan/fase-8-microservicos/README.md)
+(both written in Portuguese).
 
 ### Artifacts as first-class citizens
 
