@@ -105,6 +105,16 @@ class TestGoalMeeting:
         assert dispatch.languages == [Language.PT]
         assert "Objetivo do time" in dispatch.contexts[0]
 
+    async def test_minutes_use_translated_role_names(self) -> None:
+        use_case, _, _, _, artifact = await _build([Role.QA_ENGINEER], language=Language.EN)
+        data = GoalMeetingInput(GoalId.generate(), SessionId.generate(), "Vender", Language.PT)
+
+        await use_case.execute(data)
+
+        content = artifact.calls[0].content
+        assert "— Engenheiro de QA" in content and "— qa_engineer" not in content
+        assert artifact.calls[0].title.startswith("Ata da reunião")
+
     async def test_speaks_in_fixed_order_and_writes_minutes(self) -> None:
         roles = [Role.QA_ENGINEER, Role.PRODUCT_OWNER, Role.TECH_LEAD]
         use_case, dispatch, chat, memory, artifact = await _build(roles)

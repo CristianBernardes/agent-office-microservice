@@ -637,6 +637,10 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 
 - `spriteFor(..., alt)`: idle→`interagindo_com_objetos`, thinking/working→`outra_postura_de_trabalho`; `OfficeMap` alterna a pose por agente a cada `VITE_WANDER_INTERVAL_MS`. Agora as 8 folhas de cada cargo são usadas.
 
+## Rodada 67 — Cargos traduzidos nas atas
+
+- Cabeçalhos da ata usam o cargo localizado (pt/en) em vez do id do papel. Suíte unitária: 330 testes verdes.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -692,6 +696,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 64 | este commit | ciclo de trabalho autônomo (ADR-048) + escritório vivo no mapa: caminhadas, conversas, sprites distintos, cargo no rótulo |
 | 65 | este commit | Responsável obrigatório fora do backlog + diretiva de idioma nos prompts |
 | 66 | este commit | Poses alternativas dos sprites (interagindo_com_objetos, outra_postura_de_trabalho) |
+| 67 | este commit | Cargos traduzidos nas atas |
 
 ### O que funciona
 

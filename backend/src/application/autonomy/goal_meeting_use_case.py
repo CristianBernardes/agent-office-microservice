@@ -65,6 +65,33 @@ _LABELS = {
 }
 
 
+# Bloco: nomes de cargo localizados para os cabeçalhos da ata.
+_ROLE_NAMES: dict[Language, dict[Role, str]] = {
+    Language.PT: {
+        Role.PRODUCT_OWNER: "Product Owner",
+        Role.SCRUM_MASTER: "Scrum Master",
+        Role.TECH_LEAD: "Tech Lead",
+        Role.DEV_SENIOR: "Desenvolvedor Sênior",
+        Role.DEV_JUNIOR: "Desenvolvedor Júnior",
+        Role.QA_ENGINEER: "Engenheiro de QA",
+        Role.DATA_ANALYST: "Analista de Dados",
+        Role.HR_MANAGER: "Gerente de RH",
+        Role.PRODUCT_CONSULTANT: "Consultor de Produto",
+    },
+    Language.EN: {
+        Role.PRODUCT_OWNER: "Product Owner",
+        Role.SCRUM_MASTER: "Scrum Master",
+        Role.TECH_LEAD: "Tech Lead",
+        Role.DEV_SENIOR: "Senior Developer",
+        Role.DEV_JUNIOR: "Junior Developer",
+        Role.QA_ENGINEER: "QA Engineer",
+        Role.DATA_ANALYST: "Data Analyst",
+        Role.HR_MANAGER: "HR Manager",
+        Role.PRODUCT_CONSULTANT: "Product Consultant",
+    },
+}
+
+
 @dataclass(frozen=True, slots=True)
 class GoalMeetingInput:
     goal_id: GoalId
@@ -227,8 +254,9 @@ class GoalMeetingUseCase:
 
     async def _write_minutes(self, data: GoalMeetingInput, turns: list[MeetingTurn]) -> None:
         title = _LABELS[data.language or self._language]["title"].format(goal=data.text)
+        names = _ROLE_NAMES[data.language or self._language]
         body = "\n\n".join(
-            f"## {t.agent.name} — {t.agent.role.value}\n\n{t.thought}" for t in turns
+            f"## {t.agent.name} — {names[t.agent.role]}\n\n{t.thought}" for t in turns
         )
         author = turns[0].agent
         await self._write_artifact.execute(
