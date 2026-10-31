@@ -11,6 +11,19 @@
   let done = $state(false)
   let failed = $state(false)
 
+  const defaultTeam: Role[] = ['product_owner', 'scrum_master', 'tech_lead', 'dev_senior', 'dev_junior', 'qa_engineer']
+
+  async function hireTeam() {
+    done = false
+    failed = false
+    try {
+      for (const r of defaultTeam) await onsubmit({ name: i18n.t.roles[r], role: r, llm_model: model.trim() })
+      done = true
+    } catch {
+      failed = true
+    }
+  }
+
   async function submit(event: SubmitEvent) {
     event.preventDefault()
     if (!name.trim() || !model.trim()) return
@@ -35,6 +48,7 @@
     </select>
     <input bind:value={model} aria-label={i18n.t.hireModel} />
     <button type="submit" disabled={!name.trim() || !model.trim()}>{i18n.t.hireSubmit}</button>
+    <button type="button" disabled={!model.trim()} onclick={hireTeam}>{i18n.t.hireTeam}</button>
   </div>
   {#if done}<p role="status">{i18n.t.hireDone}</p>{/if}
   {#if failed}<p role="alert">{i18n.t.loadError}</p>{/if}

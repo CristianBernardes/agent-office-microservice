@@ -17,6 +17,7 @@ export interface Messages {
   hireModel: string
   hireSubmit: string
   hireDone: string
+  hireTeam: string
   goalTitle: string
   goalPlaceholder: string
   goalSubmit: string
@@ -69,6 +70,7 @@ export const pt: Messages = {
   hireModel: 'Modelo (Ollama)',
   hireSubmit: 'Contratar',
   hireDone: 'Agente contratado!',
+  hireTeam: 'Contratar time padrão',
   goalTitle: 'Novo objetivo',
   goalPlaceholder: 'Descreva o que o time deve entregar…',
   goalSubmit: 'Enviar ao time',
@@ -144,6 +146,7 @@ export const en: Messages = {
   hireModel: 'Model (Ollama)',
   hireSubmit: 'Hire',
   hireDone: 'Agent hired!',
+  hireTeam: 'Hire default team',
   goalTitle: 'New goal',
   goalPlaceholder: 'Describe what the team should deliver…',
   goalSubmit: 'Send to the team',

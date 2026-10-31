@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/svelte'
+import { fireEvent, render, screen, waitFor } from '@testing-library/svelte'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ChatPanel from './ChatPanel.svelte'
 import DonationModal from './DonationModal.svelte'
@@ -86,5 +86,12 @@ describe('componentes', () => {
     await fireEvent.change(screen.getByLabelText('Cargo'), { target: { value: 'tech_lead' } })
     await fireEvent.click(screen.getByRole('button', { name: 'Contratar' }))
     expect(onsubmit).toHaveBeenCalledWith({ name: 'Ana', role: 'tech_lead', llm_model: 'qwen' })
+  })
+
+  it('HireForm contrata o time padrão', async () => {
+    const onsubmit = vi.fn().mockResolvedValue(undefined)
+    render(HireForm, { defaultModel: 'qwen', onsubmit })
+    await fireEvent.click(screen.getByRole('button', { name: 'Contratar time padrão' }))
+    await waitFor(() => expect(onsubmit).toHaveBeenCalledTimes(6))
   })
 })

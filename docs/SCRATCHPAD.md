@@ -671,6 +671,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 58 | este commit | ADR-047: frontend Svelte 5 (mapa, kanban, time, chat, logs, doação pt/en) |
 | 59 | este commit | Dockerfile/compose/CI do frontend e README |
 | 60 | este commit | Frontend: formulário de contratação, `VITE_DEFAULT_LLM_MODEL`, verificação visual |
+| 61 | este commit | Botão "Contratar time padrão" (criar tarefa exige agentes) |
 
 ### O que funciona
 
