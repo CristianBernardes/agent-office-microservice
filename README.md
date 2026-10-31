@@ -532,3 +532,7 @@ decisões e do estado atual de implementação de cada fase do projeto.
 Qualquer valor de doação é bem-vindo e ajuda a cobrir os custos de saúde da minha família e a
 manter este projeto open source vivo e crescendo. Veja as formas de doar (Pix e PayPal) no topo
 deste README, ou na [versão em inglês](./README.en.md).
+
+## 📄 Licença
+
+Projeto open source sob a [Licença MIT](./LICENSE) ([versão em português](./LICENSE.pt-BR.md)). Uso livre, inclusive comercial. As doações são **voluntárias** e nunca obrigatórias.

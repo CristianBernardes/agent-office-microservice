@@ -533,3 +533,7 @@ the current implementation state of every phase of the project (written in Portu
 Any donation amount is welcome and helps cover my family's health costs and keep this open
 source project alive and growing. See the donation options (PayPal and Pix) at the top of this
 README, or in the [Portuguese version](./README.md).
+
+## 📄 License
+
+Open source under the [MIT License](./LICENSE) ([Portuguese version](./LICENSE.pt-BR.md)). Free to use, including commercially. Donations are **voluntary** and never required.

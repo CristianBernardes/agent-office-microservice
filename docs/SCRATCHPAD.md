@@ -805,6 +805,11 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Agente "Mem" residual removido; time re-semeado (11 agentes, 15 tarefas).
 - Limitação: Mermaid dos READMEs ainda não validado por renderização.
 
+### Rodada 102 — Licença
+
+- `LICENSE` (MIT, inglês) e `LICENSE.pt-BR.md` (tradução de cortesia), ambos reforçando que doações são voluntárias.
+- Seção de licença nos dois READMEs.
+
 ## Estado atual e ponto de retomada (após a Rodada 101)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -894,7 +899,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 98 | `bf8793b` | Postgres + MQTT por padrão (ADR-053), testes isolados do `.env`, títulos de tarefa higienizados (`clean_title`), SCRATCHPAD reescrito |
 | 99 | `42dc1d9` | `grafana.png` nos READMEs pt/en |
 | 100 | `927edb3` | Seção de doação centralizada (`div align=center`) nos READMEs |
-| 101 | este commit | `clean_body`, testes de integração em banco `<db>_test`, verificação MQTT→Kafka |
+| 101 | `3998ea9` | `clean_body`, testes de integração em banco `<db>_test`, verificação MQTT→Kafka |
+| 102 | este commit | LICENSE (MIT) em inglês e português, com nota de doações voluntárias; links nos READMEs |
 
 ### O que funciona
 
