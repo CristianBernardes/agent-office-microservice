@@ -90,3 +90,14 @@ export function pickBreak(
   const kind: BreakKind = random() < 0.5 ? 'rest' : 'think'
   return { agentId: agent.agent_id, kind, index: Math.floor(random() * phrases) }
 }
+
+// Bloco: direção do olhar de quem anda de um ponto a outro (eixo dominante; no mapa o eixo y cresce para baixo).
+export function directionBetween(
+  from: { left: number; top: number },
+  to: { left: number; top: number },
+): 'right' | 'up' | 'left' | 'down' {
+  const dx = to.left - from.left
+  const dy = to.top - from.top
+  if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0 ? 'right' : 'left'
+  return dy >= 0 ? 'down' : 'up'
+}

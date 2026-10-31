@@ -766,6 +766,12 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Novo `ConfirmModal.svelte` (alertdialog acessível, Esc/clique fora cancelam, foco inicial, textos pt/en) substitui o `window.confirm` do `LanguageSwitcher`.
 - Testes do `LanguageSwitcher` atualizados (abre o modal, confirma e cancela). 62 testes e `svelte-check` ok.
 
+## Rodada 95 — bug de sprites
+
+- Causa: cada folha concatena 4 direções (direita, costas, esquerda, frente; as de 12 quadros têm 2); a animação percorria a tira inteira e o personagem girava.
+- `spriteFor` agora devolve `start`/`count` da direção; o CSS anima só esse trecho. Parado = frente; ao andar a direção vem do trajeto (`directionBetween` em `layout.ts`).
+- Testes novos em `sprites.test.ts` e `layout.test.ts` (64 ok).
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -848,7 +854,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 91 | `3e75623` | READMEs pt/en detalhados com capturas, Ollama, hardware; seletor de modelos já vem do Ollama |
 | 92 | `f45e3ea` | Auditoria do `git log` x SCRATCHPAD: apêndice com o histórico completo de commits |
 | 93 | `96488a8` | Texto de doação transparente (dívida com saúde da filha, sem apelo emocional) no modal e nos READMEs |
-| 94 | este commit | Modal de confirmação profissional (`ConfirmModal`) no lugar do `window.confirm` na troca de idioma |
+| 94 | `b04ff45` | Modal de confirmação profissional (`ConfirmModal`) no lugar do `window.confirm` na troca de idioma |
+| 95 | este commit | Correção de sprites: animação limitada a uma direção da folha (antes girava) e direção de caminhada pelo trajeto |
 
 ### O que funciona
 

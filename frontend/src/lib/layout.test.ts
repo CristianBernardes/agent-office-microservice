@@ -52,3 +52,13 @@ describe('pickBreak', () => {
     expect(pickBreak([mk('a')], new Set(), 0, () => 0)).toBeNull()
   })
 })
+
+describe('directionBetween', () => {
+  it('usa o eixo dominante', async () => {
+    const { directionBetween } = await import('./layout')
+    expect(directionBetween({ left: 0, top: 0 }, { left: 10, top: 2 })).toBe('right')
+    expect(directionBetween({ left: 10, top: 0 }, { left: 0, top: 2 })).toBe('left')
+    expect(directionBetween({ left: 0, top: 0 }, { left: 1, top: 9 })).toBe('down')
+    expect(directionBetween({ left: 0, top: 9 }, { left: 1, top: 0 })).toBe('up')
+  })
+})

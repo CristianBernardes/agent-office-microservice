@@ -2,7 +2,8 @@
   import AgentSprite from './AgentSprite.svelte'
   import { i18n } from '../lib/i18n.svelte'
   import { onMount } from 'svelte'
-  import { MAP_HEIGHT, MAP_WIDTH, hueFor, meetingPoint, pickBreak, pickMeeting, placeAgents } from '../lib/layout'
+  import { MAP_HEIGHT, MAP_WIDTH, directionBetween, hueFor, meetingPoint, pickBreak, pickMeeting, placeAgents } from '../lib/layout'
+  import type { Direction } from '../lib/sprites'
   import type { Agent } from '../lib/types'
 
   let {
@@ -25,7 +26,7 @@
   const placements = $derived(placeAgents(agents))
 
   // Bloco: caminhadas — um agente vai até um colega, conversa e volta à sua mesa.
-  type Trip = { left: number; top: number; phase: 'walking' | 'chatting' | 'returning' }
+  type Trip = { left: number; top: number; phase: 'walking' | 'chatting' | 'returning'; dir: Direction }
   let trips = $state<Record<string, Trip>>({})
   const timers = new Set<ReturnType<typeof setTimeout>>()
   const later = (fn: () => void, ms: number) => {
@@ -43,11 +44,13 @@
     if (!dest) return
     const point = meetingPoint(dest.left, dest.top)
     const { walker } = meeting
-    trips[walker] = { ...point, phase: 'walking' }
-    later(() => (trips[walker] = { ...point, phase: 'chatting' }), walkMs)
+    const home = placements.find((p) => p.agent.agent_id === walker)
+    const going = home ? directionBetween(home, point) : 'down'
+    trips[walker] = { ...point, phase: 'walking', dir: going }
+    later(() => (trips[walker] = { ...point, phase: 'chatting', dir: 'down' }), walkMs)
     later(() => {
       const seat = placements.find((p) => p.agent.agent_id === walker)
-      if (seat) trips[walker] = { left: seat.left, top: seat.top, phase: 'returning' }
+      if (seat) trips[walker] = { left: seat.left, top: seat.top, phase: 'returning', dir: directionBetween(point, seat) }
     }, walkMs + chatMs)
     later(() => delete trips[walker], 2 * walkMs + chatMs)
   }
@@ -103,6 +106,7 @@
           agent={trip?.phase === 'chatting' ? { ...agent, status: 'talking' } : breaks[agent.agent_id]?.kind === 'think' ? { ...agent, status: 'thinking' } : breaks[agent.agent_id]?.kind === 'rest' ? { ...agent, status: 'idle' } : agent}
           walking={trip?.phase === 'walking' || trip?.phase === 'returning'}
           hue={hueFor(variant)}
+          direction={trip?.dir ?? 'down'}
           alt={(poseTick + variant) % 2 === 1}
         />
         <span class="name">{agent.name}</span>
