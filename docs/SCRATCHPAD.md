@@ -572,10 +572,10 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 44 — Badge de CI nos READMEs
 - Badge do workflow `ci.yml` em `README.md` e `README.en.md`.
 
-## Rodada 45 — Testes de lacunas
-- Prompt sem arquivo mapeado e `close()` do Tavily cobertos (306 unit).
+## Rodada 46 — Revisão de limitações e backlog
+- Limitações e backlog do SCRATCHPAD atualizados com o estado real.
 
-## Estado atual e ponto de retomada (após a Rodada 35)
+## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -607,8 +607,7 @@ identidade visual sugerida por papel listada acima.
 | 41 | `7f691e5` | Cobertura do ToolRegistry (293 unit) |
 | 42 | `af24d88` | Factories Postgres + cache da pool (304 unit) |
 | 43 | `16cc8d9` | CI GitHub Actions (ADR-040; ADRs 001–040) |
-| 44 | `b8c1cd4` | Badge de CI nos READMEs |
-| 45 | este commit | Testes de lacunas (306 unit) |
+| 44 | este commit | Badge de CI nos READMEs |
 
 ### O que funciona
 
@@ -619,13 +618,14 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 
 ### Limitações conhecidas
 
-- Só `move` aplica a matriz papel × estágio.
+- `move` aplica a matriz papel × estágio; `assign`/`complete` aplicam permissão por papel (ADR-035) e a entidade valida o estágio. Frontend é feito pelo autor.
 
 ### Backlog
 
 1. (feito na Rodada 35) ferramenta `research`.
 2. (feito na Rodada 32) permissões em `assign`/`complete`.
-3. Teste de integração do gateway Kafka (marcador próprio).
+3. (feito na Rodada 37) teste de integração do gateway Kafka.
+5. Backlog técnico esgotado: novos itens vêm de pedidos do Cristian ou de bugs encontrados.
 4. Frontend (feito pelo autor).
 
 ### Regras a lembrar
