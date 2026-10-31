@@ -42,6 +42,10 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "Agent '{name}' is OFFLINE and cannot start thinking.",
         Language.PT: "Agente '{name}' está OFFLINE e não pode iniciar um pensamento.",
     },
+    "agent.not_thinking": {
+        Language.EN: "Agent '{name}' is '{status}' and is not thinking.",
+        Language.PT: "Agente '{name}' está '{status}' e não está pensando.",
+    },
     "agent.cannot_receive_task": {
         Language.EN: "Agent '{name}' is '{status}' and cannot receive a new task — "
         "only 'idle' agents can be assigned.",

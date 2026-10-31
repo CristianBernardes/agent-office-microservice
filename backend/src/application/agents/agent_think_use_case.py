@@ -10,6 +10,7 @@ própria (ver RFC-003 e Fase 3 do plano de migração).
 
 from __future__ import annotations
 
+from src.application.common.agent_status_publisher import publish_agent_status
 from src.application.common.message_envelope import build_message_envelope
 from src.application.tools.tool_permissions import ToolName
 from src.application.tools.tool_registry import ToolRegistry
@@ -21,7 +22,6 @@ from src.domain.interfaces.prompt_provider import IPromptProvider
 from src.domain.localization.language import Language
 
 # Bloco: templates de tópico por tipo de evento, conforme a RFC-001.
-_STATUS_TOPIC_TEMPLATE = "office/agents/{agent_id}/status"
 _THOUGHT_TOPIC_TEMPLATE = "office/agents/{agent_id}/thought"
 _ACTION_TOPIC_TEMPLATE = "office/agents/{agent_id}/action"
 
@@ -48,7 +48,7 @@ class AgentThinkUseCase:
     async def execute(self, agent: Agent, context: str) -> LlmThoughtResponse:
         """Move o agente para `THINKING`, consulta o LLM e publica pensamento/ação."""
         agent.start_thinking()
-        await self._publish_status(agent)
+        await publish_agent_status(self._message_bus, agent)
 
         system_prompt = self._prompt_provider.get_system_prompt(
             agent.role, agent.name, self._language
@@ -63,15 +63,6 @@ class AgentThinkUseCase:
             await self._execute_tool_call(agent, response)
 
         return response
-
-    async def _publish_status(self, agent: Agent) -> None:
-        envelope = build_message_envelope(
-            agent_id=str(agent.agent_id),
-            agent_role=agent.role.value,
-            payload={"status": agent.status.value},
-        )
-        topic = _STATUS_TOPIC_TEMPLATE.format(agent_id=agent.agent_id)
-        await self._message_bus.publish(topic, envelope, qos=1, retain=True)
 
     async def _publish_thought(self, agent: Agent, response: LlmThoughtResponse) -> None:
         envelope = build_message_envelope(

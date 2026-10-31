@@ -106,3 +106,14 @@ class TestPersonalityValidation:
                 agreeableness=0.5,
                 neuroticism=-0.1,
             )
+
+
+class TestFinishThinking:
+    def test_finish_thinking_returns_to_idle(self, dev_senior_agent: Agent) -> None:
+        dev_senior_agent.start_thinking()
+        dev_senior_agent.finish_thinking()
+        assert dev_senior_agent.status == AgentStatus.IDLE
+
+    def test_finish_thinking_requires_thinking_status(self, dev_senior_agent: Agent) -> None:
+        with pytest.raises(InvalidStateTransitionError):
+            dev_senior_agent.finish_thinking()

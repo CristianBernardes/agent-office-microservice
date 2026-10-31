@@ -24,6 +24,19 @@ class HireAgentRequest(BaseModel):
     neuroticism: float = Field(default=0.5, ge=0.0, le=1.0)
 
 
+# Bloco: corpo de requisição para despachar um objetivo a um agente.
+class DispatchGoalRequest(BaseModel):
+    context: str = Field(..., min_length=1, max_length=8000)
+
+
+# Bloco: decisão do agente retornada pela API após pensar.
+class ThoughtResponse(BaseModel):
+    thought: str
+    action: str
+    target: str | None
+    tool_call: dict[str, object] | None
+
+
 # Bloco: representação de um agente retornada pela API.
 class AgentResponse(BaseModel):
     agent_id: str

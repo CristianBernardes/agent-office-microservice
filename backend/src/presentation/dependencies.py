@@ -11,6 +11,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 from src.application.agents.agent_think_use_case import AgentThinkUseCase
+from src.application.agents.dispatch_goal_use_case import DispatchGoalUseCase
 from src.application.agents.fire_agent_use_case import FireAgentUseCase
 from src.application.agents.hire_agent_use_case import HireAgentUseCase
 from src.application.artifacts.approve_artifact_use_case import ApproveArtifactUseCase
@@ -177,4 +178,14 @@ def get_agent_think_use_case() -> AgentThinkUseCase:
         prompt_provider=get_prompt_provider(),
         tool_registry=get_tool_registry(),
         language=get_settings().language(),
+    )
+
+
+# Bloco: factory do caso de uso de despacho de objetivo a um agente.
+def get_dispatch_goal_use_case() -> DispatchGoalUseCase:
+    """Monta o caso de uso de despacho de objetivo com suas dependências."""
+    return DispatchGoalUseCase(
+        agent_repository=get_agent_repository(),
+        agent_think_use_case=get_agent_think_use_case(),
+        message_bus=get_message_bus(),
     )

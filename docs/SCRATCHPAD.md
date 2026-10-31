@@ -328,3 +328,14 @@ identidade visual sugerida por papel listada acima.
   rota com 2 idiomas, settings. 107 unitários passando.
 - **Pendente:** Postgres repos, entrada para disparar objetivos, OpenAI-compatible, frontend Svelte
   (já nascendo com i18n pt/en).
+
+### Rodada 6 — Endpoint para despachar objetivos (2026-10-31)
+
+- ADR-013. `POST /agents/{id}/think` `{"context": "..."}` → `{thought, action, target, tool_call}`;
+  404 (agente inexistente) e 409 (agente OFFLINE), ambos localizados via `Accept-Language`.
+- `DispatchGoalUseCase` (busca → pensa → volta a IDLE → persiste → publica status; também volta a
+  IDLE se o LLM falhar). `Agent.finish_thinking()`/`is_thinking()`; chave i18n `agent.not_thinking`.
+- Publicação de status extraída para `application/common/agent_status_publisher.py` (DRY).
+- Testes: caso de uso (4), entidade (2), rota (4). `make format`/`lint`/`type-check` limpos;
+  117 unitários passando.
+- **Pendente:** Postgres repos, OpenAI-compatible (não decidido), frontend Svelte (pt/en).

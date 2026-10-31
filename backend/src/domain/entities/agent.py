@@ -89,6 +89,17 @@ class Agent:
             raise InvalidStateTransitionError("agent.offline_cannot_think", name=self.name)
         self.status = AgentStatus.THINKING
 
+    def is_thinking(self) -> bool:
+        return self.status == AgentStatus.THINKING
+
+    def finish_thinking(self) -> None:
+        """Devolve o agente a ``IDLE`` ao término do pensamento."""
+        if self.status != AgentStatus.THINKING:
+            raise InvalidStateTransitionError(
+                "agent.not_thinking", name=self.name, status=self.status.value
+            )
+        self.status = AgentStatus.IDLE
+
     def assign_task(self, task_id: TaskId) -> None:
         """Atribui uma tarefa ao agente, movendo-o para o estado de trabalho.
 

@@ -11,17 +11,28 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 
+from src.application.agents.dispatch_goal_use_case import DispatchGoalUseCase
 from src.application.agents.fire_agent_use_case import (
     AgentNotFoundError,
     FireAgentUseCase,
 )
 from src.application.agents.hire_agent_use_case import HireAgentInput, HireAgentUseCase
 from src.domain.entities.agent import Personality
+from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
 from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId
 from src.infrastructure.config.settings import get_settings
-from src.presentation.api.agent_schemas import AgentResponse, HireAgentRequest
-from src.presentation.dependencies import get_fire_agent_use_case, get_hire_agent_use_case
+from src.presentation.api.agent_schemas import (
+    AgentResponse,
+    DispatchGoalRequest,
+    HireAgentRequest,
+    ThoughtResponse,
+)
+from src.presentation.dependencies import (
+    get_dispatch_goal_use_case,
+    get_fire_agent_use_case,
+    get_hire_agent_use_case,
+)
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 
@@ -71,3 +82,30 @@ async def fire_agent(
             status_code=status.HTTP_404_NOT_FOUND, detail=not_found_error.localized(language)
         ) from not_found_error
     return AgentResponse.from_entity(agent)
+
+
+# Bloco: endpoint que entrega um objetivo ao agente e devolve sua decisão.
+@router.post("/{agent_id}/think", response_model=ThoughtResponse)
+async def dispatch_goal(
+    agent_id: UUID,
+    request_body: DispatchGoalRequest,
+    use_case: DispatchGoalUseCase = Depends(get_dispatch_goal_use_case),
+    language: Language = Depends(get_request_language),
+) -> ThoughtResponse:
+    """Faz o agente pensar sobre o objetivo informado (404 se inexistente, 409 se OFFLINE)."""
+    try:
+        response = await use_case.execute(AgentId(value=agent_id), request_body.context)
+    except AgentNotFoundError as not_found_error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=not_found_error.localized(language)
+        ) from not_found_error
+    except InvalidStateTransitionError as state_error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=state_error.localized(language)
+        ) from state_error
+    return ThoughtResponse(
+        thought=response.thought,
+        action=response.action,
+        target=response.target,
+        tool_call=response.tool_call,
+    )
