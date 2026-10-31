@@ -534,6 +534,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 32 — Permissões em assign/complete (ADR-035)
 - `can_assign` / `can_complete` na política de domínio; 403 localizado. 282 testes unitários.
 
+## Rodada 33 — Ollama tolerante a respostas não-JSON (ADR-036)
+- `_parse_structured_reply`: JSON direto, objeto extraído do texto ou texto livre como `thought`. 286 testes unitários.
+
 ## Estado atual e ponto de retomada (após a Rodada 31)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)

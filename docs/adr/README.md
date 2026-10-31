@@ -50,3 +50,4 @@
 | [033](./033-rotas-de-escrita-de-reunioes.md) | Rotas de escrita de reuniões | Aceito |
 | [034](./034-pesquisa-de-agentes.md) | Pesquisa de agentes que gera artefatos | Aceito |
 | [035](./035-permissoes-assign-complete.md) | Permissões de atribuir e concluir tarefas | Aceito |
+| [036](./036-leitura-tolerante-do-ollama.md) | Leitura tolerante da resposta do Ollama | Aceito |
