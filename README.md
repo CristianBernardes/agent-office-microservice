@@ -2,12 +2,20 @@
 
 **🌐 Idioma:** Português (BR) · [🇺🇸 English](./README.en.md)
 
+<div align="center">
+
 [![CI](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml/badge.svg)](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-green.svg)](./LICENSE) [![Doar](https://img.shields.io/badge/apoie-Pix%20%7C%20PayPal-ff69b4.svg)](#-antes-de-clonar-ou-fazer-fork--ajude-a-manter-este-projeto-vivo)
+
+</div>
+
+<div align="center">
 
 ▶️ **Assista ao vídeo de demonstração:**
 
 [![Assista ao vídeo](images/Agent_Office_2.png)](https://youtu.be/sAiGLPTWMv4)
+
+</div>
 
 
 > Um escritório de TI simulado por agentes de IA — cada um com um papel, personalidade e modelo de
@@ -27,25 +35,45 @@ arquitetural rigorosa (ADRs, RFCs, Design Docs).
 
 ## Capturas de tela
 
+<div align="center">
+
 ![Escritório de Agentes](images/Agent_Office.png)
 
 *O escritório vivo: agentes em suas mesas, salas de reunião e quadro Scrum.*
+
+</div>
+
+<div align="center">
 
 ![Contratar agente](images/hire_agent.png)
 
 *Contratação de agente: os modelos listados vêm do Ollama instalado (`GET /models`), nada fixo no código.*
 
+</div>
+
+<div align="center">
+
 ![Quadro Kanban](images/kambam_board.png)
 
 *Quadro Kanban de 6 colunas: backlog → todo → in_progress → testing → in_review → done.*
+
+</div>
+
+<div align="center">
 
 ![Alerta de troca de idioma](images/alert.png)
 
 *Aviso ao trocar o idioma: alterar depois do projeto iniciado pode corromper arquivos já escritos; é preciso confirmar.*
 
+</div>
+
+<div align="center">
+
 ![Painel de observabilidade no Grafana](images/grafana.png)
 
 *Painel do Grafana com métricas do backend, gateway e Kafka.*
+
+</div>
 
 ---
 

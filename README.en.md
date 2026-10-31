@@ -2,12 +2,20 @@
 
 **🌐 Language:** English · [🇧🇷 Português (BR)](./README.md)
 
+<div align="center">
+
 [![CI](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml/badge.svg)](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE) [![Donate](https://img.shields.io/badge/support-Pix%20%7C%20PayPal-ff69b4.svg)](#-before-you-clone-or-fork--help-keep-this-project-alive)
+
+</div>
+
+<div align="center">
 
 ▶️ **Watch the demo video:**
 
 [![Watch the video](images/Agent_Office_2.png)](https://youtu.be/sAiGLPTWMv4)
+
+</div>
 
 
 > An IT office simulated by AI agents — each with its own role, personality and language model,
@@ -26,25 +34,45 @@ rigorous architectural documentation (ADRs, RFCs, Design Docs).
 
 ## Screenshots
 
+<div align="center">
+
 ![Escritório de Agentes](images/Agent_Office.png)
 
 *The living office: agents at their desks, meeting rooms and the Scrum board.*
+
+</div>
+
+<div align="center">
 
 ![Hire an agent](images/hire_agent.png)
 
 *Hiring an agent: the listed models come from the locally installed Ollama (`GET /models`), nothing hardcoded.*
 
+</div>
+
+<div align="center">
+
 ![Quadro Kanban](images/kambam_board.png)
 
 *6-column Kanban board: backlog → todo → in_progress → testing → in_review → done.*
+
+</div>
+
+<div align="center">
 
 ![Language change alert](images/alert.png)
 
 *Warning when switching language: changing it after the project started may corrupt files already written; confirmation is required.*
 
+</div>
+
+<div align="center">
+
 ![Observability dashboard in Grafana](images/grafana.png)
 
 *Grafana dashboard: backend, gateway and Kafka metrics.*
+
+</div>
 
 ---
 

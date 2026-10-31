@@ -926,6 +926,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 112 | este commit | Tag `<video>` e `videos/video_demo.mp4` removidos (não tocava no GitHub); ficam miniatura e link do YouTube |
 | 113 | este commit | Link simples do YouTube removido dos READMEs (fica só a miniatura clicável) |
 | 114 | este commit | Imagem Agent_Office_2.png como chamada clicável para o vídeo nos READMEs |
+| 115 | este commit | Todas as imagens (badges, vídeo e capturas de tela) centralizadas nos READMEs |
 
 ### O que funciona
 
