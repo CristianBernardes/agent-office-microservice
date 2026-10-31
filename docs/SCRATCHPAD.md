@@ -712,6 +712,15 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Personagens fazem pausas aleatórias (descansar/pensar) com balões pt/en (`pickBreak`, testado).
 - Botão "📊 Gráficos" ao lado do "Cartão mais antigo" abre modal Kaizen (fluxo por coluna, lead time, idade dos cartões).
 
+## Pendências finais (Rodada 85 em diante)
+
+- [ ] 1. Idioma das tasks/decisões acompanha a troca pt/en (verificar se o idioma da tela chega ao backend em tarefas e decisões).
+- [ ] 2. Refazer o banco: recontratar o time de 11 agentes (modelos do `.env`) e recriar as 15 tarefas do comitê (script de seed versionado).
+- [ ] 3. Validar o fluxo ao vivo: in_progress → testing → in_review → done, `.md` no idioma certo, limite de 15 dias da sprint, pausas dos personagens.
+- [ ] 4. Migração `testing`: confirmar o nome da constraint `task_status_check` num Postgres real.
+- [ ] 5. Atualizar `docs/design/ciclo-de-trabalho.md` com a etapa de teste.
+- [ ] 6. Conferir no navegador: 6 colunas em uma linha e modal de gráficos Kaizen.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -783,8 +792,9 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 80 | (commit anterior) | Kanban: grade com 6 colunas (Concluído visível) |
 | 81 | fa5efa5 | Sprint com no máximo 15 dias fictícios (`SPRINT_MAX_DAYS`) |
 | 82 | 1f0b956 | Kanban: 6 colunas compactas em uma única linha |
-| 83 | este commit | Workspace fixo (nunca criado em runtime, 777) + `.gitkeep` |
-| 84 | este commit | Personagens vivos (pausas de descanso/reflexão) + modal de gráficos Kaizen |
+| 83 | 8d87e88 | Workspace fixo (nunca criado em runtime, 777) + `.gitkeep` |
+| 84 | 8d87e88 | Personagens vivos (pausas de descanso/reflexão) + modal de gráficos Kaizen |
+| 85 | este commit | Pendências finais registradas no SCRATCHPAD |
 
 ### O que funciona
 
