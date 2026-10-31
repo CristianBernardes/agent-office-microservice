@@ -504,7 +504,7 @@ identidade visual sugerida por papel listada acima.
 
 - `MEETING_ROUNDS` (1–5, padrão 1) em settings e `.env.example`; `GoalMeetingUseCase(rounds=)`.
 - Rodadas ≥2 usam o rótulo "debate" (pt/en) com a ata acumulada; backlog = 1 tarefa por agente (última fala); vínculos e `Meeting` com participantes únicos.
-- 268 testes unitários, ruff e mypy limpos.
+- 279 testes unitários, ruff e mypy limpos.
 - Próximo: agentes pesquisando/escrevendo `.md`, testes de integração (Postgres/Mosquitto), RFCs/Design Docs, refresh do "Estado atual".
 
 ## Rodada 27 — integração real (Postgres + Mosquitto)
@@ -531,7 +531,7 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 31 — RFC-004 e Design Doc de autonomia
 - `docs/rfc/004-contrato-da-api-http.md` (todas as rotas) e `docs/design/autonomia-e-reunioes.md`.
 
-## Estado atual e ponto de retomada (após a Rodada 27)
+## Estado atual e ponto de retomada (após a Rodada 31)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -547,26 +547,30 @@ identidade visual sugerida por papel listada acima.
 | 24–25 | `11506be`, `dc26758` | Layout do escritório (ADR-030), feed de atividades (ADR-031) |
 | 26 | `e327104` | Debate multi-rodada (ADR-032) |
 | 27 | `5ccd9be`, `03f655e` | Integração real: Postgres, pgvector, MQTT (10 testes) |
+| 28 | ver `git log` | Gateway Go validado ponta a ponta |
+| 29 | `6dd057f` | Rotas de escrita de reuniões (ADR-033) |
+| 30 | `7a65d4d` | Pesquisa de agentes → artefato .md (ADR-034) |
+| 31 | `c58abf1` | RFC-004 + design doc de autonomia |
 
 ### O que funciona
 
-268 testes unitários + 10 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
+279 testes unitários + 10 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
 ruff e mypy limpos. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
-activity. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
-Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–032.
+activity, research. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
+Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–034, RFCs 001–004.
 
 ### Limitações conhecidas
 
 - Só `move` aplica a matriz papel × estágio.
 - Upsert Postgres de goals só funciona para goals criados `open`.
-- Relacionamentos e reuniões só têm rotas de leitura; feed exclui tópicos por agente (bus em memória sem curinga).
+- Relacionamentos só têm rota de leitura; feed exclui tópicos por agente (bus em memória sem curinga).
 - Mock de embedding tem 8 dimensões; coluna é `vector(768)`.
 
 ### Backlog
 
-1. Agentes pesquisando e escrevendo `.md` em `workspace/projects/`.
-2. Rota HTTP para iniciar cerimônia; RFCs/Design Docs faltantes.
-3. (feito na Rodada 28) gateway validado.
+1. Ferramenta `research` para agentes no loop autônomo (hoje só via HTTP).
+2. Matriz papel × estágio em `assign`/`complete`.
+3. Teste de integração do gateway Kafka (marcador próprio).
 4. Frontend (feito pelo autor).
 
 ### Regras a lembrar
