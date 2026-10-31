@@ -25,6 +25,7 @@ from src.application.meetings.meeting_use_cases import (
     StartCeremonyInput,
     StartCeremonyUseCase,
 )
+from src.application.research.research_use_case import ResearchInput, ResearchTopicUseCase
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -86,6 +87,7 @@ class ToolRegistry:
         hire_agent_use_case: HireAgentUseCase | None = None,
         default_llm_model: str = "",
         start_ceremony_use_case: StartCeremonyUseCase | None = None,
+        research_use_case: ResearchTopicUseCase | None = None,
     ) -> None:
         self._handlers: dict[ToolName, ToolHandler] = {
             ToolName.WRITE_ARTIFACT: self._make_write_artifact_handler(write_artifact_use_case),
@@ -107,6 +109,8 @@ class ToolRegistry:
             self._handlers[ToolName.START_CEREMONY] = self._make_start_ceremony_handler(
                 start_ceremony_use_case
             )
+        if research_use_case is not None:
+            self._handlers[ToolName.RESEARCH] = self._make_research_handler(research_use_case)
 
     async def execute(
         self,
@@ -281,6 +285,17 @@ class ToolRegistry:
                     ),
                     goal_id=GoalId(value=UUID(str(goal))) if goal else None,
                 )
+            )
+
+        return handler
+
+    @staticmethod
+    def _make_research_handler(use_case: ResearchTopicUseCase) -> ToolHandler:
+        async def handler(
+            requester_id: AgentId, requester_role: Role, arguments: dict[str, object]
+        ) -> object:
+            return await use_case.execute(
+                ResearchInput(agent_id=requester_id, topic=str(arguments["topic"]))
             )
 
         return handler

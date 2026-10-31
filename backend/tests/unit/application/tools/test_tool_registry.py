@@ -179,3 +179,27 @@ async def test_scrum_master_can_start_ceremony(tmp_path: Path) -> None:
     )
 
     assert meeting.participants == (organizer,)  # type: ignore[attr-defined]
+
+
+async def test_researcher_role_can_use_research_tool(tmp_path: Path) -> None:
+    class _FakeResearch:
+        async def execute(self, data):  # type: ignore[no-untyped-def]
+            return data
+
+    registry = _build_registry(tmp_path, MockSearchAdapter())
+    registry._handlers[ToolName.RESEARCH] = registry._make_research_handler(_FakeResearch())  # type: ignore[arg-type]
+    agent_id = AgentId.generate()
+
+    result = await registry.execute(
+        ToolName.RESEARCH, agent_id, Role.DATA_ANALYST, {"topic": "MQTT"}
+    )
+
+    assert result.topic == "MQTT" and result.agent_id == agent_id  # type: ignore[attr-defined]
+
+
+async def test_qa_cannot_use_research_tool(tmp_path: Path) -> None:
+    registry = _build_registry(tmp_path, MockSearchAdapter())
+    with pytest.raises(ToolPermissionDeniedError):
+        await registry.execute(
+            ToolName.RESEARCH, AgentId.generate(), Role.QA_ENGINEER, {"topic": "x"}
+        )

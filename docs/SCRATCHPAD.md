@@ -540,6 +540,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 34 — Passe final nos READMEs
 - Seção "API HTTP" (tabela de rotas, autonomia, `MEETING_ROUNDS`, pesquisa) em pt e en.
 
+## Rodada 35 — Ferramenta `research` (ADR-037)
+- `ToolName.RESEARCH` para papéis com `web_search`; handler delega a `ResearchTopicUseCase`.
+
 ## Estado atual e ponto de retomada (após a Rodada 31)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -577,7 +580,7 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–034, RFCs 00
 
 ### Backlog
 
-1. Ferramenta `research` para agentes no loop autônomo (hoje só via HTTP).
+1. (feito na Rodada 35) ferramenta `research`.
 2. (feito na Rodada 32) permissões em `assign`/`complete`.
 3. Teste de integração do gateway Kafka (marcador próprio).
 4. Frontend (feito pelo autor).

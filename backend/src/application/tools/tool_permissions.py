@@ -29,6 +29,7 @@ class ToolName(str, Enum):
     WEB_SEARCH = "web_search"
     HIRE_AGENT = "hire_agent"
     START_CEREMONY = "start_ceremony"
+    RESEARCH = "research"
 
 
 # Bloco: tabela de permissões por papel.
@@ -46,6 +47,7 @@ ROLE_TOOL_PERMISSIONS: dict[Role, frozenset[ToolName]] = {
             ToolName.ASSIGN_TASK,
             ToolName.SEND_MESSAGE,
             ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
             ToolName.HIRE_AGENT,
         }
     ),
@@ -69,6 +71,7 @@ ROLE_TOOL_PERMISSIONS: dict[Role, frozenset[ToolName]] = {
             ToolName.ASSIGN_TASK,
             ToolName.SEND_MESSAGE,
             ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
             ToolName.HIRE_AGENT,
         }
     ),
@@ -81,6 +84,7 @@ ROLE_TOOL_PERMISSIONS: dict[Role, frozenset[ToolName]] = {
             ToolName.COMPLETE_TASK,
             ToolName.SEND_MESSAGE,
             ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
         }
     ),
     Role.DEV_JUNIOR: frozenset(
@@ -90,6 +94,7 @@ ROLE_TOOL_PERMISSIONS: dict[Role, frozenset[ToolName]] = {
             ToolName.COMPLETE_TASK,
             ToolName.SEND_MESSAGE,
             ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
         }
     ),
     Role.QA_ENGINEER: frozenset(
@@ -109,6 +114,7 @@ ROLE_TOOL_PERMISSIONS: dict[Role, frozenset[ToolName]] = {
             ToolName.COMPLETE_TASK,
             ToolName.SEND_MESSAGE,
             ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
         }
     ),
     Role.HR_MANAGER: frozenset(
@@ -128,6 +134,7 @@ ROLE_TOOL_PERMISSIONS: dict[Role, frozenset[ToolName]] = {
             ToolName.COMPLETE_TASK,
             ToolName.SEND_MESSAGE,
             ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
         }
     ),
 }

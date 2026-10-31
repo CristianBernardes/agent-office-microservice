@@ -410,6 +410,7 @@ def get_tool_registry() -> ToolRegistry:
         hire_agent_use_case=get_hire_agent_use_case(),
         default_llm_model=get_settings().ollama_model,
         start_ceremony_use_case=get_start_ceremony_use_case(),
+        research_use_case=get_research_use_case(),
     )
 
 
