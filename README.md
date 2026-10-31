@@ -7,7 +7,7 @@
 
 ▶️ **Assista ao vídeo de demonstração:**
 
-[![Assista ao vídeo](https://img.youtube.com/vi/sAiGLPTWMv4/maxresdefault.jpg)](https://youtu.be/sAiGLPTWMv4)
+[![Assista ao vídeo](images/Agent_Office_2.png)](https://youtu.be/sAiGLPTWMv4)
 
 
 > Um escritório de TI simulado por agentes de IA — cada um com um papel, personalidade e modelo de
