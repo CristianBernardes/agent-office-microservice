@@ -921,6 +921,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 107 | este commit | Vídeo de demonstração do YouTube no topo dos READMEs |
 | 108 | este commit | Tentativa de embed (iframe) do vídeo nos READMEs, com a miniatura clicável como alternativa |
 | 109 | este commit | Iframe removido dos READMEs (GitHub não renderiza); aguardando URL `user-attachments` do vídeo para player inline |
+| 110 | este commit | Link simples do YouTube abaixo da miniatura nos READMEs |
 
 ### O que funciona
 
