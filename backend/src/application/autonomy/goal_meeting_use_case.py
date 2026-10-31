@@ -14,7 +14,7 @@ from src.application.artifacts.write_artifact_use_case import (
     WriteArtifactInput,
     WriteArtifactUseCase,
 )
-from src.application.autonomy.task_title import clean_title
+from src.application.autonomy.task_title import clean_body, clean_title
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.memory.memory_use_cases import RememberInput, RememberUseCase
 from src.application.relationships.relationship_use_cases import RecordInteractionUseCase
@@ -244,7 +244,7 @@ class GoalMeetingUseCase:
                 await self._create_task.execute(
                     CreateTaskInput(
                         title=f"[{role}] {title}"[:120],
-                        description=turn.thought,
+                        description=clean_body(turn.thought) or title,
                         priority=Priority.MEDIUM,
                         creator_id=owner.agent_id,
                         creator_role=owner.role,

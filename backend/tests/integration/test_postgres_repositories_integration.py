@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
+import asyncpg
 import pytest
 
 from src.domain.entities.activity_event import ActivityEvent
@@ -47,9 +49,22 @@ from src.infrastructure.persistence.postgres_task_repository import PostgresTask
 pytestmark = pytest.mark.integration
 
 
+async def _ensure_test_database() -> str:
+    """Banco `<db>_test` separado: `fresh` apaga o schema e nunca pode tocar o banco real."""
+    url = urlsplit(get_settings().database_url)
+    test_db = f"{url.path.lstrip('/')}_test"
+    admin = await asyncpg.connect(urlunsplit(url))
+    try:
+        if not await admin.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", test_db):
+            await admin.execute(f'CREATE DATABASE "{test_db}"')
+    finally:
+        await admin.close()
+    return urlunsplit(url._replace(path=f"/{test_db}"))
+
+
 @pytest.fixture
 async def pool() -> AsyncIterator[object]:
-    created = await create_postgres_pool(get_settings().database_url)
+    created = await create_postgres_pool(await _ensure_test_database())
     await fresh(created)
     yield created
     await created.close()

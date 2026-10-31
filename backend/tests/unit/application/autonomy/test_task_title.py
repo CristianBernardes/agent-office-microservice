@@ -1,6 +1,6 @@
 import pytest
 
-from src.application.autonomy.task_title import clean_title
+from src.application.autonomy.task_title import clean_body, clean_title
 
 
 @pytest.mark.unit
@@ -16,3 +16,15 @@ class TestCleanTitle:
 
     def test_limits_length(self) -> None:
         assert len(clean_title("a" * 500, "x")) == 120
+
+
+@pytest.mark.unit
+class TestCleanBody:
+    def test_strips_edge_separators(self) -> None:
+        assert clean_body("---\n\nTexto\nmais\n***\n") == "Texto\nmais"
+
+    def test_keeps_inner_separators(self) -> None:
+        assert clean_body("a\n---\nb") == "a\n---\nb"
+
+    def test_empty_when_only_separators(self) -> None:
+        assert clean_body("---\n---") == ""

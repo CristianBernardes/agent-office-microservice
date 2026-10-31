@@ -797,7 +797,15 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - Tabela Pix/PayPal e agradecimento dentro de `<div align="center">` nos READMEs pt/en.
 
-## Estado atual e ponto de retomada (após a Rodada 98)
+### Rodada 101 — Higienização, isolamento dos testes de integração
+
+- MQTT→Kafka verificado: `office.events` recebe mensagens, DLQ vazia, gateway inscrito em `office/#`.
+- `clean_body` remove separadores/cercas de código nas bordas da descrição das tarefas.
+- Testes de integração Postgres (11 ok) agora usam o banco `<db>_test` (criado sob demanda); `fresh` não apaga mais o banco real.
+- Agente "Mem" residual removido; time re-semeado (11 agentes, 15 tarefas).
+- Limitação: Mermaid dos READMEs ainda não validado por renderização.
+
+## Estado atual e ponto de retomada (após a Rodada 101)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -885,7 +893,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 97 | `76f091c` | Sprite: folha `interagindo_com_objetos` só tem 24 quadros de personagem (o resto é o carrinho de props); pasta `sql/` com as 15 tarefas em pt/en |
 | 98 | `bf8793b` | Postgres + MQTT por padrão (ADR-053), testes isolados do `.env`, títulos de tarefa higienizados (`clean_title`), SCRATCHPAD reescrito |
 | 99 | `42dc1d9` | `grafana.png` nos READMEs pt/en |
-| 100 | este commit | Seção de doação centralizada (`div align=center`) nos READMEs |
+| 100 | `927edb3` | Seção de doação centralizada (`div align=center`) nos READMEs |
+| 101 | este commit | `clean_body`, testes de integração em banco `<db>_test`, verificação MQTT→Kafka |
 
 ### O que funciona
 

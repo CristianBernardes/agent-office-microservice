@@ -16,3 +16,16 @@ def clean_title(text: str, fallback: str) -> str:
         if any(ch.isalnum() for ch in line):
             return line[:_MAX_LENGTH]
     return fallback[:_MAX_LENGTH]
+
+
+_SEPARATOR_LINE = re.compile(r"^\s*(?:[-*_=~]{3,}|```\w*)\s*$")
+
+
+def clean_body(text: str) -> str:
+    """Remove linhas só de separadores/cercas de código soltas no início e no fim do texto."""
+    lines = text.strip().splitlines()
+    while lines and (not lines[0].strip() or _SEPARATOR_LINE.match(lines[0])):
+        lines.pop(0)
+    while lines and (not lines[-1].strip() or _SEPARATOR_LINE.match(lines[-1])):
+        lines.pop()
+    return "\n".join(lines)
