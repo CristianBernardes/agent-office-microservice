@@ -919,6 +919,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 105 | este commit | `develop` mesclada na `master` (botão Sponsor ativo); Mermaid dos READMEs segue sem validação por renderização (instalação não autorizada) |
 | 106 | este commit | PayPal (link de doação já usado nos READMEs) incluído no `FUNDING.yml` |
 | 107 | este commit | Vídeo de demonstração do YouTube no topo dos READMEs |
+| 108 | este commit | Tentativa de embed (iframe) do vídeo nos READMEs, com a miniatura clicável como alternativa |
 
 ### O que funciona
 
