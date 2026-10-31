@@ -587,6 +587,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 50 — Gateway sem valores fixos (ADR-042)
 - `gateway/internal/config` (obrigatório, sem defaults), `gateway/.env.example`, compose com `env_file`, teste de concorrência do dedupe, CI copia o `.env`.
 
+## Rodada 51 — Correção do .env do gateway
+- Dentro do container valem hosts e portas convencionais (`mosquitto:1883`, `kafka:9092`, `redis:6379`); portas 70xx só para host/frontend. Compose sem sobrescritas. Tavily URL/timeout viraram settings.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -625,7 +628,8 @@ identidade visual sugerida por papel listada acima.
 | 47 | `85246fb` | Cobertura mínima 85% + jobs integration/docker no CI (ADR-041) |
 | 48 | `583fd26` | Início rápido dos READMEs atualizado |
 | 49 | `4927af8` | E2E PO → Dev → QA (309 testes) |
-| 50 | este commit | Gateway configurável via .env (ADR-042) |
+| 50 | `a1485c7` | Gateway configurável via .env (ADR-042) |
+| 51 | este commit | Gateway .env com hosts/portas de container; Tavily URL/timeout em settings |
 
 ### O que funciona
 

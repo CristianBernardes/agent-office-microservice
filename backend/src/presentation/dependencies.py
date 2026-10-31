@@ -309,7 +309,11 @@ def get_prompt_provider() -> IPromptProvider:
 def get_web_search_adapter() -> IWebSearchAdapter:
     """Retorna a instância única do adaptador de busca web usado pela aplicação."""
     settings = get_application_settings()
-    return TavilySearchAdapter(api_key=settings.tavily_api_key)
+    return TavilySearchAdapter(
+        api_key=settings.tavily_api_key,
+        search_url=settings.tavily_search_url,
+        timeout_seconds=settings.tavily_timeout_seconds,
+    )
 
 
 # Bloco: factory do caso de uso de criação de artefato.

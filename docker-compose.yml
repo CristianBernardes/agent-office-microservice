@@ -117,11 +117,6 @@ services:
     restart: unless-stopped
     env_file:
       - ./gateway/.env
-    # Dentro da rede do compose apenas os hosts mudam; o resto vem do gateway/.env.
-    environment:
-      MQTT_URL: tcp://mosquitto:1883
-      KAFKA_BROKERS: kafka:9092
-      REDIS_ADDR: redis:6379
     depends_on:
       mosquitto:
         condition: service_started

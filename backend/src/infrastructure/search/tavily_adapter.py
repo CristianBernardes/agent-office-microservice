@@ -12,20 +12,18 @@ import httpx
 
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter, WebSearchResult
 
-# Bloco: endpoint fixo da API de busca da Tavily.
-# Não é uma configuração de ambiente porque não varia entre instalações — é o
-# mesmo endpoint documentado pelo provedor para todos os clientes.
-_TAVILY_SEARCH_URL = "https://api.tavily.com/search"
-
-# Bloco: tempo máximo de espera por uma resposta da Tavily.
-_REQUEST_TIMEOUT_SECONDS = 30.0
-
 
 # Bloco: adaptador de busca web para a Tavily.
 class TavilySearchAdapter(IWebSearchAdapter):
-    def __init__(self, api_key: str) -> None:
+    def __init__(
+        self,
+        api_key: str,
+        search_url: str = "https://api.tavily.com/search",
+        timeout_seconds: float = 30.0,
+    ) -> None:
         self._api_key = api_key
-        self._http_client = httpx.AsyncClient(timeout=_REQUEST_TIMEOUT_SECONDS)
+        self._search_url = search_url
+        self._http_client = httpx.AsyncClient(timeout=timeout_seconds)
 
     async def search(self, query: str, max_results: int = 5) -> list[WebSearchResult]:
         """Consulta a API da Tavily e retorna os resultados mais relevantes."""
@@ -40,7 +38,7 @@ class TavilySearchAdapter(IWebSearchAdapter):
             )
 
         http_response = await self._http_client.post(
-            _TAVILY_SEARCH_URL,
+            self._search_url,
             json={
                 "api_key": self._api_key,
                 "query": query,

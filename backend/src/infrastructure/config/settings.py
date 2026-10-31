@@ -67,6 +67,8 @@ class Settings(BaseSettings):
     # (ver ADR-011). Ausente por padrão: só é exigida quando a ferramenta
     # `web_search` é efetivamente usada.
     tavily_api_key: str = ""
+    tavily_search_url: str = "https://api.tavily.com/search"
+    tavily_timeout_seconds: float = 30.0
 
     # CORS: origens do frontend, separadas por vírgula (ADR-015)
     cors_allowed_origins: str = "http://localhost:5173"

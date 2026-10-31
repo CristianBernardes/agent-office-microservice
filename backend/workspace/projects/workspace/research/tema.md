@@ -1,11 +1,11 @@
 ---
-id: f0c13179-fbf1-49ff-b1dc-88b2c87a0171
+id: 477710e4-54fe-469b-bed5-62e40968f771
 title: Tema
 type: analysis
 status: draft
-author_id: b012f394-4a31-4f6f-ba67-7e679a741acb
-created_at: 2026-10-31T12:16:48.943645+00:00
-updated_at: 2026-10-31T12:16:48.943646+00:00
+author_id: aa214a42-f31c-497c-953c-4b59b98be10b
+created_at: 2026-10-31T12:23:33.413217+00:00
+updated_at: 2026-10-31T12:23:33.413218+00:00
 ---
 
 Estou analisando o contexto recebido.

@@ -10,7 +10,7 @@ Isso viola a regra de nunca ter configuração fixa no código e dificulta ambie
 - Pacote `internal/config`: toda variável é obrigatória, sem padrões embutidos; falha rápido listando as ausentes.
 - `gateway/.env` (não versionado) é lido opcionalmente; o ambiente real tem precedência. Modelo em `gateway/.env.example`.
 - Tópicos, QoS, client id, TTL e prefixo do dedupe são configuráveis; `relay.New` recebe `Topics`.
-- `docker-compose` usa `env_file: gateway/.env` (gateway e kafka-init) e sobrescreve apenas os hosts internos.
+- `docker-compose` usa `env_file: gateway/.env` (gateway e kafka-init) sem sobrescritas: hosts e portas de container (`mosquitto:1883`, `kafka:9092`, `redis:6379`) vêm do `.env`; as portas externas 70xx servem só ao host/frontend.
 - CI copia `.env.example` para `.env` antes de subir a stack.
 
 ## Consequências
