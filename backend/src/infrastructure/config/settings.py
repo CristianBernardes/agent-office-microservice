@@ -60,9 +60,16 @@ class Settings(BaseSettings):
     # `web_search` é efetivamente usada.
     tavily_api_key: str = ""
 
+    # CORS: origens do frontend, separadas por vírgula (ADR-015)
+    cors_allowed_origins: str = "http://localhost:5173"
+
     # HTTP da API do backend
     api_host: str = "0.0.0.0"
     api_port: int = 8000
+
+    def cors_origins(self) -> list[str]:
+        """Origens permitidas para CORS (ADR-015), separadas por vírgula, sem vazios."""
+        return [origin.strip() for origin in self.cors_allowed_origins.split(",") if origin.strip()]
 
     def language(self) -> Language:
         """Idioma padrão do escritório, normalizado (valor inválido cai em inglês)."""

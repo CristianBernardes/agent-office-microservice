@@ -40,6 +40,18 @@ class TestHealthRoute:
 
 
 class TestAgentsRoutes:
+    def test_list_agents_returns_hired_agents(self) -> None:
+        get_agent_repository.cache_clear()
+        assert client.get("/agents").json() == []
+        client.post("/agents", json={"name": "Ana", "role": "dev_senior", "llm_model": "m"})
+        listed = client.get("/agents").json()
+        assert [a["name"] for a in listed] == ["Ana"]
+
+    def test_cors_allows_configured_origin_and_blocks_others(self) -> None:
+        allowed = client.get("/health", headers={"Origin": "http://localhost:5173"})
+        blocked = client.get("/health", headers={"Origin": "http://evil.example"})
+        assert allowed.headers.get("access-control-allow-origin") == "http://localhost:5173"
+        assert "access-control-allow-origin" not in blocked.headers
     def test_hire_agent_returns_created_agent(self) -> None:
         response = client.post(
             "/agents",

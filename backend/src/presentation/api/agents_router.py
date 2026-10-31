@@ -19,6 +19,7 @@ from src.application.agents.fire_agent_use_case import (
 from src.application.agents.hire_agent_use_case import HireAgentInput, HireAgentUseCase
 from src.domain.entities.agent import Personality
 from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
+from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId
 from src.infrastructure.config.settings import get_settings
@@ -29,6 +30,7 @@ from src.presentation.api.agent_schemas import (
     ThoughtResponse,
 )
 from src.presentation.dependencies import (
+    get_agent_repository,
     get_dispatch_goal_use_case,
     get_fire_agent_use_case,
     get_hire_agent_use_case,
@@ -40,6 +42,15 @@ router = APIRouter(prefix="/agents", tags=["agents"])
 # Bloco: idioma da requisição a partir de Accept-Language (fallback: idioma do escritório).
 def get_request_language(accept_language: str | None = Header(default=None)) -> Language:
     return Language.from_accept_language(accept_language, default=get_settings().language())
+
+
+# Bloco: listagem de todos os agentes.
+@router.get("", response_model=list[AgentResponse])
+async def list_agents(
+    repository: IAgentRepository = Depends(get_agent_repository),
+) -> list[AgentResponse]:
+    """Lista todos os agentes do escritório."""
+    return [AgentResponse.from_entity(agent) for agent in await repository.list_all()]
 
 
 # Bloco: endpoint de contratação de um novo agente.

@@ -29,3 +29,4 @@
 | [012](./012-internacionalizacao-pt-en.md) | Internacionalização (pt/en) | Aceito |
 | [013](./013-endpoint-para-despachar-objetivos.md) | Endpoint para despachar objetivos a um agente | Aceito |
 | [014](./014-repositorios-postgres-e-selecao-por-env.md) | Repositórios PostgreSQL e seleção por `.env` | Aceito |
+| [015](./015-frontend-svelte-i18n-e-suporte-backend.md) | Frontend Svelte (pt/en) e suporte de backend | Aceito |
