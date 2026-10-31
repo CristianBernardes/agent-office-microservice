@@ -1,42 +1,26 @@
 ---
-id: d25476f4-0250-4e1b-aad4-f36e324eb284
+id: c9456dbd-22d0-48ab-8dd3-608704014b06
 title: Kafka
 type: analysis
 status: draft
-author_id: 90664c0a-6b46-443e-90d9-0138dcb123e1
-created_at: 2026-10-31T11:34:53.243395+00:00
-updated_at: 2026-10-31T11:34:53.243397+00:00
+author_id: c37a0b43-5628-4944-afb5-ed8356b6fd3e
+created_at: 2026-10-31T11:35:57.444573+00:00
+updated_at: 2026-10-31T11:35:57.444574+00:00
 ---
 
 # Apache Kafka Overview
 
 ## Summary
-- Distributed, high-throughput, low-latency event streaming platform.
-- Uses a log‑based architecture where data is written to partitions and retained durably.
-- Supports manual offset management, multiple consumers, and stream processing via Kafka Streams.
-- Provides three core capabilities: publishing/subscribing to streams, durable storage of events, and real‑time processing (both online and batch/retrospective).
+Apache Kafka is an open‑source distributed event streaming platform developed by the Apache Software Foundation. It provides three core capabilities:
 
-## Architecture
-- **Producers**: applications that publish records to Kafka topics, which are split into partitions for parallelism and scalability.
-- **Brokers**: serve as the cluster’s storage and messaging layer, maintaining the immutable log of each partition.
-- **Consumers**: subscribe to topics, read records by offset, and can manage offsets manually to control reliability and retry behavior.
-- **Kafka Streams**: a Java library (added in 0.10.0) that enables stateful, scalable, fault‑tolerant stream processing using a domain‑specific language with operators such as filter, map, join, windowing, and aggregation.
+1. **Publish/Subscribe Messaging** – Producers write events to topics, and consumers read from those topics. Kafka acts as a high‑throughput, fault‑tolerant message bus, reducing the need for point‑to‑point integrations.
+2. **Durable Log Storage** – Topics store messages in an append‑only log, retaining data for a configurable period. This enables replay, exactly‑once semantics, and reliable long‑term storage.
+3. **Real‑time Stream Processing** – Kafka Streams (added in 0.10.0) offers a Java DSL for building stateful, scalable, and fault‑tolerant stream‑processing applications. It supports operators such as filter, map, join, windowing, and aggregation.
 
-## Key Characteristics
-- **High throughput & low latency**: capable of millions of messages per second.
-- **Scalable horizontally**: adds brokers to increase capacity; partitions enable parallelism.
-- **Fault tolerant**: replication across brokers ensures data durability.
-- **Durable storage**: log‑based retention for arbitrary periods.
-- **Interoperability**: connectors via Kafka Connect and integration with external systems.
-
-## Use Cases
-- Real‑time ingestion of logs, transactions, IoT telemetry, and user activity.
-- Event sourcing and change‑data capture.
-- Stream analytics, real‑time dashboards, and microservice communication.
-- Integration with databases, data lakes, and analytics platforms through Kafka Connect.
+Architecturally, Kafka is a cluster of brokers that uses a producer‑consumer model over a high‑performance TCP protocol. Data is partitioned across brokers for parallelism and scalability. Producers write to partitions, and consumers track offsets manually, allowing precise control over message processing and retry handling. Kafka Connect facilitates import/export to external systems, while the underlying TCP network ensures low latency and high throughput, capable of handling millions of messages per second.
 
 ## Conclusions
-Apache Kafka is a robust, open‑source platform designed for reliable, high‑volume real‑time data streaming. Its log‑based architecture, manual offset control, and rich ecosystem (Kafka Streams, Connect, Streams API) make it suitable for a wide range of event‑driven applications, offering durability, scalability, and low‑latency processing.
+Kafka’s design—combining log‑based storage, high‑throughput messaging, and integrated stream‑processing—makes it uniquely suited for real‑time data pipelines, micro‑service communication, and event‑driven architectures. Its manual offset management empowers developers to implement robust failure recovery, and its scalability supports both on‑premise and cloud deployments. Overall, Kafka provides a unified, battle‑tested solution for end‑to‑end event streaming.
 
 ## Sources
 - [Apache Kafka - Wikipedia](https://en.wikipedia.org/wiki/Apache_Kafka)

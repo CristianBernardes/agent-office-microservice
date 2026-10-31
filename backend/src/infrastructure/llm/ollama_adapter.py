@@ -8,6 +8,8 @@ dependência (vinda da configuração em `.env`), nunca fixada neste módulo.
 from __future__ import annotations
 
 import json
+import re
+from typing import Any
 
 import httpx
 
@@ -21,6 +23,26 @@ from src.domain.interfaces.llm_adapter import (
 # Modelos locais podem ser lentos na primeira chamada (carregamento em memória);
 # o timeout é generoso para evitar falhas espúrias em hardware mais modesto.
 _REQUEST_TIMEOUT_SECONDS = 120.0
+
+
+# Bloco: modelos locais nem sempre obedecem ao formato JSON; a leitura é tolerante (ADR-036).
+_JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)
+
+
+def _parse_structured_reply(raw_content: str) -> dict[str, Any]:
+    """Extrai o objeto JSON da resposta; se não houver, trata o texto inteiro como pensamento."""
+    candidates = [raw_content.strip()]
+    match = _JSON_OBJECT.search(raw_content)
+    if match:
+        candidates.append(match.group(0))
+    for candidate in candidates:
+        try:
+            parsed = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(parsed, dict):
+            return parsed
+    return {"thought": raw_content.strip(), "action": "idle"}
 
 
 # Bloco: adaptador de LLM para o Ollama, acessado via HTTP.
@@ -57,7 +79,7 @@ class OllamaAdapter(ILlmAdapter):
         http_response.raise_for_status()
 
         raw_content = http_response.json()["message"]["content"]
-        parsed_content = json.loads(raw_content)
+        parsed_content = _parse_structured_reply(raw_content)
 
         return LlmThoughtResponse(
             thought=parsed_content.get("thought", ""),

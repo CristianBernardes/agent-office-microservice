@@ -1,11 +1,11 @@
 ---
-id: 780077b6-fc8f-4b01-a586-72be1d64b83e
+id: 79f61455-294e-47f5-b72d-8ea4a4d949f8
 title: Clean Architecture
 type: analysis
 status: draft
-author_id: 32741ae3-56dd-4b83-8adc-9f93a4436a33
-created_at: 2026-10-31T11:34:49.329529+00:00
-updated_at: 2026-10-31T11:34:49.329529+00:00
+author_id: 60af6356-7c20-42fa-a010-52aa3e196b71
+created_at: 2026-10-31T11:35:49.543943+00:00
+updated_at: 2026-10-31T11:35:49.543943+00:00
 ---
 
 Estou analisando o contexto recebido.
