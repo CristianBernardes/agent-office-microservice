@@ -13,7 +13,7 @@ export interface FlowMetrics {
   oldestAgingMs: number | null
 }
 
-const ACTIVE: readonly TaskStatus[] = ['in_progress', 'in_review']
+const ACTIVE: readonly TaskStatus[] = ['in_progress', 'testing', 'in_review']
 
 const ms = (iso: string | null): number | null => (iso ? new Date(iso).getTime() : null)
 

@@ -688,6 +688,12 @@ O ciclo de trabalho falhava com `SessionNotFoundError`: a sessão fixa do chão 
 
 Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
+## Rodada 79 — Etapa de teste antes da revisão
+
+- ADR-050: novo status `testing`; fluxo `in_progress → testing (dev) → in_review (QA) → done`. QA escreve o plano de testes (`tests/<id>.md`) no idioma do escritório.
+- Backend: enum, política de transições, migration, `_test` no ciclo de trabalho; testes unitários/e2e atualizados.
+- Frontend: coluna "Em teste"/"Testing", limite `VITE_WIP_LIMIT_TESTING`, progresso e métricas.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -754,7 +760,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 75 | este commit | Modal de doação com a história do projeto (pt/en) |
 | 76 | este commit | Planejamento gera subtarefas distintas (título + entregável) via LLM; título do `.md` de planejamento no idioma do escritório |
 | 77 | este commit | Corrige sessão do chão do escritório inexistente (ciclo falhava em toda fala); recriação do time/tarefas |
-| 78 | este commit | Makefile: format-go, format-frontend e format-all |
+| 78 | fe9850a | Makefile: format-go, format-frontend e format-all |
+| 79 | este commit | Etapa de teste (QA) antes da revisão — ADR-050 |
 
 ### O que funciona
 

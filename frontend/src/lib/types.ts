@@ -10,7 +10,7 @@ export type Role =
   | 'product_consultant'
 
 export type AgentStatus = 'idle' | 'thinking' | 'working' | 'talking' | 'offline'
-export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'in_review' | 'done' | 'blocked'
+export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'testing' | 'in_review' | 'done' | 'blocked'
 export type Priority = 'low' | 'medium' | 'high' | 'urgent'
 export type Language = 'pt' | 'en'
 
@@ -90,6 +90,7 @@ export const KANBAN_COLUMNS: readonly TaskStatus[] = [
   'backlog',
   'todo',
   'in_progress',
+  'testing',
   'in_review',
   'done',
 ]

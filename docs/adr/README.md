@@ -64,3 +64,4 @@
 | [047](./047-frontend-svelte-construido-pelo-assistente.md) | Frontend Svelte 5 construído neste repositório | Aceito |
 | [048](./048-escritorio-vivo-ciclo-de-trabalho.md) | Escritório vivo: ciclo de trabalho autônomo | Aceito |
 | [049](./049-cerimonia-de-planejamento-sprint.md) | Cerimônia de planejamento: ninguém fica ocioso | Aceito |
+| [050](./050-etapa-de-teste-antes-da-revisao.md) | Etapa de teste (QA) antes da revisão | Aceito |

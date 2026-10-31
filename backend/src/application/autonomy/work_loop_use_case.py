@@ -37,7 +37,8 @@ logger = logging.getLogger(__name__)
 _PLANNERS = (Role.PRODUCT_OWNER, Role.SCRUM_MASTER)
 _COORDINATORS = (Role.SCRUM_MASTER, Role.TECH_LEAD, Role.PRODUCT_OWNER)
 _WORKERS = (Role.DEV_SENIOR, Role.DEV_JUNIOR, Role.TECH_LEAD)
-_REVIEWERS = (Role.QA_ENGINEER, Role.TECH_LEAD)
+_TESTERS = (Role.QA_ENGINEER,)
+_REVIEWERS = (Role.TECH_LEAD, Role.QA_ENGINEER)
 
 # Bloco: sessão fixa do "chão do escritório", onde o ciclo registra as falas.
 _FLOOR_SESSION = SessionId(value=uuid5(NAMESPACE_URL, "agent-office/floor"))
@@ -56,6 +57,9 @@ _PROMPTS = {
         "Escreva o resultado do seu trabalho em poucas linhas (um rascunho em markdown).",
         "review": "Revise o trabalho entregue na tarefa «{title}».\nResultado: {result}\n"
         "Dê seu parecer curto e diga se aprova.",
+        "test": "Você é o testador da tarefa «{title}».\nResultado entregue: {result}\n"
+        "Escreva em poucas linhas o plano de testes e o resultado dos testes (markdown).",
+        "test_title": "Testes",
     },
     Language.EN: {
         "planning": "You lead the team's sprint planning ceremony.\n"
@@ -70,6 +74,9 @@ _PROMPTS = {
         "Write the outcome of your work in a few lines (a markdown draft).",
         "review": "Review the work delivered on the task «{title}».\nResult: {result}\n"
         "Give a short opinion and say whether you approve.",
+        "test": "You are the tester for the task «{title}».\nDelivered result: {result}\n"
+        "Write the test plan and the test results in a few lines (markdown).",
+        "test_title": "Tests",
     },
 }
 
@@ -102,7 +109,7 @@ class WorkLoopUseCase:
     async def tick(self) -> int:
         """Executa um passo por estágio; devolve quantas tarefas avançaram."""
         moved = 0
-        for step in (self._review, self._work, self._assign_todo, self._plan):
+        for step in (self._review, self._test, self._work, self._assign_todo, self._plan):
             try:
                 moved += await step()
             except Exception:
@@ -244,11 +251,46 @@ class WorkLoopUseCase:
             )
             task.result = result
             await self._tasks.save(task)
+            await self._move.execute(task.task_id, TaskStatus.TESTING, worker.agent_id, worker.role)
+            return 1
+        return 0
+
+    # Bloco: o QA pega a entrega e a testa; só depois ela segue para a revisão (ADR-050).
+    async def _test(self) -> int:
+        for task in await self._tasks_in(TaskStatus.TESTING):
+            tester = await self._first_tester(task)
+            if tester is None:
+                continue
+            prompt = _PROMPTS[self._language]["test"].format(
+                title=task.title, result=task.result or ""
+            )
+            report = await self._speak(tester, prompt, task.task_id)
+            label = _PROMPTS[self._language]["test_title"]
+            await self._write.execute(
+                WriteArtifactInput(
+                    title=f"{label}: {task.title}",
+                    content=f"# {label}: {task.title}\n\n{report}\n",
+                    artifact_type=ArtifactType.TEST_PLAN,
+                    path=f"tests/{task.task_id.value}.md",
+                    author_id=tester.agent_id,
+                    author_role=tester.role,
+                )
+            )
             await self._move.execute(
-                task.task_id, TaskStatus.IN_REVIEW, worker.agent_id, worker.role
+                task.task_id, TaskStatus.IN_REVIEW, tester.agent_id, tester.role
             )
             return 1
         return 0
+
+    async def _first_tester(self, task: Task) -> Agent | None:
+        for agent in await self._agents.list_all():
+            if (
+                agent.role in _TESTERS
+                and agent.status == AgentStatus.IDLE
+                and agent.agent_id != task.assigned_to
+            ):
+                return agent
+        return None
 
     async def _review(self) -> int:
         for task in await self._tasks_in(TaskStatus.IN_REVIEW):

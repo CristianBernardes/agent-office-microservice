@@ -20,6 +20,7 @@ class TaskStatus(str, Enum):
     BACKLOG = "backlog"
     TODO = "todo"
     IN_PROGRESS = "in_progress"
+    TESTING = "testing"
     IN_REVIEW = "in_review"
     DONE = "done"
     BLOCKED = "blocked"

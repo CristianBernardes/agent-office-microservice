@@ -83,11 +83,16 @@ _TEAM = [Role.PRODUCT_OWNER, Role.DEV_SENIOR, Role.QA_ENGINEER]
 async def test_task_walks_the_whole_kanban_across_ticks() -> None:
     loop, tasks, agents, _, artifacts = await _build(_TEAM)
     await loop.tick()
-    expected = [TaskStatus.IN_PROGRESS, TaskStatus.IN_REVIEW, TaskStatus.DONE]
+    expected = [
+        TaskStatus.IN_PROGRESS,
+        TaskStatus.TESTING,
+        TaskStatus.IN_REVIEW,
+        TaskStatus.DONE,
+    ]
     for status in expected:
         await loop.tick()
         assert await _status(tasks) == status
-    assert len(artifacts.calls) == 2  # planning + entrega
+    assert len(artifacts.calls) == 3  # planning + entrega + testes
     assert all(a.status == AgentStatus.IDLE for a in await agents.list_all())
 
 
@@ -97,21 +102,22 @@ async def test_task_waits_without_workers() -> None:
     assert await _status(tasks) == TaskStatus.BACKLOG
 
 
-async def test_review_waits_without_reviewer() -> None:
+async def test_delivery_waits_for_tester_before_review() -> None:
     loop, tasks, _, _, _ = await _build([Role.PRODUCT_OWNER, Role.DEV_SENIOR])
-    for _ in range(4):
+    for _ in range(5):
         await loop.tick()
-    assert await _status(tasks) == TaskStatus.IN_REVIEW
+    assert await _status(tasks) == TaskStatus.TESTING
 
 
 async def test_prompts_use_the_office_language() -> None:
     loop, _, _, dispatch, _ = await _build(_TEAM, Language.PT)
-    for _ in range(4):
+    for _ in range(5):
         await loop.tick()
-    assert dispatch.languages == [Language.PT] * 3
+    assert dispatch.languages == [Language.PT] * 4
     assert "planejamento" in dispatch.prompts[0]
     assert "Você está trabalhando" in dispatch.prompts[1]
-    assert "Revise" in dispatch.prompts[2]
+    assert "testador" in dispatch.prompts[2]
+    assert "Revise" in dispatch.prompts[3]
 
 
 async def test_newly_hired_worker_picks_up_waiting_task() -> None:

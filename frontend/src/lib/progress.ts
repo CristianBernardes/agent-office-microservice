@@ -5,6 +5,7 @@ const PROGRESS: Record<TaskStatus, number> = {
   backlog: 0,
   todo: 10,
   in_progress: 50,
+  testing: 65,
   in_review: 80,
   done: 100,
   blocked: 30,

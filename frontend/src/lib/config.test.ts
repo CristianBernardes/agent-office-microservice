@@ -13,6 +13,7 @@ const base = {
   VITE_WANDER_INTERVAL_MS: '8000',
   VITE_WIP_LIMIT_TODO: '0',
   VITE_WIP_LIMIT_IN_PROGRESS: '5',
+  VITE_WIP_LIMIT_TESTING: '3',
   VITE_WIP_LIMIT_IN_REVIEW: '3',
 }
 
@@ -28,7 +29,7 @@ describe('loadConfig', () => {
       donationReminderDays: 7,
       refreshIntervalMs: 5000,
       wanderIntervalMs: 8000,
-      wipLimits: { todo: 0, in_progress: 5, in_review: 3 },
+      wipLimits: { todo: 0, in_progress: 5, testing: 3, in_review: 3 },
     })
   })
 

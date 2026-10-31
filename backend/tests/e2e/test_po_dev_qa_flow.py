@@ -44,13 +44,15 @@ class TestProductOwnerDevQaFlow:
 
         assert _move(task_id, "todo", "product_owner")["status"] == "todo"
         assert _move(task_id, "in_progress", "dev_senior")["status"] == "in_progress"
-        assert _move(task_id, "in_review", "dev_senior")["status"] == "in_review"
+        assert _move(task_id, "testing", "dev_senior")["status"] == "testing"
+        assert _move(task_id, "in_review", "qa_engineer")["status"] == "in_review"
         assert _move(task_id, "done", "qa_engineer")["status"] == "done"
 
         history = client.get(f"/tasks/{task_id}/transitions").json()
-        assert [item["to_status"] for item in history][-4:] == [
+        assert [item["to_status"] for item in history][-5:] == [
             "todo",
             "in_progress",
+            "testing",
             "in_review",
             "done",
         ]
@@ -59,7 +61,7 @@ class TestProductOwnerDevQaFlow:
         task_id = _create("scrum_master", "Bug")
         _move(task_id, "todo", "scrum_master")
         _move(task_id, "in_progress", "dev_junior")
-        _move(task_id, "in_review", "dev_junior")
+        _move(task_id, "testing", "dev_junior")
 
         assert _move(task_id, "in_progress", "qa_engineer")["status"] == "in_progress"
 
@@ -67,7 +69,8 @@ class TestProductOwnerDevQaFlow:
         task_id = _create("product_owner", "X")
         _move(task_id, "todo", "product_owner")
         _move(task_id, "in_progress", "dev_senior")
-        _move(task_id, "in_review", "dev_senior")
+        _move(task_id, "testing", "dev_senior")
+        _move(task_id, "in_review", "qa_engineer")
 
         response = client.post(
             f"/tasks/{task_id}/move", json={"to_status": "done", **_actor("dev_senior")}

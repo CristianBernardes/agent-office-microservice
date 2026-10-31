@@ -179,14 +179,15 @@ class TestTransitionsAndMove:
         steps = [
             (TaskStatus.TODO, Role.SCRUM_MASTER),
             (TaskStatus.IN_PROGRESS, Role.DEV_JUNIOR),
-            (TaskStatus.IN_REVIEW, Role.DEV_JUNIOR),
+            (TaskStatus.TESTING, Role.DEV_JUNIOR),
+            (TaskStatus.IN_REVIEW, Role.QA_ENGINEER),
             (TaskStatus.DONE, Role.QA_ENGINEER),
         ]
         for target, role in steps:
             task = await move.execute(task_id, target, AgentId.generate(), role)
         assert task.status == TaskStatus.DONE
         assert task.completed_at is not None
-        assert len(await tasks.list_transitions(task_id)) == 5
+        assert len(await tasks.list_transitions(task_id)) == 6
 
     async def test_role_without_permission_is_denied_and_task_untouched(self, world) -> None:  # type: ignore[no-untyped-def]
         tasks, agents, bus = world
@@ -224,7 +225,8 @@ class TestTransitionsAndMove:
         for target, role in [
             (TaskStatus.TODO, Role.PRODUCT_OWNER),
             (TaskStatus.IN_PROGRESS, Role.DEV_SENIOR),
-            (TaskStatus.IN_REVIEW, Role.DEV_SENIOR),
+            (TaskStatus.TESTING, Role.DEV_SENIOR),
+            (TaskStatus.IN_REVIEW, Role.QA_ENGINEER),
             (TaskStatus.IN_PROGRESS, Role.QA_ENGINEER),
             (TaskStatus.BLOCKED, Role.SCRUM_MASTER),
         ]:

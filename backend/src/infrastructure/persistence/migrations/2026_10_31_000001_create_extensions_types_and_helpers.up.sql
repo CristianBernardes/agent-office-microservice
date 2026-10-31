@@ -8,7 +8,7 @@ CREATE DOMAIN agent_role AS TEXT CHECK (VALUE IN (
 
 -- Colunas do Kanban: o próprio status é a coluna do quadro.
 CREATE DOMAIN task_status AS TEXT CHECK (VALUE IN (
-    'backlog', 'todo', 'in_progress', 'in_review', 'done', 'blocked'));
+    'backlog', 'todo', 'in_progress', 'testing', 'in_review', 'done', 'blocked'));
 
 CREATE DOMAIN priority_level AS TEXT CHECK (VALUE IN ('low', 'medium', 'high', 'urgent'));
 

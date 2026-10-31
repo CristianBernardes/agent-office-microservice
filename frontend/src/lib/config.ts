@@ -47,6 +47,7 @@ export function loadConfig(env: Env): AppConfig {
     wipLimits: {
       todo: nonNegativeInt(env, 'VITE_WIP_LIMIT_TODO'),
       in_progress: nonNegativeInt(env, 'VITE_WIP_LIMIT_IN_PROGRESS'),
+      testing: nonNegativeInt(env, 'VITE_WIP_LIMIT_TESTING'),
       in_review: nonNegativeInt(env, 'VITE_WIP_LIMIT_IN_REVIEW'),
     },
   }
