@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -13,20 +11,18 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"
 
+	"github.com/CristianBernardes/agent-office-microservice/gateway/internal/config"
 	"github.com/CristianBernardes/agent-office-microservice/gateway/internal/relay"
 )
 
-func env(key, fallback string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return fallback
+type redisDeduper struct {
+	client *redis.Client
+	prefix string
+	ttl    time.Duration
 }
 
-type redisDeduper struct{ client *redis.Client }
-
 func (d redisDeduper) FirstSeen(ctx context.Context, id string) (bool, error) {
-	return d.client.SetNX(ctx, "gw:event:"+id, 1, 24*time.Hour).Result()
+	return d.client.SetNX(ctx, d.prefix+id, 1, d.ttl).Result()
 }
 
 type kafkaProducer struct{ writer *kafka.Writer }
@@ -45,27 +41,34 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	writer := &kafka.Writer{
-		Addr:     kafka.TCP(strings.Split(env("KAFKA_BROKERS", "localhost:9092"), ",")...),
-		Balancer: &kafka.Hash{},
+	if err := config.LoadDotEnv(".env"); err != nil {
+		log.Fatalf("lendo .env: %v", err)
 	}
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("configuração: %v", err)
+	}
+
+	writer := &kafka.Writer{Addr: kafka.TCP(cfg.KafkaBrokers...), Balancer: &kafka.Hash{}}
 	defer writer.Close()
-	rdb := redis.NewClient(&redis.Options{Addr: env("REDIS_ADDR", "localhost:6379")})
-	r := relay.New(redisDeduper{rdb}, kafkaProducer{writer})
+	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr})
+	deduper := redisDeduper{client: rdb, prefix: cfg.DedupePrefix, ttl: cfg.DedupeTTL}
+	topics := relay.Topics{Events: cfg.KafkaTopicEvts, DLQ: cfg.KafkaTopicDLQ}
+	r := relay.New(deduper, kafkaProducer{writer}, topics)
 
 	opts := mqtt.NewClientOptions().
-		AddBroker(env("MQTT_URL", "tcp://localhost:1883")).
-		SetClientID("agent-office-gateway").
+		AddBroker(cfg.MQTTURL).
+		SetClientID(cfg.MQTTClientID).
 		SetAutoReconnect(true).
 		SetCleanSession(false)
 	opts.OnConnect = func(c mqtt.Client) {
-		token := c.Subscribe("office/#", 1, func(_ mqtt.Client, m mqtt.Message) {
+		token := c.Subscribe(cfg.MQTTTopic, cfg.MQTTQoS, func(_ mqtt.Client, m mqtt.Message) {
 			if err := r.Handle(ctx, m.Topic(), m.Payload()); err != nil {
 				log.Printf("relay error on %s: %v", m.Topic(), err)
 			}
 		})
 		token.Wait()
-		log.Printf("subscribed to office/# (err=%v)", token.Error())
+		log.Printf("subscribed to %s (err=%v)", cfg.MQTTTopic, token.Error())
 	}
 	client := mqtt.NewClient(opts)
 	if t := client.Connect(); t.Wait() && t.Error() != nil {

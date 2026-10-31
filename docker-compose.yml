@@ -97,12 +97,14 @@ services:
     image: apache/kafka:3.8.0
     depends_on:
       - kafka
+    env_file:
+      - ./gateway/.env
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        for t in office.events office.events.dlq; do
+        for t in $$KAFKA_TOPIC_EVENTS $$KAFKA_TOPIC_DLQ; do
           for i in 1 2 3 4 5 6 7 8 9 10; do
-            /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic $$t --partitions 3 --replication-factor 1 && break
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic $$t --partitions $$KAFKA_TOPIC_PARTITIONS --replication-factor 1 && break
             sleep 3
           done
         done
@@ -113,6 +115,9 @@ services:
     build:
       context: ./gateway
     restart: unless-stopped
+    env_file:
+      - ./gateway/.env
+    # Dentro da rede do compose apenas os hosts mudam; o resto vem do gateway/.env.
     environment:
       MQTT_URL: tcp://mosquitto:1883
       KAFKA_BROKERS: kafka:9092

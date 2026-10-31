@@ -7,10 +7,11 @@ import (
 	"fmt"
 )
 
-const (
-	TopicEvents = "office.events"
-	TopicDLQ    = "office.events.dlq"
-)
+// Topics são os tópicos Kafka de destino (vêm da configuração).
+type Topics struct {
+	Events string
+	DLQ    string
+}
 
 // Message é uma mensagem pronta para o Kafka.
 type Message struct {
@@ -55,10 +56,11 @@ func (e envelope) validate() error {
 type Relay struct {
 	dedupe   Deduper
 	producer Producer
+	topics   Topics
 }
 
-func New(dedupe Deduper, producer Producer) *Relay {
-	return &Relay{dedupe: dedupe, producer: producer}
+func New(dedupe Deduper, producer Producer, topics Topics) *Relay {
+	return &Relay{dedupe: dedupe, producer: producer, topics: topics}
 }
 
 // Handle processa uma mensagem MQTT. Envelopes inválidos vão para a DLQ.
@@ -78,7 +80,7 @@ func (r *Relay) Handle(ctx context.Context, mqttTopic string, raw []byte) error 
 		}
 	}
 	return r.producer.Produce(ctx, Message{
-		Topic:   TopicEvents,
+		Topic:   r.topics.Events,
 		Key:     env.AgentID,
 		Value:   raw,
 		Headers: map[string]string{"mqtt_topic": mqttTopic, "event_id": env.EventID},
@@ -87,7 +89,7 @@ func (r *Relay) Handle(ctx context.Context, mqttTopic string, raw []byte) error 
 
 func (r *Relay) deadLetter(ctx context.Context, mqttTopic string, raw []byte, reason string) error {
 	return r.producer.Produce(ctx, Message{
-		Topic:   TopicDLQ,
+		Topic:   r.topics.DLQ,
 		Value:   raw,
 		Headers: map[string]string{"mqtt_topic": mqttTopic, "error": reason},
 	})

@@ -14,6 +14,8 @@ backend/*.egg-info/
 # Variáveis de ambiente — nunca versionar segredos, apenas o .env.example
 backend/.env
 !backend/.env.example
+gateway/.env
+!gateway/.env.example
 
 # Artefatos .md gerados pelos agentes em tempo de execução (ver ADR-004)
 workspace/projects/

@@ -584,6 +584,9 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 49 — E2E PO → Dev → QA
 - `backend/tests/e2e/test_po_dev_qa_flow.py`: fluxo completo pela API (aprovação, rejeição do QA, dev não aprova o próprio trabalho). 309 unit/e2e.
 
+## Rodada 50 — Gateway sem valores fixos (ADR-042)
+- `gateway/internal/config` (obrigatório, sem defaults), `gateway/.env.example`, compose com `env_file`, teste de concorrência do dedupe, CI copia o `.env`.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -622,6 +625,7 @@ identidade visual sugerida por papel listada acima.
 | 47 | `85246fb` | Cobertura mínima 85% + jobs integration/docker no CI (ADR-041) |
 | 48 | `583fd26` | Início rápido dos READMEs atualizado |
 | 49 | `4927af8` | E2E PO → Dev → QA (309 testes) |
+| 50 | este commit | Gateway configurável via .env (ADR-042) |
 
 ### O que funciona
 

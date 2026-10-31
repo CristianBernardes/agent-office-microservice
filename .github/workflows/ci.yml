@@ -46,6 +46,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install poetry
+      - run: cp gateway/.env.example gateway/.env
       - run: docker compose up -d postgres mosquitto redis kafka kafka-init gateway
       - run: sleep 45
       - run: poetry install
