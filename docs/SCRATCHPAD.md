@@ -417,3 +417,10 @@ identidade visual sugerida por papel listada acima.
 - Rotas `POST/GET /agents/{id}/memories` e `POST .../recall`; 404 localizado pt/en, 422 na validação.
 - 212 unitários passando; format/lint/mypy limpos.
 - **Próximo:** MQTT real (ADR-021), autonomia dos agentes, gateway Go/Kafka.
+
+### Rodada 14 — MQTT real e contrato de tópicos (ADR-021)
+
+- `MESSAGE_BUS_BACKEND=memory|mqtt`; `lifespan` conecta/desconecta o barramento.
+- Listener MQTT agora casa curingas (`+`, `#`) via `topic_matches`.
+- Contrato de tópicos documentado na ADR-021; testes com cliente falso (sem broker).
+- **Próximo:** loop de autonomia dos agentes (consome `office/goals/created`), gateway Go/Kafka.

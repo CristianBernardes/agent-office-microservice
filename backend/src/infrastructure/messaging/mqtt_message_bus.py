@@ -15,6 +15,17 @@ import aiomqtt
 from src.domain.interfaces.message_bus import IMessageBus, MessageHandler
 
 
+# Bloco: casamento de tópico MQTT com curingas (`+` um nível, `#` o restante).
+def topic_matches(pattern: str, topic: str) -> bool:
+    pattern_parts, topic_parts = pattern.split("/"), topic.split("/")
+    for index, part in enumerate(pattern_parts):
+        if part == "#":
+            return True
+        if index >= len(topic_parts) or (part != "+" and part != topic_parts[index]):
+            return False
+    return len(pattern_parts) == len(topic_parts)
+
+
 # Bloco: barramento de mensagens MQTT real.
 # A conexão é mantida aberta durante todo o ciclo de vida do serviço (`connect` /
 # `disconnect`), e um loop de escuta em segundo plano despacha mensagens
@@ -83,5 +94,7 @@ class MqttMessageBus(IMessageBus):
                 # silencioso: a decisão de descartar está documentada aqui).
                 continue
 
-            for handler in self._handlers_by_topic.get(topic_name, []):
-                await handler(topic_name, payload)
+            for pattern, handlers in list(self._handlers_by_topic.items()):
+                if topic_matches(pattern, topic_name):
+                    for handler in handlers:
+                        await handler(topic_name, payload)

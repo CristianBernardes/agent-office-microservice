@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     mqtt_host: str = "localhost"
     mqtt_port: int = 7083
 
+    # Barramento de mensagens: memory | mqtt (ADR-021)
+    message_bus_backend: Literal["memory", "mqtt"] = "memory"
+
     # Ollama — sempre externo ao Docker Compose deste projeto (ver ADR-009)
     ollama_base_url: str = "http://172.17.0.1:11434"
     ollama_model: str = "nemotron-3.5-bolt:latest"

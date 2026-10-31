@@ -12,7 +12,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.infrastructure.config.settings import get_settings
+from src.infrastructure.config.settings import Settings, get_settings
 from src.infrastructure.persistence.migrator import migrate
 from src.infrastructure.persistence.postgres_connection import create_postgres_pool
 from src.presentation.api.agents_router import router as agents_router
@@ -20,7 +20,7 @@ from src.presentation.api.chat_router import router as chat_router
 from src.presentation.api.health_router import router as health_router
 from src.presentation.api.memory_router import router as memory_router
 from src.presentation.api.tasks_router import router as tasks_router
-from src.presentation.dependencies import set_database_pool
+from src.presentation.dependencies import get_message_bus, set_database_pool
 
 
 # Bloco: ciclo de vida da aplicação (ADR-014).
@@ -29,6 +29,17 @@ from src.presentation.dependencies import set_database_pool
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
+    bus = get_message_bus()
+    await bus.connect()
+    try:
+        async with _database(settings):
+            yield
+    finally:
+        await bus.disconnect()
+
+
+@asynccontextmanager
+async def _database(settings: Settings) -> AsyncIterator[None]:
     if settings.persistence_backend != "postgres":
         yield
         return

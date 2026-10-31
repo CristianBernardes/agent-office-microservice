@@ -35,3 +35,4 @@
 | [018](./018-migracoes-estilo-laravel.md) | Migrações de banco estilo Laravel | Aceito |
 | [019](./019-objetivos-sessoes-e-chat.md) | Objetivos, sessões e chat | Aceito |
 | [020](./020-memoria-semantica-dos-agentes.md) | Memória semântica dos agentes | Aceito |
+| [021](./021-mqtt-real-e-contrato-de-topicos.md) | MQTT real e contrato de tópicos | Aceito |

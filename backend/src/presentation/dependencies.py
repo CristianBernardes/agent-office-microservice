@@ -42,6 +42,7 @@ from src.infrastructure.config.settings import Settings, get_settings
 from src.infrastructure.llm.ollama_adapter import OllamaAdapter
 from src.infrastructure.llm.role_based_llm_adapter_resolver import RoleBasedLlmAdapterResolver
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
+from src.infrastructure.messaging.mqtt_message_bus import MqttMessageBus
 from src.infrastructure.persistence.in_memory_agent_repository import (
     InMemoryAgentRepository,
 )
@@ -159,12 +160,14 @@ def get_memory_repository() -> IMemoryRepository:
 
 
 # Bloco: barramento de mensagens (singleton por processo).
-# `InMemoryMessageBus` é o padrão nesta rodada — o `MqttMessageBus` real exige
-# uma conexão de rede estabelecida no bootstrap da aplicação (fora do escopo
-# desta injeção de dependência síncrona; ver ADR-001).
+# `MESSAGE_BUS_BACKEND=mqtt` usa o `MqttMessageBus`, conectado no `lifespan` (ADR-021);
+# o padrão é em memória.
 @lru_cache
 def get_message_bus() -> IMessageBus:
     """Retorna a instância única do barramento de mensagens usado pela aplicação."""
+    settings = get_settings()
+    if settings.message_bus_backend == "mqtt":
+        return MqttMessageBus(settings.mqtt_host, settings.mqtt_port)
     return InMemoryMessageBus()
 
 
