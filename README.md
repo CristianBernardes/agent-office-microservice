@@ -35,9 +35,13 @@ arquitetural rigorosa (ADRs, RFCs, Design Docs).
 ## 💙 Antes de clonar ou fazer fork — ajude a manter este projeto vivo
 
 Este repositório é **open source e gratuito**, mas é mantido no tempo livre do autor. **Qualquer
-valor de doação é bem-vindo** e ajuda diretamente a cobrir os **custos de saúde e o plano de saúde
-da minha família**, além de manter tempo e energia disponíveis para continuar desenvolvendo o
-AgentOffice.
+valor de doação é bem-vindo**.
+
+**Quero ser transparente:** cuido da saúde da minha filha, que tem várias alergias, e acabei me
+**endividando** por causa desses custos. Preciso de ajuda de verdade, mesmo sendo um projeto open
+source. Prefiro dizer isso abertamente a usar minha filha como gatilho emocional: o projeto vale
+por si só, a doação é totalmente voluntária e nada aqui depende dela. As doações ajudam a quitar
+essas dívidas e a manter tempo e energia para continuar desenvolvendo o AgentOffice.
 
 Se este projeto te ajudou, te inspirou, ou você simplesmente quer ver essa ideia crescer bem no
 GitHub — considere doar antes de seguir para o clone/fork abaixo:

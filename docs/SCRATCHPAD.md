@@ -757,6 +757,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - READMEs pt/en com 3 capturas, tecnologias, instalação do Ollama (Linux/Windows), nº de IAs e hardware mínimo.
 - Botão Contratar: lista de modelos já vem de `GET /models` (Ollama `/api/tags`); campo de texto só como fallback se o Ollama estiver fora.
 
+## Rodada 93 — transparência nas doações
+
+- Modal de doação (pt/en) e READMEs (pt/en) dizem abertamente: o autor se endividou com a saúde da filha e precisa de ajuda; a doação é voluntária e o projeto não depende dela.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -837,7 +841,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 89 | `e83db75` | Artefatos `.md` de pesquisa gerados pelos agentes em `backend/workspace` commitados |
 | 90 | `5237cc0` | `scripts/seed_team.py`, migração `testing` validada em Postgres real, design doc do ciclo atualizado |
 | 91 | `3e75623` | READMEs pt/en detalhados com capturas, Ollama, hardware; seletor de modelos já vem do Ollama |
-| 92 | este commit | Auditoria do `git log` x SCRATCHPAD: apêndice com o histórico completo de commits |
+| 92 | `f45e3ea` | Auditoria do `git log` x SCRATCHPAD: apêndice com o histórico completo de commits |
+| 93 | este commit | Texto de doação transparente (dívida com saúde da filha, sem apelo emocional) no modal e nos READMEs |
 
 ### O que funciona
 

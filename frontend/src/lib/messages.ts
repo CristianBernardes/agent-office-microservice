@@ -109,7 +109,7 @@ export const pt: Messages = {
   donationPaypal: 'Doe pelo PayPal.',
   donationPaypalButton: 'Doar com PayPal',
   donationThanks:
-    'Projeto open source criado por um pai para ajudar a custear a saúde da filha, que tem várias alergias. Qualquer ajuda é muito bem-vinda. Obrigado!',
+    'Quero ser transparente: sou um pai que cuida da saúde da filha (que tem várias alergias) e acabei me endividando com esses custos. Preciso de ajuda de verdade, mesmo sendo um projeto open source — mas sem usar minha filha como apelo emocional: o projeto vale por si e a doação é totalmente voluntária. Qualquer valor ajuda. Obrigado!',
   donationLater: 'Agora não',
   close: 'Fechar',
   thoughtLabel: 'Pensando',
@@ -210,7 +210,7 @@ export const en: Messages = {
   donationPaypal: 'Donate through PayPal.',
   donationPaypalButton: 'Donate with PayPal',
   donationThanks:
-    "Open source project built by a dad to help cover his daughter's healthcare; she has several allergies. Any help is very welcome. Thank you!",
+    "I want to be upfront: I'm a dad caring for my daughter's health (she has several allergies) and these costs have put me in debt. I genuinely need help, even though this is an open source project — but I don't want to use my daughter as an emotional hook: the project stands on its own and donating is entirely voluntary. Any amount helps. Thank you!",
   donationLater: 'Not now',
   close: 'Close',
   thoughtLabel: 'Thinking',

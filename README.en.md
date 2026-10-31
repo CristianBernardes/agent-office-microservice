@@ -34,8 +34,13 @@ rigorous architectural documentation (ADRs, RFCs, Design Docs).
 ## 💙 Before you clone or fork — help keep this project alive
 
 This repository is **open source and free**, but it is maintained in the author's free time.
-**Any donation amount is welcome** and directly helps cover **health costs and health insurance
-for my family**, as well as keeping the time and energy available to keep developing AgentOffice.
+**Any donation amount is welcome**.
+
+**I want to be upfront:** I take care of my daughter's health — she has several allergies — and
+these costs have put me in **debt**. I genuinely need help, even though this is an open source
+project. I would rather say this openly than use my daughter as an emotional hook: the project
+stands on its own, donating is entirely voluntary, and nothing here depends on it. Donations help
+pay off these debts and keep the time and energy available to continue developing AgentOffice.
 
 If this project helped you, inspired you, or you simply want to see this idea grow well on
 GitHub — please consider donating before you clone/fork below:
