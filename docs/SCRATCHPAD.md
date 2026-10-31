@@ -485,6 +485,13 @@ identidade visual sugerida por papel listada acima.
 - 256 testes unitários, ruff e mypy limpos.
 - Próximo: `office_layout`, `activity_events`, debate multi-rodada, testes de integração.
 
+## Rodada 24 — layout do escritório (ADR-030)
+
+- `OfficeLayout` (JSON opaco), `ILayoutRepository`, repos em memória e Postgres (upsert em `office_layout`).
+- Rotas `GET/PUT /layout/{name}` com erros pt/en.
+- 261 testes unitários, ruff e mypy limpos. Repo Postgres não testado contra banco real.
+- Próximo: `activity_events`, debate multi-rodada, testes de integração.
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)

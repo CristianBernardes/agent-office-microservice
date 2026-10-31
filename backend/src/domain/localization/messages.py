@@ -99,6 +99,14 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "A meeting needs at least one participant.",
         Language.PT: "Uma reunião precisa de pelo menos um participante.",
     },
+    "layout.not_found": {
+        Language.EN: "Layout '{name}' was not found.",
+        Language.PT: "O layout '{name}' não foi encontrado.",
+    },
+    "layout.invalid": {
+        Language.EN: "A layout needs a name and a non-empty JSON object.",
+        Language.PT: "Um layout precisa de nome e de um objeto JSON não vazio.",
+    },
     "tool.not_implemented": {
         Language.EN: "Tool '{tool}' does not have a handler implemented yet in this round.",
         Language.PT: "A ferramenta '{tool}' ainda não possui um handler implementado "

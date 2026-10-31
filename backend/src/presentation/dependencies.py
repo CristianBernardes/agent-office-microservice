@@ -21,6 +21,7 @@ from src.application.artifacts.review_artifact_use_case import ReviewArtifactUse
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
+from src.application.layout.layout_use_cases import GetLayoutUseCase, SaveLayoutUseCase
 from src.application.meetings.meeting_use_cases import ListMeetingsUseCase, StartCeremonyUseCase
 from src.application.memory.memory_use_cases import RecallMemoryUseCase, RememberUseCase
 from src.application.relationships.relationship_use_cases import (
@@ -37,6 +38,7 @@ from src.application.tools.tool_registry import ToolRegistry
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.artifact_repository import IArtifactRepository
 from src.domain.interfaces.chat_repository import IChatRepository
+from src.domain.interfaces.layout_repository import ILayoutRepository
 from src.domain.interfaces.llm_adapter import ILlmAdapter
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
 from src.domain.interfaces.meeting_repository import IMeetingRepository
@@ -58,6 +60,7 @@ from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
 from src.infrastructure.persistence.in_memory_chat_repository import InMemoryChatRepository
+from src.infrastructure.persistence.in_memory_layout_repository import InMemoryLayoutRepository
 from src.infrastructure.persistence.in_memory_meeting_repository import (
     InMemoryMeetingRepository,
 )
@@ -73,6 +76,7 @@ from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
 from src.infrastructure.persistence.postgres_chat_repository import PostgresChatRepository
+from src.infrastructure.persistence.postgres_layout_repository import PostgresLayoutRepository
 from src.infrastructure.persistence.postgres_meeting_repository import (
     PostgresMeetingRepository,
 )
@@ -189,6 +193,22 @@ def get_relationship_repository() -> IRelationshipRepository:
 
 def get_record_interaction_use_case() -> RecordInteractionUseCase:
     return RecordInteractionUseCase(get_relationship_repository())
+
+
+# Bloco: layout do escritório (ADR-030).
+@lru_cache
+def get_layout_repository() -> ILayoutRepository:
+    if _use_postgres():
+        return PostgresLayoutRepository(_require_pool())
+    return InMemoryLayoutRepository()
+
+
+def get_get_layout_use_case() -> GetLayoutUseCase:
+    return GetLayoutUseCase(get_layout_repository())
+
+
+def get_save_layout_use_case() -> SaveLayoutUseCase:
+    return SaveLayoutUseCase(get_layout_repository())
 
 
 # Bloco: reuniões e cerimônias (ADR-028).
