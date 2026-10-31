@@ -23,7 +23,11 @@ from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCa
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
 from src.application.layout.layout_use_cases import GetLayoutUseCase, SaveLayoutUseCase
-from src.application.meetings.meeting_use_cases import ListMeetingsUseCase, StartCeremonyUseCase
+from src.application.meetings.meeting_use_cases import (
+    FinishMeetingUseCase,
+    ListMeetingsUseCase,
+    StartCeremonyUseCase,
+)
 from src.application.memory.memory_use_cases import RecallMemoryUseCase, RememberUseCase
 from src.application.relationships.relationship_use_cases import (
     ListRelationshipsUseCase,
@@ -249,6 +253,10 @@ def get_list_relationships_use_case() -> ListRelationshipsUseCase:
 
 def get_start_ceremony_use_case() -> StartCeremonyUseCase:
     return StartCeremonyUseCase(get_meeting_repository())
+
+
+def get_finish_meeting_use_case() -> FinishMeetingUseCase:
+    return FinishMeetingUseCase(get_meeting_repository())
 
 
 # Bloco: barramento de mensagens (singleton por processo).

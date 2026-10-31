@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.domain.entities.meeting import Meeting
 from src.domain.entities.relationship import Relationship
@@ -59,3 +59,16 @@ class MeetingResponse(BaseModel):
             started_at=meeting.started_at,
             ended_at=meeting.ended_at,
         )
+
+
+class StartMeetingRequest(BaseModel):
+    kind: str = Field(min_length=1)
+    title: str = Field(min_length=1, max_length=200)
+    organizer_id: UUID
+    participants: list[UUID] = Field(default_factory=list)
+    goal_id: UUID | None = None
+
+
+class FinishMeetingRequest(BaseModel):
+    summary: str = Field(min_length=1)
+    decisions: list[str] = Field(default_factory=list)

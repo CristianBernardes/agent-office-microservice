@@ -519,6 +519,10 @@ identidade visual sugerida por papel listada acima.
 - MQTT → gateway → Kafka verificado: envelope válido chega em `office.events`; duplicata (mesmo `event_id`) descartada pelo Redis; envelope inválido vai para `office.events.dlq`.
 - Bug corrigido: o gateway subia antes dos tópicos existirem (`Unknown Topic Or Partition`); agora `depends_on: kafka-init: service_completed_successfully`.
 
+## Rodada 29 — Rotas de escrita de reuniões (ADR-033)
+- `POST /meetings` (inicia cerimônia) e `POST /meetings/{id}/finish` (encerra), localizadas pt/en.
+- 272 testes unitários, ruff e mypy limpos.
+
 ## Estado atual e ponto de retomada (após a Rodada 27)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)

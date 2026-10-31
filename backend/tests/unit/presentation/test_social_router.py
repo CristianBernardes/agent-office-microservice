@@ -55,3 +55,41 @@ class TestSocialRoutes:
 
         assert [m["title"] for m in body] == ["Daily"]
         assert client.get(f"/goals/{uuid4()}/meetings").json() == []
+
+
+class TestMeetingWriteRoutes:
+    def _start(self) -> dict:
+        organizer = uuid4()
+        response = client.post(
+            "/meetings", json={"kind": "daily", "title": "Daily", "organizer_id": str(organizer)}
+        )
+        assert response.status_code == 201
+        return response.json()
+
+    def test_start_includes_organizer(self) -> None:
+        body = self._start()
+        assert body["status"] == "in_progress"
+        assert body["participants"] == [body["organizer_id"]]
+
+    def test_invalid_kind(self) -> None:
+        response = client.post(
+            "/meetings", json={"kind": "nope", "title": "x", "organizer_id": str(uuid4())}
+        )
+        assert response.status_code == 422
+
+    def test_finish_and_conflict(self) -> None:
+        meeting = self._start()
+        url = f"/meetings/{meeting['meeting_id']}/finish"
+        ok = client.post(url, json={"summary": "ok", "decisions": ["a"]})
+        assert ok.status_code == 200
+        assert ok.json()["decisions"] == ["a"]
+        assert client.post(url, json={"summary": "again"}).status_code == 409
+
+    def test_finish_not_found_localized(self) -> None:
+        response = client.post(
+            f"/meetings/{uuid4()}/finish",
+            json={"summary": "x"},
+            headers={"Accept-Language": "pt"},
+        )
+        assert response.status_code == 404
+        assert "Reunião" in response.json()["detail"]
