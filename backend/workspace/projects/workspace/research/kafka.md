@@ -1,17 +1,41 @@
 ---
-id: 75f0a350-58a6-4dad-9990-c07fa6d3130c
+id: 28350f0f-def4-4fa4-aa68-95635e7bdddb
 title: Kafka
 type: analysis
 status: draft
-author_id: 5cbd9ddb-83a5-447f-86b0-f29311c0dd5c
-created_at: 2026-10-31T15:04:15.382738+00:00
-updated_at: 2026-10-31T15:04:15.382741+00:00
+author_id: ca169fee-cf4e-447a-9e9d-7c75581e57ba
+created_at: 2026-10-31T15:08:01.202602+00:00
+updated_at: 2026-10-31T15:08:01.202604+00:00
 ---
 
-# Relatório Técnico sobre Apache Kafka
+# Kafka: Mensageria de Alta Performance
 
-## Resumo
-Apache Kafka é uma plataforma de mensageria distribuída de alta disponibilidade que utiliza o modelo de publicação‑assinatura para ingestão e consumo de eventos em tempo real. Ela organiza os dados em tópicos (topics) que são divididos em partições (partitions) para paralelismo e tolerância a falhas, armazenados em brokers que mantêm registro persistente. O Kafka oferece alta taxa de transferência, baixa latência e suporte a múltiplos consumidores simultâneos, sendo amplamente utilizado para pipelines de dados, integração de sistemas e streaming analítico.
+**Resumo:**
+Kafka é uma plataforma de mensageria distribuída, tolerante a falhas e de alta escalabilidade, projetada para ingestão de eventos em tempo real e processamento de fluxos de dados. Utiliza um modelo de publicação‑assinatura onde produtores enviam mensagens a tópicos e consumidores leem essas mensagens de forma assíncrona, garantindo durabilidade e ordem.
+
+## Visão Geral
+- **Arquitetura**: Brokers formam um cluster; os dados são particionados e replicados para alta disponibilidade.
+- **Topicos**: Cada mensagem é atribuída a um tópico; particionamento permite paralelismo e ordem por partição.
+- **Produtores**: Aplicações que publicam mensagens; podem ser síncronas ou assíncronas.
+- **Consumidores**: Aplicações que subscrevem a tópicos; suportam grupos de consumo para balanceamento de carga.
+- **Replicação**: Faturas (replicas) garantem tolerância a falhas e recuperação.
+
+## Principais Componentes
+- **Zookeeper** (ou KRaft nos últimos releases): gerencia metadados do cluster.
+- **Partições**: Dividem tópicos en sub‑segmentos, facilitando escalabilidade horizontal.
+- **Log Segmentado**: Cada mensagem é armazenada em um arquivo log sequencial, permitindo leitura rápida e retenção configurável.
+
+## Vantagens
+- **Alta taxa de throughput**: milhões de mensagens por segundo.
+- **Baixa latência**: ideal para uso em tempo real.
+- **Durabilidade**: mensagens são persistidas em disco.
+- **Escalabilidade**: adicionar brokers ou partições sem interrupção.
+
+## Casos de Uso
+- **Event sourcing** e captura de mudanças de estado.
+- **Pipeline de ingestão** de logs e métricas.
+- **Integração de micro‑serviços** via eventos.
+- **Processamento de streaming** com conectores (Kafka Connect).
 
 ## Conclusões
-Kafka demonstra ser uma solução robusta para cenários que exigem ingestão massiva de eventos com garantia de entrega e replay de dados. Sua arquitetura desacoplada permite escalabilidade horizontal e fácil integração com ecossistemas de processamento (ex.: Spark, Flink). Portanto, a adoção de Kafka pode melhorar a confiabilidade e a eficiência de sistemas que dependem de fluxos de dados em tempo real.
+Kafka se consolida como a escolha padrão para sistemas que requerem mensageria robusta, escalável e de alto desempenho. Sua arquitetura baseada em logs sequenciais e modelo de pub/sub oferece flexibilidade para diversos padrões de uso, desde ingestão de eventos até stream processing em tempo real. A adoção de Kafka traz ganhos significativos em confiabilidade e capacidade de processamento, sendo amplamente adotado por empresas de grande porte e startups que precisam de pipelines de dados resilientes.

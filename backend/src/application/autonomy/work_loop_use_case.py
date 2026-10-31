@@ -23,6 +23,7 @@ from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.localization.language import Language
+from src.domain.services.task_splitter import distribute_extra_parts, split_task
 from src.domain.value_objects.identifiers import SessionId, TaskId
 
 logger = logging.getLogger(__name__)
@@ -124,52 +125,35 @@ class WorkLoopUseCase:
         return len(backlog)
 
     async def _split_for_team(self, backlog: list[Task], missing: int) -> list[Task]:
-        """Divide tarefas em partes até haver trabalho para todos (``missing`` partes extras)."""
-        if missing == 0:
-            return backlog
-        extra = [
-            missing // len(backlog) + (1 if i < missing % len(backlog) else 0)
-            for i in range(len(backlog))
-        ]
+        """Divide tarefas em partes até haver trabalho para todos."""
+        note = _PROMPTS[self._language]["part"]
         result: list[Task] = []
-        for task, more in zip(backlog, extra, strict=True):
-            total = more + 1
-            if total == 1:
-                result.append(task)
-                continue
-            base_title, base_desc = task.title, task.description
-            for index in range(1, total + 1):
-                part = (
-                    task
-                    if index == 1
-                    else Task(
-                        task_id=TaskId.generate(),
-                        title=base_title,
-                        description=base_desc,
-                        priority=task.priority,
-                        goal_id=task.goal_id,
-                    )
-                )
-                part.title = f"{base_title} ({index}/{total})"
-                part.description = (
-                    _PROMPTS[self._language]["part"].format(
-                        index=index, total=total, title=base_title
-                    )
-                    + f"\n{base_desc}"
-                )
-                await self._tasks.save(part)
+        for task, more in zip(backlog, distribute_extra_parts(len(backlog), missing), strict=True):
+            for part in split_task(task, more + 1, note):
+                if more:
+                    await self._tasks.save(part)
                 result.append(part)
         return result
+
+    async def _speak(self, speaker: Agent, prompt: str, task_id: TaskId | None = None) -> str:
+        """Pede ao agente uma fala via LLM e a publica no chão do escritório."""
+        text = (await self._dispatch.execute(speaker.agent_id, prompt, self._language)).thought
+        await self._send.execute(
+            SendMessageInput(
+                session_id=_FLOOR_SESSION,
+                content=text,
+                sender_id=speaker.agent_id,
+                task_id=task_id,
+            )
+        )
+        return text
 
     async def _hold_planning(self, planner: Agent, tasks: list[Task], workers: list[Agent]) -> None:
         prompt = _PROMPTS[self._language]["planning"].format(
             tasks="; ".join(t.title for t in tasks),
             team=", ".join(f"{w.name} ({w.role.value})" for w in workers),
         )
-        plan = (await self._dispatch.execute(planner.agent_id, prompt, self._language)).thought
-        await self._send.execute(
-            SendMessageInput(session_id=_FLOOR_SESSION, content=plan, sender_id=planner.agent_id)
-        )
+        plan = await self._speak(planner, prompt)
         await self._write.execute(
             WriteArtifactInput(
                 title="Sprint planning",
@@ -212,15 +196,7 @@ class WorkLoopUseCase:
             prompt = _PROMPTS[self._language]["work"].format(
                 title=task.title, description=task.description
             )
-            result = (await self._dispatch.execute(worker.agent_id, prompt, self._language)).thought
-            await self._send.execute(
-                SendMessageInput(
-                    session_id=_FLOOR_SESSION,
-                    content=result,
-                    sender_id=worker.agent_id,
-                    task_id=task.task_id,
-                )
-            )
+            result = await self._speak(worker, prompt, task.task_id)
             await self._write.execute(
                 WriteArtifactInput(
                     title=task.title,
@@ -247,17 +223,7 @@ class WorkLoopUseCase:
             prompt = _PROMPTS[self._language]["review"].format(
                 title=task.title, result=task.result or ""
             )
-            opinion = (
-                await self._dispatch.execute(reviewer.agent_id, prompt, self._language)
-            ).thought
-            await self._send.execute(
-                SendMessageInput(
-                    session_id=_FLOOR_SESSION,
-                    content=opinion,
-                    sender_id=reviewer.agent_id,
-                    task_id=task.task_id,
-                )
-            )
+            opinion = await self._speak(reviewer, prompt, task.task_id)
             await self._move.execute(
                 task.task_id, TaskStatus.DONE, reviewer.agent_id, reviewer.role, note=opinion[:200]
             )

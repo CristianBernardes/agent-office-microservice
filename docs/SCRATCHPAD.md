@@ -660,6 +660,10 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 
 Cerimônia de planejamento antes do trabalho (ADR-049): facilitador PO/SM, artefato `planning/`, divisão de tarefas em partes para ninguém ficar ocioso. Testes atualizados.
 
+## Rodada 72
+
+Auditoria SOLID/DRY/YAGNI: divisão de tarefas extraída para `domain/services/task_splitter.py` (com testes), helper `_speak` elimina duplicação no ciclo, RFC-005 e design doc `ciclo-de-trabalho.md`.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -720,6 +724,7 @@ Cerimônia de planejamento antes do trabalho (ADR-049): facilitador PO/SM, artef
 | 69 | este commit | Reset do banco/workspace, time completo contratado e backlog inicial |
 | 70 | este commit | Kanban: WIP/limites, métricas de fluxo, cargo no cartão, timestamps de task; PayPal visível também em pt |
 | 71 | este commit | Sprint planning conduzido por PO/SM, divisão de tarefas, ADR-049 |
+| 72 | este commit | Refatoração SRP/DRY (task_splitter, _speak), RFC-005 e design doc do ciclo |
 
 ### O que funciona
 
