@@ -183,3 +183,11 @@ async def test_floor_session_is_created_on_first_speech() -> None:
     )
     await loop._speak(owner, "hi")
     assert await chat.find_session(_FLOOR_SESSION) is not None
+
+
+async def test_planning_states_the_sprint_day_limit() -> None:
+    loop, _, _, dispatch, artifacts = await _build(_TEAM, Language.PT)
+    for _ in range(3):
+        await loop.tick()
+    assert "15 dias fictícios" in dispatch.prompts[0]
+    assert "15 dias fictícios" in artifacts.calls[0].content

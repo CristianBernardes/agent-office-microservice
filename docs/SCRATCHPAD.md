@@ -698,6 +698,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - A grade do Kanban tinha 5 colunas; com `testing` a sexta (Concluído) quebrava de linha. Ajustada para 6.
 
+## Rodada 81 — Duração máxima da sprint
+
+- `SPRINT_MAX_DAYS` (padrão e teto 15) vai no prompt do planejamento e no markdown da sprint, no idioma escolhido. Teste unitário incluído.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -766,7 +770,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 77 | este commit | Corrige sessão do chão do escritório inexistente (ciclo falhava em toda fala); recriação do time/tarefas |
 | 78 | fe9850a | Makefile: format-go, format-frontend e format-all |
 | 79 | 4250ad1 | Etapa de teste (QA) antes da revisão — ADR-050 |
-| 80 | este commit | Kanban: grade com 6 colunas (Concluído visível) |
+| 80 | (commit anterior) | Kanban: grade com 6 colunas (Concluído visível) |
+| 81 | este commit | Sprint com no máximo 15 dias fictícios (`SPRINT_MAX_DAYS`) |
 
 ### O que funciona
 

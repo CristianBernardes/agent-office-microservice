@@ -47,8 +47,10 @@ _PROMPTS = {
     Language.PT: {
         "planning": "Você conduz a cerimônia de planejamento (sprint planning) do time.\n"
         "Tarefas: {tasks}\nTime: {team}\n"
+        "A sprint dura no máximo {days} dias fictícios; defina a duração dentro desse limite.\n"
         "Explique em poucas linhas como o trabalho será dividido para que ninguém fique ocioso.",
         "planning_title": "Planejamento da sprint",
+        "sprint_length": "Duração máxima da sprint: {days} dias fictícios.",
         "breakdown": "Divida a tarefa «{title}» em {count} subtarefas distintas.\n"
         "Descrição: {description}\n"
         "Responda SOMENTE com {count} linhas no formato: Título curto | O que deve ser entregue.",
@@ -64,8 +66,10 @@ _PROMPTS = {
     Language.EN: {
         "planning": "You lead the team's sprint planning ceremony.\n"
         "Tasks: {tasks}\nTeam: {team}\n"
+        "The sprint lasts at most {days} fictional days; set its duration within that limit.\n"
         "Explain in a few lines how the work will be split so nobody stays idle.",
         "planning_title": "Sprint planning",
+        "sprint_length": "Maximum sprint length: {days} fictional days.",
         "breakdown": "Split the task «{title}» into {count} distinct, non-overlapping subtasks.\n"
         "Description: {description}\n"
         "Answer ONLY with {count} lines in the format: Short title | What must be delivered.",
@@ -94,6 +98,7 @@ class WorkLoopUseCase:
         message_bus: IMessageBus,
         language: Language,
         chat_repository: IChatRepository,
+        sprint_max_days: int = 15,
     ) -> None:
         self._agents = agent_repository
         self._tasks = task_repository
@@ -105,6 +110,7 @@ class WorkLoopUseCase:
         self._bus = message_bus
         self._language = language
         self._chat = chat_repository
+        self._sprint_max_days = sprint_max_days
 
     async def tick(self) -> int:
         """Executa um passo por estágio; devolve quantas tarefas avançaram."""
@@ -193,13 +199,15 @@ class WorkLoopUseCase:
         prompt = _PROMPTS[self._language]["planning"].format(
             tasks="; ".join(t.title for t in tasks),
             team=", ".join(f"{w.name} ({w.role.value})" for w in workers),
+            days=self._sprint_max_days,
         )
         plan = await self._speak(planner, prompt)
         title = _PROMPTS[self._language]["planning_title"]
+        length = _PROMPTS[self._language]["sprint_length"].format(days=self._sprint_max_days)
         await self._write.execute(
             WriteArtifactInput(
                 title=title,
-                content=f"# {title}\n\n{plan}\n",
+                content=f"# {title}\n\n{length}\n\n{plan}\n",
                 artifact_type=ArtifactType.SPRINT_PLANNING,
                 path=f"planning/{uuid4()}.md",
                 author_id=planner.agent_id,

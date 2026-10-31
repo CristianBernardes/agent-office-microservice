@@ -468,6 +468,7 @@ def get_work_loop_use_case() -> WorkLoopUseCase:
         message_bus=get_message_bus(),
         language=get_settings().language(),
         chat_repository=get_chat_repository(),
+        sprint_max_days=get_settings().sprint_max_days,
     )
 
 
