@@ -75,3 +75,34 @@ export function formatDuration(value: number | null): string {
   const hours = Math.floor(minutes / 60)
   return hours < 24 ? `${hours}h${String(minutes % 60).padStart(2, '0')}` : `${Math.floor(hours / 24)}d${hours % 24}h`
 }
+
+export interface Bar {
+  label: string
+  value: number
+}
+
+export interface KaizenCharts {
+  wip: Bar[]
+  leadTimes: Bar[]
+  agings: Bar[]
+}
+
+// Bloco: dados dos gráficos Kaizen (fluxo por coluna, lead time concluído e idade dos cartões ativos).
+export function kaizenCharts(tasks: Task[], now: number): KaizenCharts {
+  const columns: TaskStatus[] = ['backlog', 'todo', ...ACTIVE, 'done']
+  const leadTimes = tasks.flatMap((t) => {
+    const end = ms(t.completed_at)
+    return t.status === 'done' && end !== null
+      ? [{ label: t.title, value: end - new Date(t.created_at).getTime() }]
+      : []
+  })
+  const agings = tasks.flatMap((t) => {
+    const age = agingMs(t, now)
+    return age === null ? [] : [{ label: t.title, value: age }]
+  })
+  return {
+    wip: columns.map((c) => ({ label: c, value: tasks.filter((t) => t.status === c).length })),
+    leadTimes,
+    agings: agings.sort((a, b) => b.value - a.value),
+  }
+}

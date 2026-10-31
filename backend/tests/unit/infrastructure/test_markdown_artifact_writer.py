@@ -59,3 +59,26 @@ class TestMarkdownArtifactWriter:
         written_path = await writer.write(sample_artifact)
 
         assert written_path.parent.is_dir()
+
+    async def test_files_and_new_folders_are_world_writable(
+        self, tmp_path: Path, sample_artifact: Artifact
+    ) -> None:
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        writer = MarkdownArtifactWriter(workspace_root=str(workspace / "projects"))
+
+        written_path = await writer.write(sample_artifact)
+
+        assert written_path.stat().st_mode & 0o777 == 0o777
+        assert written_path.parent.stat().st_mode & 0o777 == 0o777
+        assert (workspace / "projects").stat().st_mode & 0o777 == 0o777
+
+    async def test_does_not_create_missing_workspace(
+        self, tmp_path: Path, sample_artifact: Artifact
+    ) -> None:
+        writer = MarkdownArtifactWriter(workspace_root=str(tmp_path / "ausente" / "projects"))
+
+        with pytest.raises(FileNotFoundError):
+            await writer.write(sample_artifact)
+
+        assert not (tmp_path / "ausente").exists()

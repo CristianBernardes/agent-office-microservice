@@ -18,7 +18,8 @@ gateway/.env
 !gateway/.env.example
 
 # Artefatos .md gerados pelos agentes em tempo de execução (ver ADR-004)
-workspace/projects/
+workspace/*
+!workspace/.gitkeep
 
 # Variáveis do docker-compose
 .env

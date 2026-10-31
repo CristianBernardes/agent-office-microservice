@@ -9,6 +9,9 @@ export interface Messages {
   connected: string
   disconnected: string
   noAgents: string
+  charts: Record<'button' | 'title' | 'flow' | 'lead' | 'aging' | 'empty' | 'close', string>
+  restPhrases: string[]
+  thinkPhrases: string[]
   noActivity: string
   loadError: string
   metrics: Record<'wip' | 'throughput' | 'leadTime' | 'leadP85' | 'cycleTime' | 'aging' | 'wipLimit' | 'wipExceeded', string>
@@ -63,6 +66,17 @@ export const pt: Messages = {
   connected: 'Tempo real conectado',
   disconnected: 'Tempo real desconectado',
   noAgents: 'Nenhum agente contratado.',
+  charts: {
+    button: '📊 Gráficos',
+    title: 'Gráficos Kaizen',
+    flow: 'Cartões por coluna (fluxo)',
+    lead: 'Lead time das tarefas concluídas',
+    aging: 'Idade dos cartões em andamento',
+    empty: 'Sem dados ainda.',
+    close: 'Fechar',
+  },
+  restPhrases: ['☕ Vou tomar um café…', '😮‍💨 Preciso respirar um pouco', '🚶 Esticando as pernas', '💧 Pausa para beber água'],
+  thinkPhrases: ['🤔 Deixa eu pensar nisso…', '💭 Será que há um jeito mais simples?', '📝 Organizando as ideias', '🧠 Revendo o que fizemos'],
   noActivity: 'Nenhuma atividade ainda.',
   loadError: 'Não foi possível carregar os dados.',
   metrics: {
@@ -151,6 +165,17 @@ export const en: Messages = {
   connected: 'Realtime connected',
   disconnected: 'Realtime disconnected',
   noAgents: 'No agents hired.',
+  charts: {
+    button: '📊 Charts',
+    title: 'Kaizen charts',
+    flow: 'Cards per column (flow)',
+    lead: 'Lead time of completed tasks',
+    aging: 'Age of in-progress cards',
+    empty: 'No data yet.',
+    close: 'Close',
+  },
+  restPhrases: ['☕ Grabbing a coffee…', '😮‍💨 I need a breather', '🚶 Stretching my legs', '💧 Water break'],
+  thinkPhrases: ['🤔 Let me think about this…', '💭 Is there a simpler way?', '📝 Sorting out my ideas', '🧠 Reviewing what we did'],
   noActivity: 'No activity yet.',
   loadError: 'Could not load data.',
   metrics: {

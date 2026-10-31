@@ -1,4 +1,5 @@
 <script lang="ts">
+  import KaizenChartsModal from './KaizenChartsModal.svelte'
   import { i18n } from '../lib/i18n.svelte'
   import { agingMs, computeMetrics, formatDuration, isWipExceeded, type WipLimits } from '../lib/metrics'
   import { KANBAN_COLUMNS, type Agent, type Task, type TaskStatus } from '../lib/types'
@@ -24,6 +25,7 @@
   const exceeded = (column: TaskStatus) => isWipExceeded(itemsOf(column).length, wipLimits[column])
   const metrics = $derived(computeMetrics(tasks, wipLimits, now))
 
+  let showCharts = $state(false)
   let failed = $state(false)
   const actorOf = (task: Task) => agents.find((a) => a.agent_id === task.assigned_to)
 
@@ -48,7 +50,9 @@
     <span>{i18n.t.metrics.leadP85}: <b>{formatDuration(metrics.leadTimeP85Ms)}</b></span>
     <span>{i18n.t.metrics.cycleTime}: <b>{formatDuration(metrics.cycleTimeAvgMs)}</b></span>
     <span>{i18n.t.metrics.aging}: <b>{formatDuration(metrics.oldestAgingMs)}</b></span>
+    <button type="button" class="charts-btn" onclick={() => (showCharts = true)}>{i18n.t.charts.button}</button>
   </div>
+  {#if showCharts}<KaizenChartsModal {tasks} {now} onclose={() => (showCharts = false)} />{/if}
   {#if failed}<p role="alert">{i18n.t.loadError}</p>{/if}
   <div class="columns">
     {#each KANBAN_COLUMNS as column (column)}
@@ -85,6 +89,7 @@
 </section>
 
 <style>
+  .charts-btn { background: transparent; color: inherit; border: 1px solid var(--border); border-radius: 6px; padding: 1px 8px; cursor: pointer; }
   .columns { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; overflow-x: auto; }
   .column { background: var(--bg); border-radius: 8px; padding: 6px; min-height: 80px; }
   h3 { margin: 0 0 8px; font-size: 13px; opacity: 0.8; }

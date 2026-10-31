@@ -706,6 +706,12 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - Colunas com `minmax(0, 1fr)` e menos espaçamento para as 6 caberem numa linha; frontend reconstruído.
 
+## Rodada 83-84 — Workspace fixo, personagens vivos e gráficos Kaizen
+
+- `workspace/` não é mais criado em runtime (erro se ausente); subpastas e arquivos nascem com 777; `.gitkeep` versionado.
+- Personagens fazem pausas aleatórias (descansar/pensar) com balões pt/en (`pickBreak`, testado).
+- Botão "📊 Gráficos" ao lado do "Cartão mais antigo" abre modal Kaizen (fluxo por coluna, lead time, idade dos cartões).
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -776,7 +782,9 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 79 | 4250ad1 | Etapa de teste (QA) antes da revisão — ADR-050 |
 | 80 | (commit anterior) | Kanban: grade com 6 colunas (Concluído visível) |
 | 81 | fa5efa5 | Sprint com no máximo 15 dias fictícios (`SPRINT_MAX_DAYS`) |
-| 82 | este commit | Kanban: 6 colunas compactas em uma única linha |
+| 82 | 1f0b956 | Kanban: 6 colunas compactas em uma única linha |
+| 83 | este commit | Workspace fixo (nunca criado em runtime, 777) + `.gitkeep` |
+| 84 | este commit | Personagens vivos (pausas de descanso/reflexão) + modal de gráficos Kaizen |
 
 ### O que funciona
 

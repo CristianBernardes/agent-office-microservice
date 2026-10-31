@@ -20,7 +20,7 @@ describe('placeAgents', () => {
   })
 })
 
-import { hueFor, meetingPoint, pickMeeting } from './layout'
+import { hueFor, meetingPoint, pickBreak, pickMeeting } from './layout'
 
 describe('vida no escritório', () => {
   const mk = (id: string, status = 'idle') => ({ agent_id: id, status }) as never
@@ -38,5 +38,17 @@ describe('vida no escritório', () => {
   it('meetingPoint fica ao lado do colega', () => {
     expect(meetingPoint(10, 20).left).toBeGreaterThan(10)
     expect(meetingPoint(10, 20).top).toBe(20)
+  })
+})
+
+describe('pickBreak', () => {
+  const mk = (id: string) => ({ agent_id: id, status: 'idle' }) as never
+  it('sorteia uma pausa de descanso ou reflexão para um agente livre', () => {
+    expect(pickBreak([mk('a')], new Set(), 4, () => 0)).toEqual({ agentId: 'a', kind: 'rest', index: 0 })
+    expect(pickBreak([mk('a')], new Set(), 4, () => 0.9)).toEqual({ agentId: 'a', kind: 'think', index: 3 })
+  })
+  it('ignora agentes ocupados e sem frases', () => {
+    expect(pickBreak([mk('a')], new Set(['a']), 4, () => 0)).toBeNull()
+    expect(pickBreak([mk('a')], new Set(), 0, () => 0)).toBeNull()
   })
 })

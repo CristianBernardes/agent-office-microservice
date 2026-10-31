@@ -73,3 +73,20 @@ export function pickMeeting(
 export function meetingPoint(left: number, top: number): { left: number; top: number } {
   return { left: left + (60 / MAP_WIDTH) * 100, top }
 }
+
+export type BreakKind = 'rest' | 'think'
+export type Break = { agentId: string; kind: BreakKind; index: number }
+
+// Bloco: sorteia quem faz uma pausa (descansar ou pensar); só agentes ativos e livres.
+export function pickBreak(
+  agents: readonly Agent[],
+  busy: ReadonlySet<string>,
+  phrases: number,
+  random: () => number,
+): Break | null {
+  const free = agents.filter((a) => a.status !== 'offline' && !busy.has(a.agent_id))
+  if (free.length === 0 || phrases < 1) return null
+  const agent = free[Math.floor(random() * free.length)]
+  const kind: BreakKind = random() < 0.5 ? 'rest' : 'think'
+  return { agentId: agent.agent_id, kind, index: Math.floor(random() * phrases) }
+}

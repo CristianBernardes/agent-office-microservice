@@ -2,7 +2,7 @@
   import AgentSprite from './AgentSprite.svelte'
   import { i18n } from '../lib/i18n.svelte'
   import { onMount } from 'svelte'
-  import { MAP_HEIGHT, MAP_WIDTH, hueFor, meetingPoint, pickMeeting, placeAgents } from '../lib/layout'
+  import { MAP_HEIGHT, MAP_WIDTH, hueFor, meetingPoint, pickBreak, pickMeeting, placeAgents } from '../lib/layout'
   import type { Agent } from '../lib/types'
 
   let {
@@ -52,14 +52,27 @@
     later(() => delete trips[walker], 2 * walkMs + chatMs)
   }
 
+  // Bloco: pausas — agentes descansam ou pensam um pouco, como pessoas de verdade.
+  let breaks = $state<Record<string, { kind: 'rest' | 'think'; text: string }>>({})
+  function startBreak() {
+    const busy = new Set([...Object.keys(trips), ...Object.keys(breaks)])
+    const phrases = (kind: 'rest' | 'think') => (kind === 'rest' ? i18n.t.restPhrases : i18n.t.thinkPhrases)
+    const pick = pickBreak(agents, busy, Math.min(i18n.t.restPhrases.length, i18n.t.thinkPhrases.length), Math.random)
+    if (!pick) return
+    breaks[pick.agentId] = { kind: pick.kind, text: phrases(pick.kind)[pick.index] }
+    later(() => delete breaks[pick.agentId], chatMs)
+  }
+
   // Bloco: a cada ciclo cada agente alterna entre a pose padrão e a alternativa (defasado por agente).
   let poseTick = $state(0)
 
   onMount(() => {
     const interval = wanderIntervalMs > 0 ? setInterval(startMeeting, wanderIntervalMs) : undefined
+    const pauses = wanderIntervalMs > 0 ? setInterval(startBreak, Math.round(wanderIntervalMs * 1.5)) : undefined
     const poses = wanderIntervalMs > 0 ? setInterval(() => poseTick++, wanderIntervalMs) : undefined
     return () => {
       clearInterval(interval)
+      clearInterval(pauses)
       clearInterval(poses)
       timers.forEach(clearTimeout)
     }
@@ -83,9 +96,11 @@
       >
         {#if thoughts[agent.agent_id]}
           <span class="bubble" role="status">{thoughts[agent.agent_id]}</span>
+        {:else if breaks[agent.agent_id]}
+          <span class="bubble break" role="status">{breaks[agent.agent_id].text}</span>
         {/if}
         <AgentSprite
-          agent={trip?.phase === 'chatting' ? { ...agent, status: 'talking' } : agent}
+          agent={trip?.phase === 'chatting' ? { ...agent, status: 'talking' } : breaks[agent.agent_id]?.kind === 'think' ? { ...agent, status: 'thinking' } : breaks[agent.agent_id]?.kind === 'rest' ? { ...agent, status: 'idle' } : agent}
           walking={trip?.phase === 'walking' || trip?.phase === 'returning'}
           hue={hueFor(variant)}
           alt={(poseTick + variant) % 2 === 1}
@@ -124,5 +139,6 @@
     background: #fff; color: #111; font-size: 12px; padding: 6px 8px; border-radius: 8px;
     overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical;
   }
+  .bubble.break { background: #fff8e1; font-style: italic; }
   .empty { text-align: center; opacity: 0.7; }
 </style>

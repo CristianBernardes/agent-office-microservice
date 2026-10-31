@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Task } from './types'
-import { agingMs, computeMetrics, formatDuration, isWipExceeded, percentile } from './metrics'
+import { kaizenCharts, agingMs, computeMetrics, formatDuration, isWipExceeded, percentile } from './metrics'
 
 const T0 = new Date('2026-01-01T00:00:00Z').getTime()
 const iso = (min: number) => new Date(T0 + min * 60000).toISOString()
@@ -52,5 +52,19 @@ describe('metrics', () => {
     expect(formatDuration(null)).toBe('—')
     expect(formatDuration(30000)).toBe('<1min')
     expect(formatDuration(90 * 60000)).toBe('1h30')
+  })
+})
+
+describe('kaizenCharts', () => {
+  it('monta fluxo por coluna, lead time e idade dos cartões ativos', () => {
+    const tasks = [
+      task('done', { title: 'a', started_at: iso(1), completed_at: iso(30) }),
+      task('in_progress', { title: 'b', started_at: iso(10) }),
+      task('in_progress', { title: 'c', started_at: iso(20) }),
+    ]
+    const c = kaizenCharts(tasks, T0 + 60 * 60000)
+    expect(c.wip.find((b) => b.label === 'in_progress')?.value).toBe(2)
+    expect(c.leadTimes).toEqual([{ label: 'a', value: 30 * 60000 }])
+    expect(c.agings.map((b) => b.label)).toEqual(['b', 'c'])
   })
 })
