@@ -60,3 +60,4 @@
 | [043](./043-compose-sem-valores-fixos.md) | docker-compose sem valores fixos | Aceito |
 | [044](./044-settings-sem-defaults-de-infraestrutura.md) | Settings sem defaults de infraestrutura | Aceito |
 | [045](./045-idempotencia-de-eventos-no-postgres.md) | Idempotência de eventos no Postgres | Aceito |
+| [046](./046-consumidor-kafka-mqtt-fora-do-escopo.md) | Consumidor Kafka→MQTT fora do escopo | Aceito |

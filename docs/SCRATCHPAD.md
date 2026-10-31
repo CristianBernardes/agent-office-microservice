@@ -610,6 +610,10 @@ README copia `.env.example` da raiz, do backend e do gateway.
 
 ADR-045. `ON CONFLICT (event_id) DO NOTHING` em activity_events; teste de integração (14 integração, 309 unit).
 
+## Rodada 57 — decisão sobre Kafka→MQTT
+
+ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evolução futura.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -654,7 +658,8 @@ ADR-045. `ON CONFLICT (event_id) DO NOTHING` em activity_events; teste de integr
 | 53 | `1737958` | ADR-044: Settings sem defaults de infraestrutura |
 | 54 | `c85e6ba` | MQTT do backend movido do compose para backend/.env.example (valores de container) |
 | 55 | `dd3d2cc` | README: Quick Start copia os três .env.example |
-| 56 | este commit | ADR-045: idempotência de activity_events por event_id; conftest movido para tests/unit |
+| 56 | `4f637a6` | ADR-045: idempotência de activity_events por event_id; conftest movido para tests/unit |
+| 57 | este commit | ADR-046: consumidor Kafka→MQTT fora do escopo (YAGNI, risco de laço) |
 
 ### O que funciona
 
