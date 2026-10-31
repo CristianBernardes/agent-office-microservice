@@ -28,3 +28,4 @@
 | [011](./011-tavily-como-provedor-de-busca-web.md) | Tavily como provedor de busca web | Aceito |
 | [012](./012-internacionalizacao-pt-en.md) | Internacionalização (pt/en) | Aceito |
 | [013](./013-endpoint-para-despachar-objetivos.md) | Endpoint para despachar objetivos a um agente | Aceito |
+| [014](./014-repositorios-postgres-e-selecao-por-env.md) | Repositórios PostgreSQL e seleção por `.env` | Aceito |

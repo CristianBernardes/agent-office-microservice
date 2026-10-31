@@ -339,3 +339,13 @@ identidade visual sugerida por papel listada acima.
 - Testes: caso de uso (4), entidade (2), rota (4). `make format`/`lint`/`type-check` limpos;
   117 unitários passando.
 - **Pendente:** Postgres repos, OpenAI-compatible (não decidido), frontend Svelte (pt/en).
+
+### Rodada 7 — Repositórios PostgreSQL (2026-10-31)
+
+- ADR-014. `PostgresAgentRepository` e `PostgresArtifactRepository` (asyncpg, upsert), esquema
+  idempotente `schema.sql` aplicado no startup (`apply_schema`). `PERSISTENCE_BACKEND=memory|postgres`
+  (padrão `memory`; valor inválido falha); `lifespan` abre/fecha a pool e falha rápido sem banco.
+- Testes: repositórios com pool falsa (agente/artefato, nulos, linha corrompida, ausente), seleção
+  por env, lifespan, setting inválida; integração real em `make test-integration`.
+  `make format`/`lint`/`type-check` limpos; 134 unitários passando.
+- **Pendente:** OpenAI-compatible (não decidido), frontend Svelte (pt/en).

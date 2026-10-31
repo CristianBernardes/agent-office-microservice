@@ -10,6 +10,7 @@ fallback para desenvolvimento local sem `.env`, nunca credenciais de produção.
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -27,6 +28,9 @@ class Settings(BaseSettings):
 
     # Banco de dados
     database_url: str = "postgresql://agm:agm@localhost:7034/agm"
+
+    # Backend de persistência: memory | postgres (ADR-014)
+    persistence_backend: Literal["memory", "postgres"] = "memory"
 
     # Barramento MQTT
     mqtt_host: str = "localhost"

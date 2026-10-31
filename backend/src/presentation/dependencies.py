@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+import asyncpg
+
 from src.application.agents.agent_think_use_case import AgentThinkUseCase
 from src.application.agents.dispatch_goal_use_case import DispatchGoalUseCase
 from src.application.agents.fire_agent_use_case import FireAgentUseCase
@@ -35,6 +37,10 @@ from src.infrastructure.persistence.in_memory_agent_repository import (
 from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
+from src.infrastructure.persistence.postgres_agent_repository import PostgresAgentRepository
+from src.infrastructure.persistence.postgres_artifact_repository import (
+    PostgresArtifactRepository,
+)
 from src.infrastructure.prompts.file_prompt_provider import FilePromptProvider
 from src.infrastructure.search.tavily_adapter import TavilySearchAdapter
 
@@ -48,7 +54,31 @@ from src.infrastructure.search.tavily_adapter import TavilySearchAdapter
 @lru_cache
 def get_agent_repository() -> IAgentRepository:
     """Retorna a instância única do repositório de agentes usado pela aplicação."""
+    if _use_postgres():
+        return PostgresAgentRepository(_require_pool())
     return InMemoryAgentRepository()
+
+
+# Bloco: pool PostgreSQL compartilhada, definida pelo lifespan do FastAPI (ADR-014).
+_database_pool: asyncpg.Pool | None = None
+
+
+def set_database_pool(pool: asyncpg.Pool | None) -> None:
+    """Registra (ou remove) a pool e descarta os repositórios já cacheados."""
+    global _database_pool
+    _database_pool = pool
+    get_agent_repository.cache_clear()
+    get_artifact_repository.cache_clear()
+
+
+def _use_postgres() -> bool:
+    return get_settings().persistence_backend == "postgres"
+
+
+def _require_pool() -> asyncpg.Pool:
+    if _database_pool is None:
+        raise RuntimeError("PERSISTENCE_BACKEND=postgres, but the database pool is not initialized")
+    return _database_pool
 
 
 # Bloco: factory do caso de uso de contratação de agente.
@@ -75,6 +105,8 @@ def get_application_settings() -> Settings:
 @lru_cache
 def get_artifact_repository() -> IArtifactRepository:
     """Retorna a instância única do repositório de artefatos usado pela aplicação."""
+    if _use_postgres():
+        return PostgresArtifactRepository(_require_pool())
     return InMemoryArtifactRepository()
 
 
