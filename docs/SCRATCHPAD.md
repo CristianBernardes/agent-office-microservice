@@ -823,7 +823,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 `master` fast-forward até `b95cfb6` (FUNDING.yml na branch padrão). Validação Mermaid pendente: exige instalar `mermaid`+`jsdom`, não autorizado.
 
-## Estado atual e ponto de retomada (após a Rodada 105)
+## Estado atual e ponto de retomada (após a Rodada 117)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -928,6 +928,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 114 | este commit | Imagem Agent_Office_2.png como chamada clicável para o vídeo nos READMEs |
 | 115 | este commit | Todas as imagens (badges, vídeo e capturas de tela) centralizadas nos READMEs |
 | 116 | este commit | READMEs: removidas afirmações obsoletas (frontend "não implementado", Phaser, fases pendentes) |
+| 117 | este commit | Verificação final: backend 363 unit, frontend 64 testes verdes; estado atual atualizado. Pendências só do autor: Stripe/Sponsors, conta Apoia-se (trocar [LINK-APOIA-SE] no artigo), publicar divulgação, validar Mermaid |
 
 ### O que funciona
 
