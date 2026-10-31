@@ -54,3 +54,4 @@
 | [037](./037-ferramenta-research.md) | Ferramenta `research` para agentes | Aceito |
 | [038](./038-rota-de-interacao.md) | Rota de escrita de relacionamentos | Aceito |
 | [039](./039-curingas-no-bus-em-memoria.md) | Curingas MQTT no barramento em memória | Aceito |
+| [040](./040-integracao-continua-github-actions.md) | Integração contínua com GitHub Actions | Aceito |

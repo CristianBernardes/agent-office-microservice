@@ -566,6 +566,9 @@ identidade visual sugerida por papel listada acima.
 - `set_database_pool` agora descarta o cache de TODOS os repositórios (antes só agent/artifact).
 - Testes das factories Postgres e das falhas toleradas da reunião (304 unit).
 
+## Rodada 43 — CI (ADR-040)
+- `.github/workflows/ci.yml`: backend (ruff, mypy, pytest unit) e gateway (go vet/test).
+
 ## Estado atual e ponto de retomada (após a Rodada 35)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -596,7 +599,8 @@ identidade visual sugerida por papel listada acima.
 | 39 | `c2f8042` | Embedding mock 768 dims |
 | 40 | `49e54c8` | Curingas no bus em memória; feed por agente (291 unit + 13 integração; ADRs 001–039) |
 | 41 | `7f691e5` | Cobertura do ToolRegistry (293 unit) |
-| 42 | este commit | Factories Postgres + cache da pool (304 unit) |
+| 42 | `af24d88` | Factories Postgres + cache da pool (304 unit) |
+| 43 | este commit | CI GitHub Actions (ADR-040; ADRs 001–040) |
 
 ### O que funciona
 
