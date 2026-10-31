@@ -19,6 +19,7 @@ from src.application.agents.hire_agent_use_case import HireAgentUseCase
 from src.application.artifacts.approve_artifact_use_case import ApproveArtifactUseCase
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
+from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
 from src.application.memory.memory_use_cases import RecallMemoryUseCase, RememberUseCase
 from src.application.tasks.task_use_cases import (
@@ -328,4 +329,15 @@ def get_dispatch_goal_use_case() -> DispatchGoalUseCase:
         agent_repository=get_agent_repository(),
         agent_think_use_case=get_agent_think_use_case(),
         message_bus=get_message_bus(),
+    )
+
+
+def get_goal_meeting_use_case() -> GoalMeetingUseCase:
+    return GoalMeetingUseCase(
+        agent_repository=get_agent_repository(),
+        dispatch_goal=get_dispatch_goal_use_case(),
+        send_message=get_send_message_use_case(),
+        remember=get_remember_use_case(),
+        write_artifact=get_write_artifact_use_case(),
+        language=get_settings().language(),
     )

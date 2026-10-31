@@ -425,7 +425,16 @@ identidade visual sugerida por papel listada acima.
 - Contrato de tópicos documentado na ADR-021; testes com cliente falso (sem broker).
 - **Próximo:** loop de autonomia dos agentes (consome `office/goals/created`), gateway Go/Kafka.
 
-## Estado atual e ponto de retomada (2026-10-31, após a Rodada 14)
+### Rodada 15 — Autonomia: reunião do time sobre um objetivo (ADR-022)
+
+- `GoalMeetingUseCase`: ao receber `office/goals/created`, os papéis presentes falam em ordem fixa
+  (PO → consultor → analista → tech lead → dev sênior → QA → SM), cada um vendo a ata até ali; falas vão
+  ao chat e à memória; ata gravada em `projects/{goal_id}/meeting.md` (workspace, gitignored).
+- Resiliente: falha de um agente não derruba a reunião; sem agentes, nada acontece.
+- Ligado por `AUTONOMY_ENABLED` (padrão `false`); handler dispara em background task.
+- 229 testes unitários. **Próximo:** PO decompor o objetivo em tarefas, gateway Go/Kafka.
+
+## Estado atual e ponto de retomada (2026-10-31, após a Rodada 15)
 
 ### Commits por rodada (branch `develop`)
 
@@ -442,10 +451,11 @@ identidade visual sugerida por papel listada acima.
 | 12 | `fe1a4c5` | Objetivos, sessões e chat (ADR-019) |
 | 13 | `6066d20` | Memória semântica (ADR-020) |
 | 14 | `25fa799` | MQTT real + contrato de tópicos (ADR-021) |
+| 15 | (este commit) | Autonomia: reunião sobre objetivo (ADR-022) |
 
 Tudo até a Rodada 13 está no remoto; a Rodada 14 está commitada localmente (push pendente de aprovação).
 
-### O que já funciona (222 testes unitários; format/lint/mypy limpos)
+### O que já funciona (229 testes unitários; format/lint/mypy limpos)
 
 - **API:** `/health`, `/agents` (CRUD parcial + `think`), `/tasks` (criar, atribuir, concluir, mover,
   transições), `/goals`, `/messages`, `/sessions/{id}/messages`, `/agents/{id}/memories` (+ `recall`).
@@ -464,7 +474,7 @@ Tudo até a Rodada 13 está no remoto; a Rodada 14 está commitada localmente (p
 - Tools sem handler: `HIRE_AGENT` e `START_CEREMONY`.
 - A query pgvector e o `MqttMessageBus` só foram testados com fakes; falta integração real.
 - Mock de embedding tem 8 dimensões; a coluna é `vector(768)` (apenas Ollama real grava no Postgres).
-- Ainda não há loop de autonomia: `office/goals/created` é publicado, mas ninguém consome.
+- Autonomia mínima (ADR-022, opt-in `AUTONOMY_ENABLED`): só a reunião; o PO ainda não cria tarefas a partir do objetivo.
 
 ### Backlog ordenado (um commit por item, ADR antes do código, testes pt/en)
 

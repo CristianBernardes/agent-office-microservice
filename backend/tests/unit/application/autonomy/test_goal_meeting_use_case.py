@@ -1,0 +1,147 @@
+"""Testes unitários da reunião autônoma sobre um objetivo (ADR-022)."""
+
+from __future__ import annotations
+
+import asyncio
+from types import SimpleNamespace
+from typing import Any
+
+import pytest
+
+from src.application.autonomy.goal_meeting_use_case import (
+    MEETING_ORDER,
+    GoalMeetingInput,
+    GoalMeetingUseCase,
+    register_goal_autonomy,
+)
+from src.domain.entities.agent import Agent, Personality, Role
+from src.domain.localization.language import Language
+from src.domain.value_objects.identifiers import AgentId, GoalId, SessionId
+from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
+from src.infrastructure.persistence.in_memory_agent_repository import InMemoryAgentRepository
+
+pytestmark = pytest.mark.unit
+
+
+class _Dispatch:
+    def __init__(self, failing: set[AgentId] | None = None) -> None:
+        self.contexts: list[str] = []
+        self._failing = failing or set()
+
+    async def execute(self, agent_id: AgentId, context: str) -> Any:
+        if agent_id in self._failing:
+            raise ConnectionError("llm down")
+        self.contexts.append(context)
+        return SimpleNamespace(thought=f"fala-{len(self.contexts)}")
+
+
+class _Recorder:
+    def __init__(self) -> None:
+        self.calls: list[Any] = []
+
+    async def execute(self, data: Any) -> None:
+        self.calls.append(data)
+
+
+def _agent(role: Role) -> Agent:
+    return Agent(
+        agent_id=AgentId.generate(),
+        name=role.value,
+        role=role,
+        personality=Personality(0.5, 0.5, 0.5, 0.5, 0.5),
+        llm_model="m",
+    )
+
+
+async def _build(
+    roles: list[Role], language: Language = Language.EN, failing_role: Role | None = None
+) -> tuple[GoalMeetingUseCase, _Dispatch, _Recorder, _Recorder, _Recorder]:
+    repository = InMemoryAgentRepository()
+    failing: set[AgentId] = set()
+    for role in roles:
+        agent = _agent(role)
+        await repository.save(agent)
+        if role == failing_role:
+            failing.add(agent.agent_id)
+    dispatch, chat, memory, artifact = _Dispatch(failing), _Recorder(), _Recorder(), _Recorder()
+    use_case = GoalMeetingUseCase(
+        repository,
+        dispatch,  # type: ignore[arg-type]
+        chat,  # type: ignore[arg-type]
+        memory,  # type: ignore[arg-type]
+        artifact,  # type: ignore[arg-type]
+        language,
+    )
+    return use_case, dispatch, chat, memory, artifact
+
+
+def _input() -> GoalMeetingInput:
+    return GoalMeetingInput(GoalId.generate(), SessionId.generate(), "Sell a digital product")
+
+
+class TestGoalMeeting:
+    async def test_speaks_in_fixed_order_and_writes_minutes(self) -> None:
+        roles = [Role.QA_ENGINEER, Role.PRODUCT_OWNER, Role.TECH_LEAD]
+        use_case, dispatch, chat, memory, artifact = await _build(roles)
+
+        turns = await use_case.execute(_input())
+
+        order = [t.agent.role for t in turns]
+        assert order == [r for r in MEETING_ORDER if r in roles]
+        assert len(chat.calls) == len(memory.calls) == 3
+        assert len(artifact.calls) == 1
+        assert artifact.calls[0].path.endswith("/meeting.md")
+        assert artifact.calls[0].author_role == Role.PRODUCT_OWNER
+        assert "fala-1" in dispatch.contexts[1]
+
+    async def test_context_is_localized(self) -> None:
+        use_case, dispatch, *_ = await _build([Role.PRODUCT_OWNER], Language.PT)
+        await use_case.execute(_input())
+        assert "Objetivo do time" in dispatch.contexts[0]
+
+    async def test_no_agents_means_no_meeting(self) -> None:
+        use_case, _, chat, _, artifact = await _build([])
+        assert await use_case.execute(_input()) == []
+        assert chat.calls == [] and artifact.calls == []
+
+    async def test_failing_agent_does_not_stop_meeting(self) -> None:
+        roles = [Role.PRODUCT_OWNER, Role.TECH_LEAD]
+        use_case, _, chat, _, artifact = await _build(roles, failing_role=Role.PRODUCT_OWNER)
+        turns = await use_case.execute(_input())
+        assert [t.agent.role for t in turns] == [Role.TECH_LEAD]
+        assert len(chat.calls) == 1 and len(artifact.calls) == 1
+
+    async def test_one_agent_per_role(self) -> None:
+        use_case, *_ = await _build([Role.PRODUCT_OWNER, Role.PRODUCT_OWNER])
+        assert len(await use_case.execute(_input())) == 1
+
+
+class TestGoalSubscription:
+    async def test_goal_event_triggers_meeting(self) -> None:
+        bus = InMemoryMessageBus()
+        recorder = _Recorder()
+        await register_goal_autonomy(bus, lambda: recorder)()  # type: ignore[arg-type,return-value]
+        goal_id, session_id = GoalId.generate(), SessionId.generate()
+
+        await bus.publish(
+            "office/goals/created",
+            {
+                "payload": {
+                    "goal_id": str(goal_id.value),
+                    "session_id": str(session_id.value),
+                    "text": "x",
+                }
+            },
+        )
+        await asyncio.sleep(0)
+
+        assert recorder.calls[0].goal_id == goal_id
+
+    async def test_invalid_event_is_dropped(self) -> None:
+        bus = InMemoryMessageBus()
+        recorder = _Recorder()
+        await register_goal_autonomy(bus, lambda: recorder)()  # type: ignore[arg-type,return-value]
+        await bus.publish("office/goals/created", {"payload": {"goal_id": "nope"}})
+        await bus.publish("office/goals/created", {"payload": "str"})
+        await asyncio.sleep(0)
+        assert recorder.calls == []

@@ -1,0 +1,190 @@
+"""Caso de uso: o time se reúne sobre um objetivo e registra a ata (ADR-022)."""
+
+from __future__ import annotations
+
+import asyncio
+import logging
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
+from uuid import UUID
+
+from src.application.agents.dispatch_goal_use_case import DispatchGoalUseCase
+from src.application.artifacts.write_artifact_use_case import (
+    WriteArtifactInput,
+    WriteArtifactUseCase,
+)
+from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
+from src.application.memory.memory_use_cases import RememberInput, RememberUseCase
+from src.domain.entities.agent import Agent, Role
+from src.domain.entities.artifact import ArtifactType
+from src.domain.entities.memory import MemoryType
+from src.domain.interfaces.agent_repository import IAgentRepository
+from src.domain.interfaces.message_bus import IMessageBus
+from src.domain.localization.language import Language
+from src.domain.value_objects.identifiers import GoalId, SessionId
+
+logger = logging.getLogger(__name__)
+
+_GOALS_CREATED_TOPIC = "office/goals/created"
+
+# Bloco: ordem de fala da reunião (quem define o problema fala primeiro; o SM fecha).
+MEETING_ORDER: tuple[Role, ...] = (
+    Role.PRODUCT_OWNER,
+    Role.PRODUCT_CONSULTANT,
+    Role.DATA_ANALYST,
+    Role.TECH_LEAD,
+    Role.DEV_SENIOR,
+    Role.QA_ENGINEER,
+    Role.SCRUM_MASTER,
+)
+
+# Bloco: rótulos localizados do contexto e da ata.
+_LABELS = {
+    Language.PT: {
+        "goal": "Objetivo do time",
+        "minutes": "Ata da reunião até agora",
+        "turn": "Sua vez de falar, como {role}. Contribua com o seu papel.",
+        "title": "Ata da reunião — {goal}",
+    },
+    Language.EN: {
+        "goal": "Team goal",
+        "minutes": "Meeting minutes so far",
+        "turn": "Your turn to speak, as {role}. Contribute from your role.",
+        "title": "Meeting minutes — {goal}",
+    },
+}
+
+
+@dataclass(frozen=True, slots=True)
+class GoalMeetingInput:
+    goal_id: GoalId
+    session_id: SessionId
+    text: str
+
+
+@dataclass(frozen=True, slots=True)
+class MeetingTurn:
+    agent: Agent
+    thought: str
+
+
+class GoalMeetingUseCase:
+    def __init__(
+        self,
+        agent_repository: IAgentRepository,
+        dispatch_goal: DispatchGoalUseCase,
+        send_message: SendMessageUseCase,
+        remember: RememberUseCase,
+        write_artifact: WriteArtifactUseCase,
+        language: Language,
+    ) -> None:
+        self._agents = agent_repository
+        self._dispatch = dispatch_goal
+        self._send_message = send_message
+        self._remember = remember
+        self._write_artifact = write_artifact
+        self._labels = _LABELS[language]
+
+    async def execute(self, data: GoalMeetingInput) -> list[MeetingTurn]:
+        participants = await self._participants()
+        if not participants:
+            logger.warning("Nenhum agente disponível para a reunião do objetivo %s", data.goal_id)
+            return []
+        turns: list[MeetingTurn] = []
+        for agent in participants:
+            turn = await self._take_turn(agent, data, turns)
+            if turn is not None:
+                turns.append(turn)
+        if turns:
+            await self._write_minutes(data, turns)
+        return turns
+
+    async def _participants(self) -> list[Agent]:
+        agents = await self._agents.list_all()
+        by_role: dict[Role, Agent] = {}
+        for agent in agents:
+            by_role.setdefault(agent.role, agent)
+        return [by_role[role] for role in MEETING_ORDER if role in by_role]
+
+    async def _take_turn(
+        self, agent: Agent, data: GoalMeetingInput, turns: list[MeetingTurn]
+    ) -> MeetingTurn | None:
+        try:
+            response = await self._dispatch.execute(
+                agent.agent_id, self._context(agent, data, turns)
+            )
+            await self._send_message.execute(
+                SendMessageInput(
+                    session_id=data.session_id, content=response.thought, sender_id=agent.agent_id
+                )
+            )
+            await self._remember.execute(
+                RememberInput(
+                    agent_id=agent.agent_id,
+                    content=response.thought,
+                    memory_type=MemoryType.CONVERSATION,
+                    session_id=data.session_id,
+                )
+            )
+        except Exception:
+            # Um agente com falha (ex.: LLM fora do ar) não pode derrubar a reunião inteira.
+            logger.exception("Falha na fala de %s na reunião", agent.name)
+            return None
+        return MeetingTurn(agent, response.thought)
+
+    def _context(self, agent: Agent, data: GoalMeetingInput, turns: list[MeetingTurn]) -> str:
+        minutes = "\n".join(f"- {t.agent.name} ({t.agent.role.value}): {t.thought}" for t in turns)
+        parts = [f"{self._labels['goal']}: {data.text}"]
+        if minutes:
+            parts.append(f"{self._labels['minutes']}:\n{minutes}")
+        parts.append(self._labels["turn"].format(role=agent.role.value))
+        return "\n\n".join(parts)
+
+    async def _write_minutes(self, data: GoalMeetingInput, turns: list[MeetingTurn]) -> None:
+        title = self._labels["title"].format(goal=data.text)
+        body = "\n\n".join(
+            f"## {t.agent.name} — {t.agent.role.value}\n\n{t.thought}" for t in turns
+        )
+        author = turns[0].agent
+        await self._write_artifact.execute(
+            WriteArtifactInput(
+                title=title,
+                content=f"# {title}\n\n{body}\n",
+                artifact_type=ArtifactType.ANALYSIS,
+                path=f"projects/{data.goal_id.value}/meeting.md",
+                author_id=author.agent_id,
+                author_role=author.role,
+            )
+        )
+
+
+# Bloco: assina o tópico de objetivos e dispara a reunião em background (não bloqueia o listener).
+_background_tasks: set[asyncio.Task[object]] = set()
+
+
+def register_goal_autonomy(
+    bus: IMessageBus, use_case_factory: Callable[[], GoalMeetingUseCase]
+) -> Callable[[], Awaitable[None]]:
+    """Devolve a corrotina de registro da assinatura de `office/goals/created`."""
+
+    async def handler(_topic: str, envelope: dict[str, object]) -> None:
+        payload = envelope.get("payload")
+        if not isinstance(payload, dict):
+            return
+        try:
+            data = GoalMeetingInput(
+                goal_id=GoalId(value=UUID(str(payload["goal_id"]))),
+                session_id=SessionId(value=UUID(str(payload["session_id"]))),
+                text=str(payload["text"]),
+            )
+        except (KeyError, ValueError):
+            logger.warning("Evento de objetivo inválido descartado")
+            return
+        task = asyncio.create_task(use_case_factory().execute(data))
+        _background_tasks.add(task)
+        task.add_done_callback(_background_tasks.discard)
+
+    async def register() -> None:
+        await bus.subscribe(_GOALS_CREATED_TOPIC, handler)
+
+    return register
