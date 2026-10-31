@@ -57,3 +57,4 @@
 | [040](./040-integracao-continua-github-actions.md) | Integração contínua com GitHub Actions | Aceito |
 | [041](./041-cobertura-minima-integracao-e-docker-no-ci.md) | Cobertura mínima, integração e build Docker no CI | Aceito |
 | [042](./042-configuracao-do-gateway-via-env.md) | Configuração do gateway somente via ambiente | Aceito |
+| [043](./043-compose-sem-valores-fixos.md) | docker-compose sem valores fixos | Aceito |

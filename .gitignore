@@ -19,3 +19,7 @@ gateway/.env
 
 # Artefatos .md gerados pelos agentes em tempo de execução (ver ADR-004)
 workspace/projects/
+
+# Variáveis do docker-compose
+.env
+!.env.example

@@ -590,6 +590,10 @@ identidade visual sugerida por papel listada acima.
 ## Rodada 51 — Correção do .env do gateway
 - Dentro do container valem hosts e portas convencionais (`mosquitto:1883`, `kafka:9092`, `redis:6379`); portas 70xx só para host/frontend. Compose sem sobrescritas. Tavily URL/timeout viraram settings.
 
+## Rodada 52 — compose sem valores fixos
+
+ADR-043. `.env.example` na raiz (Postgres, portas externas, URL do Ollama); `docker-compose.yml` usa `${VAR}`; `DATABASE_URL` montada com host `postgres:5432`. CI copia os três `.env.example`.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -629,7 +633,8 @@ identidade visual sugerida por papel listada acima.
 | 48 | `583fd26` | Início rápido dos READMEs atualizado |
 | 49 | `4927af8` | E2E PO → Dev → QA (309 testes) |
 | 50 | `a1485c7` | Gateway configurável via .env (ADR-042) |
-| 51 | este commit | Gateway .env com hosts/portas de container; Tavily URL/timeout em settings |
+| 51 | `3d9339c` | Gateway .env com hosts/portas de container; Tavily URL/timeout em settings |
+| 52 | este commit | ADR-043: compose sem valores fixos (.env raiz, HOST_PORT_*, credenciais Postgres) |
 
 ### O que funciona
 

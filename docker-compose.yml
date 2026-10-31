@@ -5,8 +5,8 @@ services:
     image: eclipse-mosquitto
     restart: unless-stopped
     ports:
-      - "7083:1883"
-      - "7000:3000"
+      - "${HOST_PORT_MQTT}:1883"
+      - "${HOST_PORT_MQTT_WS}:3000"
     volumes:
       - ./ops/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
@@ -20,16 +20,16 @@ services:
     container_name: agent-office-microservice-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: agm
-      POSTGRES_USER: agm
-      POSTGRES_PASSWORD: agm
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "7034:5432"
+      - "${HOST_PORT_POSTGRES}:5432"
     volumes:
       - ./.docker/pgdata:/var/lib/postgresql/data
       - ./ops/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U agm -d agm"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -50,16 +50,16 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      DATABASE_URL: postgresql://agm:agm@postgres:5432/agm
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       MQTT_HOST: mosquitto
       MQTT_PORT: "1883"
       # Dentro do container, "localhost" aponta para o próprio container, não
       # para o host — por isso o IP da bridge padrão do Docker é usado para
       # alcançar o Ollama rodando no host. O Ollama continua SEMPRE externo a
       # este Compose (ver docs/adr/009-ollama-externo-ao-docker-compose.md).
-      OLLAMA_BASE_URL: http://172.17.0.1:11434
+      OLLAMA_BASE_URL: ${OLLAMA_URL_IN_CONTAINER}
     ports:
-      - "7001:8000"
+      - "${HOST_PORT_BACKEND}:8000"
     volumes:
       - ./workspace:/app/workspace
     depends_on:
@@ -72,7 +72,7 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
-      - "7079:6379"
+      - "${HOST_PORT_REDIS}:6379"
     networks:
       - agent-office-microservice
 
@@ -89,7 +89,7 @@ services:
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
-      - "7092:9092"
+      - "${HOST_PORT_KAFKA}:9092"
     networks:
       - agent-office-microservice
 
