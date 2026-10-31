@@ -85,8 +85,8 @@
 </section>
 
 <style>
-  .columns { display: grid; grid-template-columns: repeat(6, minmax(150px, 1fr)); gap: 10px; overflow-x: auto; }
-  .column { background: var(--bg); border-radius: 8px; padding: 8px; min-height: 80px; }
+  .columns { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; overflow-x: auto; }
+  .column { background: var(--bg); border-radius: 8px; padding: 6px; min-height: 80px; }
   h3 { margin: 0 0 8px; font-size: 13px; opacity: 0.8; }
   .card { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
   .owner { font-size: 12px; opacity: 0.75; }

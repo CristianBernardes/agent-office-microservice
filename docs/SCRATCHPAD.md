@@ -702,6 +702,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - `SPRINT_MAX_DAYS` (padrão e teto 15) vai no prompt do planejamento e no markdown da sprint, no idioma escolhido. Teste unitário incluído.
 
+## Rodada 82 — Kanban compacto
+
+- Colunas com `minmax(0, 1fr)` e menos espaçamento para as 6 caberem numa linha; frontend reconstruído.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -771,7 +775,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 78 | fe9850a | Makefile: format-go, format-frontend e format-all |
 | 79 | 4250ad1 | Etapa de teste (QA) antes da revisão — ADR-050 |
 | 80 | (commit anterior) | Kanban: grade com 6 colunas (Concluído visível) |
-| 81 | este commit | Sprint com no máximo 15 dias fictícios (`SPRINT_MAX_DAYS`) |
+| 81 | fa5efa5 | Sprint com no máximo 15 dias fictícios (`SPRINT_MAX_DAYS`) |
+| 82 | este commit | Kanban: 6 colunas compactas em uma única linha |
 
 ### O que funciona
 
