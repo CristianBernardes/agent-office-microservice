@@ -244,7 +244,9 @@ git clone https://github.com/CristianBernardes/agent-office-edicao-brasileira.gi
 cd agent-office-edicao-brasileira/agent-office-microservice
 
 # 2. Configure o backend
+cp .env.example .env
 cp backend/.env.example backend/.env
+cp gateway/.env.example gateway/.env
 # (opcional) edite TAVILY_API_KEY em backend/.env para habilitar busca web
 
 # 3. Garanta que o Ollama está rodando no seu host

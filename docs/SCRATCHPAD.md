@@ -602,6 +602,10 @@ ADR-044. `database_url`, `mqtt_host`, `mqtt_port`, `ollama_base_url` obrigatóri
 
 `MQTT_HOST`/`MQTT_PORT` removidos do `docker-compose.yml`; `backend/.env.example` traz `mosquitto:1883` (container). Fora do Docker, use localhost:7083.
 
+## Rodada 55 — Quick Start
+
+README copia `.env.example` da raiz, do backend e do gateway.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -644,7 +648,8 @@ ADR-044. `database_url`, `mqtt_host`, `mqtt_port`, `ollama_base_url` obrigatóri
 | 51 | `3d9339c` | Gateway .env com hosts/portas de container; Tavily URL/timeout em settings |
 | 52 | `53609f1` | ADR-043: compose sem valores fixos (.env raiz, HOST_PORT_*, credenciais Postgres) |
 | 53 | `1737958` | ADR-044: Settings sem defaults de infraestrutura |
-| 54 | este commit | MQTT do backend movido do compose para backend/.env.example (valores de container) |
+| 54 | `c85e6ba` | MQTT do backend movido do compose para backend/.env.example (valores de container) |
+| 55 | este commit | README: Quick Start copia os três .env.example |
 
 ### O que funciona
 
