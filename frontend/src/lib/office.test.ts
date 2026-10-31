@@ -8,6 +8,7 @@ const agent = (id: string): Agent => ({
 })
 const task = (id: string, status: Task['status']): Task => ({
   task_id: id, title: id, description: '', status, priority: 'low', assigned_to: null, result: null,
+  created_at: '2026-01-01T00:00:00Z', started_at: null, completed_at: null,
 })
 
 function fakeApi(overrides: Partial<ApiClient> = {}): ApiClient {

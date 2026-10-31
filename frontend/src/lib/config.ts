@@ -1,4 +1,5 @@
 import type { Language } from './types'
+import type { WipLimits } from './metrics'
 
 export interface AppConfig {
   apiUrl: string
@@ -10,6 +11,7 @@ export interface AppConfig {
   donationReminderDays: number
   refreshIntervalMs: number
   wanderIntervalMs: number
+  wipLimits: WipLimits
 }
 
 type Env = Record<string, string | undefined>
@@ -42,5 +44,10 @@ export function loadConfig(env: Env): AppConfig {
     donationReminderDays: nonNegativeInt(env, 'VITE_DONATION_REMINDER_DAYS'),
     refreshIntervalMs: nonNegativeInt(env, 'VITE_REFRESH_INTERVAL_MS'),
     wanderIntervalMs: nonNegativeInt(env, 'VITE_WANDER_INTERVAL_MS'),
+    wipLimits: {
+      todo: nonNegativeInt(env, 'VITE_WIP_LIMIT_TODO'),
+      in_progress: nonNegativeInt(env, 'VITE_WIP_LIMIT_IN_PROGRESS'),
+      in_review: nonNegativeInt(env, 'VITE_WIP_LIMIT_IN_REVIEW'),
+    },
   }
 }

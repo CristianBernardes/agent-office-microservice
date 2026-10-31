@@ -56,6 +56,14 @@ describe('componentes', () => {
     expect(onmove).toHaveBeenCalledWith(task, 'done', agent)
   })
 
+  it('KanbanBoard mostra cargo do responsável, contagem e alerta de WIP', () => {
+    const t2 = { ...task, status: 'in_progress' as const, assigned_to: agent.agent_id }
+    render(KanbanBoard, { tasks: [t2, { ...t2, task_id: 'x2' }], agents: [agent], onmove: vi.fn(), wipLimits: { in_progress: 1 } })
+    expect(screen.getByTestId('count-in_progress').textContent).toBe('2/1')
+    expect(document.body.textContent).toContain(`Ana· ${i18n.t.roles.dev_senior}`)
+    expect(screen.getByTestId('flow-metrics')).toBeTruthy()
+  })
+
   it('TeamBoard mostra quem está com qual task', () => {
     render(TeamBoard, { agents: [agent], tasks: [task], selectedId: null, onselect: vi.fn() })
     expect(screen.getByText('Ana')).toBeTruthy()
@@ -74,6 +82,7 @@ describe('componentes', () => {
   it('DonationModal usa Pix em pt e PayPal em en', async () => {
     const view = render(DonationModal, { paypalUrl: 'https://paypal.me/x', pixLabel: 'Pix', onclose: vi.fn() })
     expect(screen.getByRole('img')).toBeTruthy()
+    expect(screen.getByRole('link')).toHaveProperty('href', 'https://paypal.me/x')
     i18n.set('en')
     view.rerender({ paypalUrl: 'https://paypal.me/x', pixLabel: 'Pix', onclose: vi.fn() })
     expect(await screen.findByRole('link')).toHaveProperty('href', 'https://paypal.me/x')

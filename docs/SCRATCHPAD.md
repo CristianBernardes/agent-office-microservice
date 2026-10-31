@@ -650,6 +650,12 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 - Banco (`.docker/pgdata`) e `workspace/` zerados; 11 agentes contratados (todos os cargos) e 12 tarefas de backlog criadas via API pelo PO.
 - Os `.md` gerados (ata, tarefas, pesquisa) seguem `OFFICE_LANGUAGE` / idioma do objetivo.
 
+## Rodada 70 — Kanban profissional
+
+- Backend: `Task.created_at/started_at` expostos na API (lead/cycle time).
+- Frontend: `lib/metrics.ts` (WIP, vazão, lead time médio/P85, cycle time, aging) com testes; limites `VITE_WIP_LIMIT_*` (0 = sem limite); coluna `n/limite` em vermelho ao exceder; cartão mostra cargo do responsável e idade.
+- Doação: `VITE_PAYPAL_URL` configurado; PayPal aparece também em pt.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -708,6 +714,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 67 | este commit | Cargos traduzidos nas atas |
 | 68 | este commit | Correção do sprite bugado (interagindo_com_objetos) |
 | 69 | este commit | Reset do banco/workspace, time completo contratado e backlog inicial |
+| 70 | este commit | Kanban: WIP/limites, métricas de fluxo, cargo no cartão, timestamps de task; PayPal visível também em pt |
 
 ### O que funciona
 

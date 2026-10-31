@@ -30,6 +30,9 @@ export interface Task {
   priority: Priority
   assigned_to: string | null
   result: string | null
+  created_at: string
+  started_at: string | null
+  completed_at: string | null
 }
 
 export interface Goal {

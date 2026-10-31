@@ -13,13 +13,14 @@ from src.domain.value_objects.identifiers import AgentId, GoalId, TaskId
 
 _UPSERT_SQL = """
 INSERT INTO tasks (task_id, title, description, status, priority, assigned_to,
-                   result, completed_at, goal_id, reviewer_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                   result, completed_at, goal_id, reviewer_id, created_at, started_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 ON CONFLICT (task_id) DO UPDATE SET
     title = EXCLUDED.title, description = EXCLUDED.description, status = EXCLUDED.status,
     priority = EXCLUDED.priority, assigned_to = EXCLUDED.assigned_to,
     result = EXCLUDED.result, completed_at = EXCLUDED.completed_at,
-    goal_id = EXCLUDED.goal_id, reviewer_id = EXCLUDED.reviewer_id
+    goal_id = EXCLUDED.goal_id, reviewer_id = EXCLUDED.reviewer_id,
+    started_at = EXCLUDED.started_at
 """
 
 # actor_id desconhecido vira NULL (a FK permite) para nunca perder o histórico.
@@ -49,6 +50,8 @@ class PostgresTaskRepository(ITaskRepository):
             task.completed_at,
             task.goal_id.value if task.goal_id else None,
             task.reviewer_id.value if task.reviewer_id else None,
+            task.created_at,
+            task.started_at,
         )
 
     async def find_by_id(self, task_id: TaskId) -> Task | None:
@@ -110,4 +113,6 @@ def _to_task(row: asyncpg.Record) -> Task:
         completed_at=row["completed_at"],
         goal_id=None if row["goal_id"] is None else GoalId(value=row["goal_id"]),
         reviewer_id=None if row["reviewer_id"] is None else AgentId(value=row["reviewer_id"]),
+        created_at=row["created_at"],
+        started_at=row["started_at"],
     )

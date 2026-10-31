@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -62,6 +63,9 @@ class TaskResponse(BaseModel):
     priority: Priority
     assigned_to: str | None
     result: str | None
+    created_at: datetime
+    started_at: datetime | None
+    completed_at: datetime | None
 
     @staticmethod
     def from_entity(task: Task) -> TaskResponse:
@@ -74,4 +78,7 @@ class TaskResponse(BaseModel):
             priority=task.priority,
             assigned_to=str(task.assigned_to) if task.assigned_to else None,
             result=task.result,
+            created_at=task.created_at,
+            started_at=task.started_at,
+            completed_at=task.completed_at,
         )

@@ -18,7 +18,8 @@
     {#if method === 'pix'}
       <p>{i18n.t.donationPix}</p>
       <img src="/images/pix-qr-code.jpeg" alt={`QR code ${pixLabel}`} width="240" />
-    {:else}
+    {/if}
+    {#if paypalUrl}
       <p>{i18n.t.donationPaypal}</p>
       <a class="paypal" href={paypalUrl} target="_blank" rel="noopener noreferrer">
         {i18n.t.donationPaypalButton}

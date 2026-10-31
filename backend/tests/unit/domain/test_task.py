@@ -41,3 +41,21 @@ class TestTaskLifecycle:
     def test_cannot_complete_a_task_still_in_backlog(self, backlog_task: Task) -> None:
         with pytest.raises(InvalidStateTransitionError):
             backlog_task.complete("Resultado inválido.")
+
+
+class TestTaskTimestamps:
+    def test_created_at_is_set_and_not_started(self, backlog_task: Task) -> None:
+        assert backlog_task.created_at is not None
+        assert backlog_task.started_at is None
+
+    def test_first_entry_in_progress_sets_started_at_once(self, backlog_task: Task) -> None:
+        backlog_task.move_to(TaskStatus.IN_PROGRESS)
+        first = backlog_task.started_at
+        assert first is not None
+        backlog_task.move_to(TaskStatus.IN_REVIEW)
+        backlog_task.move_to(TaskStatus.IN_PROGRESS)
+        assert backlog_task.started_at == first
+
+    def test_assign_sets_started_at(self, backlog_task: Task) -> None:
+        backlog_task.assign(AgentId.generate())
+        assert backlog_task.started_at is not None

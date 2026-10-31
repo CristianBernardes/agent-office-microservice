@@ -48,16 +48,26 @@ class Task:
     completed_at: datetime | None = field(default=None)
     goal_id: GoalId | None = field(default=None)
     reviewer_id: AgentId | None = field(default=None)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    started_at: datetime | None = field(default=None)
+
+    def _mark_started(self) -> None:
+        # Bloco: o início (base do cycle time) é a primeira entrada em andamento.
+        if self.started_at is None:
+            self.started_at = datetime.now(UTC)
 
     def move_to(self, new_status: TaskStatus) -> None:
         """Muda o estágio (a permissão é verificada pela política ``task_workflow``)."""
         self.status = new_status
+        if new_status == TaskStatus.IN_PROGRESS:
+            self._mark_started()
         self.completed_at = datetime.now(UTC) if new_status == TaskStatus.DONE else None
 
     def assign(self, agent_id: AgentId) -> None:
         """Atribui a tarefa a um agente, movendo-a para ``IN_PROGRESS``."""
         self.assigned_to = agent_id
         self.status = TaskStatus.IN_PROGRESS
+        self._mark_started()
 
     def complete(self, result: str) -> None:
         """Conclui a tarefa com um resultado textual.

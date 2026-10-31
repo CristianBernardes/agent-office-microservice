@@ -104,7 +104,7 @@
     <ChatPanel messages={store.messages} agents={store.agents} />
     <LogPanel {lines} agents={store.agents} />
   </div>
-  <KanbanBoard tasks={store.tasks} agents={store.agents} onmove={moveTask} />
+  <KanbanBoard tasks={store.tasks} agents={store.agents} onmove={moveTask} wipLimits={config.wipLimits} />
   {#if store.error}<p role="alert">{i18n.t.loadError}</p>{/if}
 </main>
 

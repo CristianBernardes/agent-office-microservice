@@ -11,6 +11,7 @@ export interface Messages {
   noAgents: string
   noActivity: string
   loadError: string
+  metrics: Record<'wip' | 'throughput' | 'leadTime' | 'leadP85' | 'cycleTime' | 'aging' | 'wipLimit' | 'wipExceeded', string>
   hireTitle: string
   hireName: string
   hireRole: string
@@ -64,6 +65,16 @@ export const pt: Messages = {
   noAgents: 'Nenhum agente contratado.',
   noActivity: 'Nenhuma atividade ainda.',
   loadError: 'Não foi possível carregar os dados.',
+  metrics: {
+    wip: 'WIP (em andamento + revisão)',
+    throughput: 'Vazão (concluídas)',
+    leadTime: 'Lead time médio',
+    leadP85: 'Lead time P85',
+    cycleTime: 'Cycle time médio',
+    aging: 'Cartão mais antigo em andamento',
+    wipLimit: 'Limite de WIP',
+    wipExceeded: 'Limite de WIP excedido',
+  },
   hireTitle: 'Contratar agente',
   hireName: 'Nome',
   hireRole: 'Cargo',
@@ -140,6 +151,16 @@ export const en: Messages = {
   noAgents: 'No agents hired.',
   noActivity: 'No activity yet.',
   loadError: 'Could not load data.',
+  metrics: {
+    wip: 'WIP (in progress + review)',
+    throughput: 'Throughput (done)',
+    leadTime: 'Average lead time',
+    leadP85: 'Lead time P85',
+    cycleTime: 'Average cycle time',
+    aging: 'Oldest card in progress',
+    wipLimit: 'WIP limit',
+    wipExceeded: 'WIP limit exceeded',
+  },
   hireTitle: 'Hire an agent',
   hireName: 'Name',
   hireRole: 'Role',
