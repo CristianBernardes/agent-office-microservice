@@ -22,6 +22,11 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.PT: "O papel '{role}' não pode mover uma tarefa "
         "de '{from_status}' para '{to_status}'.",
     },
+    "task.no_owner_available": {
+        Language.EN: "Task '{title}' cannot leave the backlog: no available worker to own it.",
+        Language.PT: "A tarefa '{title}' não pode sair do backlog: nenhum profissional "
+        "disponível para ser o responsável.",
+    },
     "task.assign_forbidden": {
         Language.EN: "Role '{role}' is not allowed to assign tasks.",
         Language.PT: "O papel '{role}' não pode atribuir tarefas.",

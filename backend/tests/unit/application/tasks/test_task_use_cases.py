@@ -172,9 +172,10 @@ class TestTransitionsAndMove:
         assert history[-1].actor_role == Role.DEV_SENIOR
 
     async def test_full_kanban_flow_by_the_right_roles(self, world) -> None:  # type: ignore[no-untyped-def]
-        tasks, _, bus = world
+        tasks, agents, bus = world
+        await _agent(agents)
         task_id = await _create(tasks, bus)
-        move = MoveTaskUseCase(tasks, bus)
+        move = MoveTaskUseCase(tasks, bus, agents)
         steps = [
             (TaskStatus.TODO, Role.SCRUM_MASTER),
             (TaskStatus.IN_PROGRESS, Role.DEV_JUNIOR),
@@ -188,33 +189,38 @@ class TestTransitionsAndMove:
         assert len(await tasks.list_transitions(task_id)) == 5
 
     async def test_role_without_permission_is_denied_and_task_untouched(self, world) -> None:  # type: ignore[no-untyped-def]
-        tasks, _, bus = world
+        tasks, agents, bus = world
+        await _agent(agents)
         task_id = await _create(tasks, bus)
         with pytest.raises(PermissionDeniedError) as error:
-            await MoveTaskUseCase(tasks, bus).execute(task_id, TaskStatus.TODO, PO, Role.DEV_JUNIOR)
+            await MoveTaskUseCase(tasks, bus, agents).execute(
+                task_id, TaskStatus.TODO, PO, Role.DEV_JUNIOR
+            )
         assert "não pode mover" in error.value.localized(Language.PT)
         assert "not allowed to move" in error.value.localized(Language.EN)
         stored = await tasks.find_by_id(task_id)
         assert stored is not None and stored.status == TaskStatus.BACKLOG
 
     async def test_move_outside_matrix_is_invalid(self, world) -> None:  # type: ignore[no-untyped-def]
-        tasks, _, bus = world
+        tasks, agents, bus = world
+        await _agent(agents)
         with pytest.raises(InvalidStateTransitionError):
-            await MoveTaskUseCase(tasks, bus).execute(
+            await MoveTaskUseCase(tasks, bus, agents).execute(
                 await _create(tasks, bus), TaskStatus.DONE, PO, Role.PRODUCT_OWNER
             )
 
     async def test_move_unknown_task(self, world) -> None:  # type: ignore[no-untyped-def]
-        tasks, _, bus = world
+        tasks, agents, bus = world
         with pytest.raises(TaskNotFoundError):
-            await MoveTaskUseCase(tasks, bus).execute(
+            await MoveTaskUseCase(tasks, bus, agents).execute(
                 TaskId.generate(), TaskStatus.TODO, PO, Role.PRODUCT_OWNER
             )
 
     async def test_reviewer_can_send_back_and_move_clears_completion(self, world) -> None:  # type: ignore[no-untyped-def]
-        tasks, _, bus = world
+        tasks, agents, bus = world
+        await _agent(agents)
         task_id = await _create(tasks, bus)
-        move = MoveTaskUseCase(tasks, bus)
+        move = MoveTaskUseCase(tasks, bus, agents)
         for target, role in [
             (TaskStatus.TODO, Role.PRODUCT_OWNER),
             (TaskStatus.IN_PROGRESS, Role.DEV_SENIOR),
@@ -224,3 +230,26 @@ class TestTransitionsAndMove:
         ]:
             task = await move.execute(task_id, target, PO, role)
         assert task.status == TaskStatus.BLOCKED and task.completed_at is None
+
+
+class TestOwnerRule:
+    async def test_leaving_backlog_assigns_least_loaded_owner(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        one, two = await _agent(agents, "Um"), await _agent(agents, "Dois")
+        first, second = await _create(tasks, bus), await _create(tasks, bus)
+        move = MoveTaskUseCase(tasks, bus, agents)
+        a = await move.execute(first, TaskStatus.TODO, PO, Role.PRODUCT_OWNER)
+        b = await move.execute(second, TaskStatus.TODO, PO, Role.PRODUCT_OWNER)
+        assert {a.assigned_to, b.assigned_to} == {one.agent_id, two.agent_id}
+
+    async def test_without_workers_task_stays_in_backlog(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        task_id = await _create(tasks, bus)
+        with pytest.raises(InvalidStateTransitionError) as error:
+            await MoveTaskUseCase(tasks, bus, agents).execute(
+                task_id, TaskStatus.TODO, PO, Role.PRODUCT_OWNER
+            )
+        assert "responsável" in error.value.localized(Language.PT)
+        stored = await tasks.find_by_id(task_id)
+        assert stored is not None and stored.status == TaskStatus.BACKLOG
+        assert stored.assigned_to is None

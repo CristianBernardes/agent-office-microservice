@@ -109,15 +109,22 @@ class WorkLoopUseCase:
             return 0
         moved = 0
         for task in await self._tasks_in(TaskStatus.TODO):
-            worker = await self._first(_WORKERS, idle=True)
+            worker = await self._owner_or_idle(task)
             if worker is None:
-                break
+                continue
             await self._assign.execute(
                 task.task_id, worker.agent_id, coordinator.agent_id, coordinator.role
             )
             await self._announce(worker.agent_id)
             moved += 1
         return moved
+
+    # Bloco: respeita o responsável já definido; só troca se ele sumiu ou está offline.
+    async def _owner_or_idle(self, task: Task) -> Agent | None:
+        owner = await self._assignee(task)
+        if owner is not None and owner.status != AgentStatus.OFFLINE:
+            return owner if owner.status == AgentStatus.IDLE else None
+        return await self._first(_WORKERS, idle=True)
 
     async def _work(self) -> int:
         for task in await self._tasks_in(TaskStatus.IN_PROGRESS):

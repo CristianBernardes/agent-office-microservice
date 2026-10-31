@@ -33,6 +33,14 @@ _PROMPT_FILENAME_BY_ROLE: dict[Role, str] = {
 }
 
 
+# Bloco: diretiva final e explícita de idioma — modelos tendem a derivar para o inglês.
+_LANGUAGE_DIRECTIVE: dict[Language, str] = {
+    Language.PT: "\n\nIMPORTANTE: responda SEMPRE em português do Brasil, mesmo que o "
+    "contexto ou os termos técnicos estejam em inglês.",
+    Language.EN: "\n\nIMPORTANT: ALWAYS answer in English.",
+}
+
+
 # Bloco: provedor de prompts baseado em arquivos Markdown.
 class FilePromptProvider(IPromptProvider):
     def __init__(self) -> None:
@@ -41,7 +49,7 @@ class FilePromptProvider(IPromptProvider):
     def get_system_prompt(self, role: Role, agent_name: str, language: Language) -> str:
         """Lê (com cache) o template do papel e o personaliza com o nome do agente."""
         template = self._load_template(role, language)
-        return template.format(name=agent_name)
+        return template.format(name=agent_name) + _LANGUAGE_DIRECTIVE[language]
 
     def _load_template(self, role: Role, language: Language) -> str:
         cache_key = (role, language)

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from src.application.agents.fire_agent_use_case import AgentNotFoundError
 from src.application.common.message_envelope import build_message_envelope
 from src.application.tasks.task_errors import TaskNotFoundError
-from src.domain.entities.agent import Role
+from src.domain.entities.agent import AgentStatus, Role
 from src.domain.entities.task import Priority, Task, TaskStatus, TaskTransition
 from src.domain.exceptions.domain_exceptions import (
     InvalidStateTransitionError,
@@ -161,10 +161,37 @@ class CompleteTaskUseCase:
 
 
 # Bloco: caso de uso de movimento de cartão, regido pela matriz papel × estágio.
+_OWNER_ROLES = (Role.DEV_SENIOR, Role.DEV_JUNIOR, Role.TECH_LEAD)
+
+
 class MoveTaskUseCase:
-    def __init__(self, task_repository: ITaskRepository, message_bus: IMessageBus) -> None:
+    def __init__(
+        self,
+        task_repository: ITaskRepository,
+        message_bus: IMessageBus,
+        agent_repository: IAgentRepository,
+    ) -> None:
         self._task_repository = task_repository
         self._message_bus = message_bus
+        self._agent_repository = agent_repository
+
+    # Bloco: fora do backlog toda tarefa tem responsável — escolhe o profissional menos carregado.
+    async def _ensure_owner(self, task: Task) -> None:
+        if task.assigned_to is not None:
+            return
+        tasks = await self._task_repository.list_all()
+        load: dict[AgentId, int] = {}
+        for other in tasks:
+            if other.assigned_to is not None and other.status != TaskStatus.DONE:
+                load[other.assigned_to] = load.get(other.assigned_to, 0) + 1
+        candidates = [
+            a
+            for a in await self._agent_repository.list_all()
+            if a.role in _OWNER_ROLES and a.status != AgentStatus.OFFLINE
+        ]
+        if not candidates:
+            raise InvalidStateTransitionError("task.no_owner_available", title=task.title)
+        task.assigned_to = min(candidates, key=lambda a: load.get(a.agent_id, 0)).agent_id
 
     async def execute(
         self,
@@ -184,6 +211,8 @@ class MoveTaskUseCase:
         if not can_move(actor_role, previous, target):
             raise PermissionDeniedError("task.move_forbidden", role=actor_role.value, **params)
 
+        if target != TaskStatus.BACKLOG:
+            await self._ensure_owner(task)
         task.move_to(target)
         await self._task_repository.save(task)
         await _record_transition(self._task_repository, task, previous, actor_id, actor_role, note)

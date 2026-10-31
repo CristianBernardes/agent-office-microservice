@@ -394,7 +394,11 @@ def get_recall_memory_use_case() -> RecallMemoryUseCase:
 
 
 def get_move_task_use_case() -> MoveTaskUseCase:
-    return MoveTaskUseCase(task_repository=get_task_repository(), message_bus=get_message_bus())
+    return MoveTaskUseCase(
+        task_repository=get_task_repository(),
+        message_bus=get_message_bus(),
+        agent_repository=get_agent_repository(),
+    )
 
 
 # Bloco: registro de ferramentas (singleton por processo).

@@ -109,6 +109,7 @@ class TestMoveRoute:
         )
 
     def test_planner_moves_and_history_is_exposed(self) -> None:
+        _hire()
         task_id = _create()
         assert self._move(task_id, "todo", "scrum_master").json()["status"] == "todo"
         history = client.get(f"/tasks/{task_id}/transitions").json()

@@ -20,6 +20,7 @@ client = TestClient(app)
 def _clean() -> Iterator[None]:
     get_task_repository.cache_clear()
     get_agent_repository.cache_clear()
+    client.post("/agents", json={"name": "Ana", "role": "dev_senior", "llm_model": "m"})
     yield
 
 

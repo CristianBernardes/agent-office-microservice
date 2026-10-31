@@ -61,7 +61,7 @@ async def _build(
         agents,
         tasks,
         AssignTaskUseCase(tasks, agents, bus),
-        MoveTaskUseCase(tasks, bus),
+        MoveTaskUseCase(tasks, bus, agents),
         dispatch,  # type: ignore[arg-type]
         chat,  # type: ignore[arg-type]
         artifacts,  # type: ignore[arg-type]
@@ -92,7 +92,7 @@ async def test_task_walks_the_whole_kanban_across_ticks() -> None:
 async def test_task_waits_without_workers() -> None:
     loop, tasks, _, _, _ = await _build([Role.PRODUCT_OWNER])
     await loop.tick()
-    assert await _status(tasks) == TaskStatus.TODO
+    assert await _status(tasks) == TaskStatus.BACKLOG
 
 
 async def test_review_waits_without_reviewer() -> None:
@@ -116,4 +116,6 @@ async def test_newly_hired_worker_picks_up_waiting_task() -> None:
     await loop.tick()
     await agents.save(_agent(Role.DEV_JUNIOR))
     await loop.tick()
+    await loop.tick()
     assert await _status(tasks) == TaskStatus.IN_PROGRESS
+    assert all(t.assigned_to is not None for t in await tasks.list_all())

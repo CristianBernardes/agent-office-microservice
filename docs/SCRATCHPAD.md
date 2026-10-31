@@ -627,6 +627,12 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 - Backend: `WorkLoopUseCase` (ADR-048) move tarefas backlog→todo→in_progress→in_review→done sozinho; `WORK_LOOP_INTERVAL_SECONDS` (0 = desligado).
 - Frontend: agentes andam até colegas (folha `deslocamento_entre_salas`), conversam e voltam; `VITE_WANDER_INTERVAL_MS`; matiz distinto por índice dentro do cargo; cargo exibido no rótulo.
 
+## Rodada 65 — Responsável obrigatório e idioma
+
+- `MoveTaskUseCase._ensure_owner`: ao sair do backlog a tarefa recebe o dev/TL menos carregado; sem ninguém, permanece no backlog com erro localizado. Work loop respeita o responsável.
+- `FilePromptProvider` anexa diretiva final de idioma (pt/en) a todo prompt de sistema; atas antigas em inglês são anteriores à correção.
+- Testes: TestOwnerRule, diretiva de idioma, ajustes em e2e/rotas.
+
 ## Estado atual e ponto de retomada (após a Rodada 46)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
@@ -680,6 +686,7 @@ ADR-046: não implementar; gateway permanece unidirecional. Replay fica como evo
 | 62 | este commit | `GET /models` (Ollama) e seleção do modelo de IA ao contratar |
 | 63 | este commit | Idioma por objetivo (Accept-Language → reunião/prompts) e `/models` sem embeddings |
 | 64 | este commit | ciclo de trabalho autônomo (ADR-048) + escritório vivo no mapa: caminhadas, conversas, sprites distintos, cargo no rótulo |
+| 65 | este commit | Responsável obrigatório fora do backlog + diretiva de idioma nos prompts |
 
 ### O que funciona
 
