@@ -21,18 +21,23 @@ rigorous architectural documentation (ADRs, RFCs, Design Docs).
 ## Screenshots
 
 ![Escritório de Agentes](images/Agent_Office.png)
+
 *The living office: agents at their desks, meeting rooms and the Scrum board.*
 
 ![Hire an agent](images/hire_agent.png)
+
 *Hiring an agent: the listed models come from the locally installed Ollama (`GET /models`), nothing hardcoded.*
 
 ![Quadro Kanban](images/kambam_board.png)
+
 *6-column Kanban board: backlog → todo → in_progress → testing → in_review → done.*
 
 ![Language change alert](images/alert.png)
+
 *Warning when switching language: changing it after the project started may corrupt files already written; confirmation is required.*
 
 ![Observability dashboard in Grafana](images/grafana.png)
+
 *Grafana dashboard: backend, gateway and Kafka metrics.*
 
 ---

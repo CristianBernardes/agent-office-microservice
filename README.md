@@ -22,18 +22,23 @@ arquitetural rigorosa (ADRs, RFCs, Design Docs).
 ## Capturas de tela
 
 ![Escritório de Agentes](images/Agent_Office.png)
+
 *O escritório vivo: agentes em suas mesas, salas de reunião e quadro Scrum.*
 
 ![Contratar agente](images/hire_agent.png)
+
 *Contratação de agente: os modelos listados vêm do Ollama instalado (`GET /models`), nada fixo no código.*
 
 ![Quadro Kanban](images/kambam_board.png)
+
 *Quadro Kanban de 6 colunas: backlog → todo → in_progress → testing → in_review → done.*
 
 ![Alerta de troca de idioma](images/alert.png)
+
 *Aviso ao trocar o idioma: alterar depois do projeto iniciado pode corromper arquivos já escritos; é preciso confirmar.*
 
 ![Painel de observabilidade no Grafana](images/grafana.png)
+
 *Painel do Grafana com métricas do backend, gateway e Kafka.*
 
 ---
