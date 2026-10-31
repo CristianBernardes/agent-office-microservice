@@ -18,6 +18,8 @@ POETRY      := poetry
         test test-unit test-integration coverage \
         migrate migrate-rollback migrate-status migrate-fresh make-migration \
         lint format format-go format-frontend format-all type-check check \
+        lint-go test-go build-go lint-frontend test-frontend build-frontend \
+        install-frontend check-all \
         clean check-poetry
 
 ## help: Lista todos os comandos disponíveis deste Makefile.
@@ -42,12 +44,20 @@ help:
 	@echo "    make format-all       - formata backend, gateway e frontend"
 	@echo "    make lint             - executa ruff check (lint)"
 	@echo "    make type-check       - executa mypy em modo estrito"
-	@echo "    make check            - roda format + lint + type-check + test"
+	@echo "    make check            - roda format + lint + type-check + test (backend)"
+	@echo "    make lint-go          - gofmt (verificação) + go vet no gateway"
+	@echo "    make lint-frontend    - svelte-check + tsc no frontend"
+	@echo "    make check-all        - valida backend, gateway e frontend (lint + testes)"
 	@echo ""
 	@echo "  Testes:"
 	@echo "    make test             - roda testes unitários e de integração"
 	@echo "    make test-unit        - roda apenas testes unitários (sem dependências externas)"
 	@echo "    make test-integration - roda testes de integração (requer 'make up')"
+	@echo "    make test-go          - roda os testes do gateway Go"
+	@echo "    make test-frontend    - roda os testes do frontend (vitest)"
+	@echo "    make build-go         - compila o gateway Go"
+	@echo "    make build-frontend   - gera o build de produção do frontend"
+	@echo "    make install-frontend - instala as dependências do frontend (npm ci)"
 	@echo "    make coverage         - roda testes unitários com relatório de cobertura"
 	@echo ""
 	@echo "  Limpeza:"
@@ -109,6 +119,39 @@ type-check: check-poetry
 
 ## check: Roda a sequência completa de validação — formatação, lint, tipos e testes.
 check: format lint type-check test
+
+## lint-go: Verifica formatação (gofmt) e executa go vet no gateway.
+lint-go:
+	@cd $(GATEWAY_DIR) && out=$$(gofmt -l .); \
+		if [ -n "$$out" ]; then echo "Arquivos Go fora do padrão gofmt:"; echo "$$out"; exit 1; fi
+	cd $(GATEWAY_DIR) && go vet ./...
+
+## test-go: Roda os testes do gateway Go.
+test-go:
+	cd $(GATEWAY_DIR) && go test ./...
+
+## build-go: Compila o gateway Go.
+build-go:
+	cd $(GATEWAY_DIR) && go build ./...
+
+## install-frontend: Instala as dependências do frontend.
+install-frontend:
+	cd $(FRONTEND_DIR) && npm ci
+
+## lint-frontend: Executa svelte-check e tsc no frontend.
+lint-frontend:
+	cd $(FRONTEND_DIR) && npm run check
+
+## test-frontend: Roda os testes do frontend (vitest).
+test-frontend:
+	cd $(FRONTEND_DIR) && npm test
+
+## build-frontend: Gera o build de produção do frontend.
+build-frontend:
+	cd $(FRONTEND_DIR) && npm run build
+
+## check-all: Valida backend, gateway e frontend (lint, tipos e testes).
+check-all: check lint-go test-go lint-frontend test-frontend
 
 ## format-go: Formata o código do gateway Go com gofmt.
 format-go:
