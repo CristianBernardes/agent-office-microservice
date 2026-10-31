@@ -819,7 +819,11 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - Perfil aprovado; `github: CristianBernardes` no `FUNDING.yml` e botão nos dois READMEs.
 
-## Estado atual e ponto de retomada (após a Rodada 101)
+### Rodada 105 — Merge na master
+
+`master` fast-forward até `b95cfb6` (FUNDING.yml na branch padrão). Validação Mermaid pendente: exige instalar `mermaid`+`jsdom`, não autorizado.
+
+## Estado atual e ponto de retomada (após a Rodada 105)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -911,7 +915,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 101 | `3998ea9` | `clean_body`, testes de integração em banco `<db>_test`, verificação MQTT→Kafka |
 | 102 | `2c16021` | LICENSE (MIT) em inglês e português, com nota de doações voluntárias; links nos READMEs |
 | 103 | `19b9668` | `FUNDING.yml`, badges de licença/doação e rascunhos de divulgação (`docs/divulgacao/`) |
-| 104 | este commit | GitHub Sponsors (`CristianBernardes`) no `FUNDING.yml` e nos READMEs |
+| 104 | `b95cfb6` | GitHub Sponsors (`CristianBernardes`) no `FUNDING.yml` e nos READMEs |
+| 105 | este commit | `develop` mesclada na `master` (botão Sponsor ativo); Mermaid dos READMEs segue sem validação por renderização (instalação não autorizada) |
 
 ### O que funciona
 
