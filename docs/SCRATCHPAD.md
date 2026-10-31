@@ -492,6 +492,14 @@ identidade visual sugerida por papel listada acima.
 - 261 testes unitários, ruff e mypy limpos. Repo Postgres não testado contra banco real.
 - Próximo: `activity_events`, debate multi-rodada, testes de integração.
 
+## Rodada 25 — feed de atividades (ADR-031)
+
+- `ActivityEvent`, `IActivityRepository`, repos em memória e Postgres (`activity_events`).
+- `register_activity_feed` assina os tópicos de domínio no `lifespan`; `GET /activity?limit=`.
+- Limitação: tópicos por agente (`agents/{id}/...`) fora por falta de curinga no barramento.
+- 264 testes unitários, ruff e mypy limpos.
+- Próximo: debate multi-rodada, testes de integração, RFCs/Design Docs, refresh do "Estado atual".
+
 ## Estado atual e ponto de retomada (2026-10-31, após a Rodada 16)
 
 ### Commits por rodada (branch `develop`)

@@ -45,3 +45,4 @@
 | [028](./028-reunioes-e-cerimonias.md) | Reuniões e cerimônias (`start_ceremony`) | Aceito |
 | [029](./029-reunioes-persistidas-e-rotas-sociais.md) | Reuniões persistidas e rotas sociais | Aceito |
 | [030](./030-layout-do-escritorio.md) | Layout do escritório | Aceito |
+| [031](./031-feed-de-atividades.md) | Feed de atividades | Aceito |

@@ -12,6 +12,7 @@ from functools import lru_cache
 
 import asyncpg
 
+from src.application.activity.activity_feed import ListActivityUseCase
 from src.application.agents.agent_think_use_case import AgentThinkUseCase
 from src.application.agents.dispatch_goal_use_case import DispatchGoalUseCase
 from src.application.agents.fire_agent_use_case import FireAgentUseCase
@@ -35,6 +36,7 @@ from src.application.tasks.task_use_cases import (
     MoveTaskUseCase,
 )
 from src.application.tools.tool_registry import ToolRegistry
+from src.domain.interfaces.activity_repository import IActivityRepository
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.artifact_repository import IArtifactRepository
 from src.domain.interfaces.chat_repository import IChatRepository
@@ -53,6 +55,9 @@ from src.infrastructure.llm.ollama_adapter import OllamaAdapter
 from src.infrastructure.llm.role_based_llm_adapter_resolver import RoleBasedLlmAdapterResolver
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
 from src.infrastructure.messaging.mqtt_message_bus import MqttMessageBus
+from src.infrastructure.persistence.in_memory_activity_repository import (
+    InMemoryActivityRepository,
+)
 from src.infrastructure.persistence.in_memory_agent_repository import (
     InMemoryAgentRepository,
 )
@@ -71,6 +76,9 @@ from src.infrastructure.persistence.in_memory_relationship_repository import (
     InMemoryRelationshipRepository,
 )
 from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
+from src.infrastructure.persistence.postgres_activity_repository import (
+    PostgresActivityRepository,
+)
 from src.infrastructure.persistence.postgres_agent_repository import PostgresAgentRepository
 from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
@@ -193,6 +201,18 @@ def get_relationship_repository() -> IRelationshipRepository:
 
 def get_record_interaction_use_case() -> RecordInteractionUseCase:
     return RecordInteractionUseCase(get_relationship_repository())
+
+
+# Bloco: feed de atividades (ADR-031).
+@lru_cache
+def get_activity_repository() -> IActivityRepository:
+    if _use_postgres():
+        return PostgresActivityRepository(_require_pool())
+    return InMemoryActivityRepository()
+
+
+def get_list_activity_use_case() -> ListActivityUseCase:
+    return ListActivityUseCase(get_activity_repository())
 
 
 # Bloco: layout do escritório (ADR-030).
