@@ -9,8 +9,6 @@
 
 [![Watch the video](https://img.youtube.com/vi/sAiGLPTWMv4/maxresdefault.jpg)](https://youtu.be/sAiGLPTWMv4)
 
-[https://youtu.be/sAiGLPTWMv4](https://youtu.be/sAiGLPTWMv4)
-
 
 > An IT office simulated by AI agents — each with its own role, personality and language model,
 > collaborating in real time via MQTT to research, debate, decide and document, exactly like a

@@ -924,6 +924,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 110 | este commit | Link simples do YouTube abaixo da miniatura nos READMEs |
 | 111 | este commit | Vídeo de demonstração (`videos/video_demo.mp4`, convertido de HEVC para H.264) em tag `<video>` nos READMEs |
 | 112 | este commit | Tag `<video>` e `videos/video_demo.mp4` removidos (não tocava no GitHub); ficam miniatura e link do YouTube |
+| 113 | este commit | Link simples do YouTube removido dos READMEs (fica só a miniatura clicável) |
 
 ### O que funciona
 
