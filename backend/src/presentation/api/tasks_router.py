@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from src.application.agents.fire_agent_use_case import AgentNotFoundError
 from src.application.tasks.task_errors import TaskNotFoundError
@@ -13,10 +13,12 @@ from src.application.tasks.task_use_cases import (
     CompleteTaskUseCase,
     CreateTaskInput,
     CreateTaskUseCase,
+    DeleteTaskUseCase,
     MoveTaskUseCase,
     SetTaskOwnerUseCase,
     SetTaskPriorityUseCase,
 )
+from src.domain.entities.agent import Role
 from src.domain.exceptions.domain_exceptions import (
     InvalidStateTransitionError,
     PermissionDeniedError,
@@ -39,6 +41,7 @@ from src.presentation.dependencies import (
     get_assign_task_use_case,
     get_complete_task_use_case,
     get_create_task_use_case,
+    get_delete_task_use_case,
     get_move_task_use_case,
     get_set_task_owner_use_case,
     get_set_task_priority_use_case,
@@ -193,3 +196,19 @@ async def set_task_priority(
     except TaskNotFoundError as error:
         raise _http_error(error, language) from error
     return TaskResponse.from_entity(task)
+
+
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
+async def delete_task(
+    task_id: UUID,
+    actor_id: UUID,
+    actor_role: Role,
+    use_case: DeleteTaskUseCase = Depends(get_delete_task_use_case),
+    language: Language = Depends(get_request_language),
+) -> Response:
+    """Exclui a tarefa do quadro (404 se inexistente)."""
+    try:
+        await use_case.execute(TaskId(value=task_id), AgentId(value=actor_id), actor_role)
+    except TaskNotFoundError as error:
+        raise _http_error(error, language) from error
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

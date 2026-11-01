@@ -53,6 +53,7 @@ export interface ApiClient {
     priority: Priority,
     actor: ActorInput,
   ): Promise<Task>;
+  deleteTask(taskId: string, actor: ActorInput): Promise<void>;
   fireAgent(agentId: string): Promise<Agent>;
   listPendingDismissals(): Promise<DismissalProposal[]>;
   decideDismissal(
@@ -83,6 +84,7 @@ export function createApiClient(
     });
     if (!response.ok)
       throw new ApiError(response.status, await response.text());
+    if (response.status === 204) return undefined as T;
     return (await response.json()) as T;
   }
 
@@ -118,6 +120,13 @@ export function createApiClient(
         method: "PUT",
         body: JSON.stringify({ priority, ...actor }),
       }),
+    deleteTask: async (taskId, actor) => {
+      const query = new URLSearchParams({
+        actor_id: actor.actor_id,
+        actor_role: actor.actor_role,
+      });
+      await request<void>(`/tasks/${taskId}?${query}`, { method: "DELETE" });
+    },
     listPendingDismissals: () =>
       request<DismissalProposal[]>("/dismissals?pending_only=true"),
     decideDismissal: (proposalId, approved) =>

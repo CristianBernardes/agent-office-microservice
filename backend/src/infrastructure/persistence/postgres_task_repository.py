@@ -64,6 +64,10 @@ class PostgresTaskRepository(ITaskRepository):
         rows = await self._pool.fetch("SELECT * FROM tasks ORDER BY created_at")
         return [_to_task(row) for row in rows]
 
+    async def delete(self, task_id: TaskId) -> None:
+        """Remove a tarefa; o histórico cai em cascata (FK ON DELETE CASCADE)."""
+        await self._pool.execute("DELETE FROM tasks WHERE task_id = $1", task_id.value)
+
     async def add_transition(self, transition: TaskTransition) -> None:
         """Grava o movimento em ``task_transitions``."""
         await self._pool.execute(

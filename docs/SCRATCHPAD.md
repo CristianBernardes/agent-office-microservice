@@ -860,7 +860,26 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   descrevem CI/CD como plano original e não foram reescritos.
 - Rodadas 43, 44 e 47 acima ficam como histórico.
 
-## Estado atual e ponto de retomada (após a Rodada 125)
+### Rodada 127 — Vazamento do raciocínio do LLM em inglês (ADR-057)
+
+- **Bug relatado:** o balão de pensamento e artefatos `.md` (ex. `workspace/projects/tasks/bdebb380-...md`)
+  mostravam o raciocínio interno do modelo em inglês ("We need to produce a markdown...",
+  "the instruction says..."), mesmo com o escritório em português. Reproduzido com `gpt-oss:20b`
+  (modelo do RH) chamando o Ollama local diretamente.
+- **Causa:** modelos "reasoning" às vezes escrevem o raciocínio no campo `content` da resposta
+  em vez do campo `thinking` separado da API do Ollama; a leitura tolerante (ADR-036) então
+  trata esse texto misto como o próprio pensamento do agente.
+- **Correção (três camadas):** diretiva de idioma reforçada (proíbe comentar como vai responder
+  e texto de raciocínio antes do conteúdo); `think: false` em toda chamada ao Ollama; guard
+  `strip_reasoning_preamble` (`domain/services/llm_output_guard.py`) que corta o raciocínio
+  vazado antes do conteúdo entregável, aplicado em `_parse_structured_reply` (vale para todo
+  pensamento, trabalho e artefato).
+- **Validação:** 422 unit (backend) verdes; reprodução manual com três chamadas reais ao
+  `gpt-oss:20b` no cenário relatado (recrutamento), sem vazamento em nenhuma.
+- **Limitação:** o guard é heurístico; não há garantia absoluta contra vazamentos com um
+  padrão textual diferente dos observados.
+
+## Estado atual e ponto de retomada (após a Rodada 127)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -975,6 +994,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 124 | este commit | READMEs pt/en: responsabilidades por cargo, poderes do dono do produto, demissão aprovada e rotas novas | documentação apenas | `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
 | 125 | este commit | Remove o CI/CD: workflow e selo de CI apagados; ADR-040/041 revogados | documentação e configuração | `.github/workflows/ci.yml`, `README*.md`, `docs/adr/*`, `docs/SCRATCHPAD.md` |
 | 126 | este commit | `develop` mesclada na `master`: o workflow de CI sai também da branch padrão | merge sem conflitos | `docs/SCRATCHPAD.md` |
+| 127 | este commit | Bloqueia vazamento do raciocínio do LLM em inglês no balão de pensamento e nos artefatos (ADR-057) | 422 unit (backend); validação manual com gpt-oss real | `backend/src/domain/services/llm_output_guard.py`, `backend/src/infrastructure/llm/ollama_adapter.py`, `backend/src/infrastructure/prompts/file_prompt_provider.py`, `docs/adr/057*`, `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 

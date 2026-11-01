@@ -14,10 +14,10 @@ pytestmark = pytest.mark.unit
 @pytest.mark.parametrize("role", list(Role))
 def test_portuguese_prompt_demands_portuguese(role: Role) -> None:
     prompt = FilePromptProvider().get_system_prompt(role, "Ana", Language.PT)
-    assert prompt.rstrip().endswith("em inglês.")
+    assert prompt.rstrip().endswith("texto de raciocínio interno antes do conteúdo.")
     assert "SEMPRE em português" in prompt
 
 
 def test_english_prompt_demands_english() -> None:
     prompt = FilePromptProvider().get_system_prompt(Role.QA_ENGINEER, "Ana", Language.EN)
-    assert prompt.rstrip().endswith("ALWAYS answer in English.")
+    assert prompt.rstrip().endswith("no internal reasoning text before the content.")

@@ -73,6 +73,8 @@ export interface Messages {
   taskOwner: string;
   taskPriority: string;
   taskSave: string;
+  taskDelete: string;
+  taskDeleteConfirm: string;
   taskDragHint: string;
   chatPlaceholder: string;
   chatSend: string;
@@ -182,6 +184,8 @@ export const pt: Messages = {
   taskOwner: "Responsável",
   taskPriority: "Prioridade",
   taskSave: "Salvar",
+  taskDelete: "Excluir tarefa",
+  taskDeleteConfirm: "Confirmar exclusão",
   taskDragHint: "Arraste o cartão para outra coluna",
   chatPlaceholder: "Responda ao time (o Product Owner conversa com você aqui)…",
   chatSend: "Enviar",
@@ -322,6 +326,8 @@ export const en: Messages = {
   taskOwner: "Owner",
   taskPriority: "Priority",
   taskSave: "Save",
+  taskDelete: "Delete task",
+  taskDeleteConfirm: "Confirm deletion",
   taskDragHint: "Drag the card to another column",
   chatPlaceholder: "Reply to the team (the Product Owner talks to you here)…",
   chatSend: "Send",
