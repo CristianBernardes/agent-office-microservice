@@ -23,6 +23,10 @@ class ITaskRepository(ABC):
         """Lista todas as tarefas persistidas."""
 
     @abstractmethod
+    async def delete(self, task_id: TaskId) -> None:
+        """Remove a tarefa (e seu histórico); sem erro se não existir."""
+
+    @abstractmethod
     async def add_transition(self, transition: TaskTransition) -> None:
         """Registra um movimento de cartão no histórico."""
 

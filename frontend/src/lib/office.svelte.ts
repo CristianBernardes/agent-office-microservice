@@ -93,6 +93,10 @@ export class OfficeStore {
     this.tasks = this.tasks.map((t) => (t.task_id === task.task_id ? task : t));
   }
 
+  removeTask(taskId: string): void {
+    this.tasks = this.tasks.filter((t) => t.task_id !== taskId);
+  }
+
   tasksByStatus(status: Task["status"]): Task[] {
     return this.tasks.filter((t) => t.status === status);
   }
