@@ -879,7 +879,18 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - **Limitação:** o guard é heurístico; não há garantia absoluta contra vazamentos com um
   padrão textual diferente dos observados.
 
-## Estado atual e ponto de retomada (após a Rodada 127)
+### Rodada 128 — Excluir tarefas do board
+
+- **Pedido:** o dono do produto quer apagar tarefas criadas pelos agentes que são alucinação.
+- **Backend:** `DELETE /tasks/{id}?actor_id=&actor_role=` (204; 404 se inexistente);
+  `DeleteTaskUseCase` libera o agente responsável, remove a tarefa (histórico em cascata) e
+  publica `office/tasks/deleted`; `ITaskRepository.delete` nas implementações em memória e Postgres.
+- **Frontend:** botão "Excluir tarefa" no modal "Editar tarefa", com segundo clique de
+  confirmação; `api.deleteTask` e `store.removeTask`; textos pt/en.
+- **Validação:** 420 unit (backend), mypy/ruff limpos, 79 testes e svelte-check (frontend).
+- **Limitação:** o frontend não escuta `office/tasks/deleted`; outra aba só atualiza no reload.
+
+## Estado atual e ponto de retomada (após a Rodada 128)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -995,6 +1006,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 125 | este commit | Remove o CI/CD: workflow e selo de CI apagados; ADR-040/041 revogados | documentação e configuração | `.github/workflows/ci.yml`, `README*.md`, `docs/adr/*`, `docs/SCRATCHPAD.md` |
 | 126 | este commit | `develop` mesclada na `master`: o workflow de CI sai também da branch padrão | merge sem conflitos | `docs/SCRATCHPAD.md` |
 | 127 | este commit | Bloqueia vazamento do raciocínio do LLM em inglês no balão de pensamento e nos artefatos (ADR-057) | 422 unit (backend); validação manual com gpt-oss real | `backend/src/domain/services/llm_output_guard.py`, `backend/src/infrastructure/llm/ollama_adapter.py`, `backend/src/infrastructure/prompts/file_prompt_provider.py`, `docs/adr/057*`, `docs/SCRATCHPAD.md` |
+| 128 | este commit | Exclusão de tarefas do board pelo dono do produto | 420 unit (backend); 79 (frontend) | `backend/src/application/tasks/task_use_cases.py`, `backend/src/presentation/api/tasks_router.py`, `frontend/src/components/TaskEditModal.svelte`, `README*.md`, `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 

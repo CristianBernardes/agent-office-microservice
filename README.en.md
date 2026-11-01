@@ -171,7 +171,8 @@ and Scrum Master plan and coordinate. See
 ### You are the product owner
 
 - **Kanban board:** drag cards between columns (you bypass the role-based permission matrix), reassign
-  the owner and change the priority in "Edit task".
+  the owner, change the priority and **delete tasks** (e.g. ones the agents hallucinated) in
+  "Edit task", with a confirmation step.
 - **Talking to the PO:** the team debates, and the PO brings the proposal to you as a chat question; the
   team proceeds with a provisional plan and you answer in the chat box
   ([ADR-055](docs/adr/055-dialogo-do-po-com-o-cliente.md)).
@@ -420,7 +421,7 @@ Full contract: [RFC-004](docs/rfc/004-contrato-da-api-http.md) (in Portuguese).
 | `/agents` (+ `/fire`, `/think`, `/memories`, `/relationships`) | Team, reasoning, memory and bonds |
 | `/dismissals` (+ `/approve`, `/reject`) | Dismissals proposed by HR, decided by the product owner |
 | `/relationships/interactions` | Records an interaction between two agents |
-| `/tasks` (+ `/assign`, `/complete`, `/move`, `/owner`, `/priority`, `/transitions`) | Kanban with role-based permissions; `/move` accepts `owner_override` |
+| `/tasks` (+ `/assign`, `/complete`, `/move`, `/owner`, `/priority`, `/transitions`, `DELETE /tasks/{id}`) | Kanban with role-based permissions; `/move` accepts `owner_override`; `DELETE` removes the task |
 | `/goals`, `/messages`, `/sessions/{id}/messages` | User goals and chat |
 | `/meetings` (+ `/finish`), `/goals/{id}/meetings` | Meetings and ceremonies |
 | `POST /research` | An agent searches the web and writes a `.md` |
