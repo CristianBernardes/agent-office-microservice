@@ -18,6 +18,7 @@ from src.domain.interfaces.llm_adapter import (
     LlmEmbeddingResponse,
     LlmThoughtResponse,
 )
+from src.domain.services.llm_output_guard import strip_reasoning_preamble
 
 # Bloco: tempo máximo de espera por uma resposta do Ollama.
 # Modelos locais podem ser lentos na primeira chamada (carregamento em memória);
@@ -30,9 +31,14 @@ _JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)
 
 
 def _parse_structured_reply(raw_content: str) -> dict[str, Any]:
-    """Extrai o objeto JSON da resposta; se não houver, trata o texto inteiro como pensamento."""
-    candidates = [raw_content.strip()]
-    match = _JSON_OBJECT.search(raw_content)
+    """Extrai o objeto JSON da resposta; se não houver, trata o texto inteiro como pensamento.
+
+    Antes de tudo, remove o raciocínio que alguns modelos vazam para o texto final, quase
+    sempre em inglês, mesmo com o sistema instruído a responder em outro idioma (ADR-057).
+    """
+    content = strip_reasoning_preamble(raw_content)
+    candidates = [content]
+    match = _JSON_OBJECT.search(content)
     if match:
         candidates.append(match.group(0))
     for candidate in candidates:
@@ -42,7 +48,7 @@ def _parse_structured_reply(raw_content: str) -> dict[str, Any]:
             continue
         if isinstance(parsed, dict):
             return parsed
-    return {"thought": raw_content.strip(), "action": "idle"}
+    return {"thought": content, "action": "idle"}
 
 
 # Bloco: adaptador de LLM para o Ollama, acessado via HTTP.
@@ -80,6 +86,9 @@ class OllamaAdapter(ILlmAdapter):
                 ],
                 "options": {"temperature": temperature},
                 "stream": False,
+                # Desliga o canal de raciocínio separado em modelos "reasoning" (ex.: gpt-oss);
+                # modelos que não o suportam simplesmente ignoram o parâmetro (ADR-057).
+                "think": False,
             },
         )
         http_response.raise_for_status()
