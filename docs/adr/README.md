@@ -54,8 +54,8 @@
 | [037](./037-ferramenta-research.md) | Ferramenta `research` para agentes | Aceito |
 | [038](./038-rota-de-interacao.md) | Rota de escrita de relacionamentos | Aceito |
 | [039](./039-curingas-no-bus-em-memoria.md) | Curingas MQTT no barramento em memória | Aceito |
-| [040](./040-integracao-continua-github-actions.md) | Integração contínua com GitHub Actions | Aceito |
-| [041](./041-cobertura-minima-integracao-e-docker-no-ci.md) | Cobertura mínima, integração e build Docker no CI | Aceito |
+| [040](./040-integracao-continua-github-actions.md) | Integração contínua com GitHub Actions | Revogado |
+| [041](./041-cobertura-minima-integracao-e-docker-no-ci.md) | Cobertura mínima, integração e build Docker no CI | Revogado |
 | [042](./042-configuracao-do-gateway-via-env.md) | Configuração do gateway somente via ambiente | Aceito |
 | [043](./043-compose-sem-valores-fixos.md) | docker-compose sem valores fixos | Aceito |
 | [044](./044-settings-sem-defaults-de-infraestrutura.md) | Settings sem defaults de infraestrutura | Aceito |

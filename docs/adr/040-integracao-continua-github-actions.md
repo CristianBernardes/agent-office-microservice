@@ -1,6 +1,8 @@
 # ADR-040 — Integração contínua com GitHub Actions
 
-**Status:** Aceito
+**Status:** Revogado
+**Revogado em 2026-11-01 pelo dono do produto:** este projeto não terá CI/CD. O workflow `.github/workflows/ci.yml` foi removido; a qualidade é garantida localmente com `make check`.
+
 
 ## Contexto
 Projeto open source com contribuições externas: a qualidade (formatação, lint, tipos, testes) dependia de cada colaborador rodar `make check` localmente.

@@ -1,6 +1,8 @@
 # ADR-041 — Cobertura mínima, integração e build Docker no CI
 
-**Status:** Aceito
+**Status:** Revogado
+**Revogado em 2026-11-01 pelo dono do produto:** este projeto não terá CI/CD. O workflow `.github/workflows/ci.yml` foi removido; a qualidade é garantida localmente com `make check`.
+
 
 ## Contexto
 
