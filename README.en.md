@@ -4,7 +4,6 @@
 
 <div align="center">
 
-[![CI](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml/badge.svg)](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE) [![Donate](https://img.shields.io/badge/support-Pix%20%7C%20PayPal-ff69b4.svg)](#-before-you-clone-or-fork--help-keep-this-project-alive)
 
 </div>
@@ -152,13 +151,34 @@ tools:
 | **Senior Developer** | Implementation, code review, mentoring |
 | **Junior Developer** | Simple tasks, learning |
 | **QA Engineer** | Test plans, bug reports |
-| **Data Analyst** | Metrics, KPIs, analyses |
-| **HR Manager** | Onboarding, culture, hiring |
-| **Product Consultant** | Market validation, research |
+| **Data Analyst** | Data, SQL, metrics, KPIs, analyses |
+| **HR Manager** | Hiring, onboarding, culture; **proposes dismissals** to the product owner |
+| **Product Consultant** | Market validation, competitors, pricing, research |
 
 Each role can only use the tools assigned to it (e.g. only Tech Lead and Product Owner can
 `approve_artifact`; only Scrum Master can `start_ceremony`) — permission validation is
 centralized and never delegated to the LLM.
+
+### Everyone takes what belongs to their area
+
+When a task leaves the backlog, it goes to the professional whose area matches it, using Portuguese and
+English keywords: *hire* → HR, *analyze data / SQL* → Data Analyst, *market / competitors* → Product
+Consultant, *architecture / deploy* → Tech Lead, *implement / API* → Developer. With no recognized area,
+the task falls to the developers and the Tech Lead (the least loaded one). QA tests and reviews; the PO
+and Scrum Master plan and coordinate. See
+[ADR-054](docs/adr/054-responsabilidades-por-cargo-e-poderes-do-dono.md) (in Portuguese).
+
+### You are the product owner
+
+- **Kanban board:** drag cards between columns (you bypass the role-based permission matrix), reassign
+  the owner and change the priority in "Edit task".
+- **Talking to the PO:** the team debates, and the PO brings the proposal to you as a chat question; the
+  team proceeds with a provisional plan and you answer in the chat box
+  ([ADR-055](docs/adr/055-dialogo-do-po-com-o-cliente.md)).
+- **Dismissals:** the **Fire** button (team list and map) asks for confirmation and returns the open
+  tasks to the flow. HR can also *propose* a dismissal with a reason: a modal asks you to approve it or
+  keep the person on the team — nobody is dismissed without your decision
+  ([ADR-056](docs/adr/056-demissao-com-aprovacao-do-dono.md)).
 
 ## How the Agents Work
 
@@ -398,8 +418,9 @@ Full contract: [RFC-004](docs/rfc/004-contrato-da-api-http.md) (in Portuguese).
 |---|---|
 | `GET /health` | Service health |
 | `/agents` (+ `/fire`, `/think`, `/memories`, `/relationships`) | Team, reasoning, memory and bonds |
+| `/dismissals` (+ `/approve`, `/reject`) | Dismissals proposed by HR, decided by the product owner |
 | `/relationships/interactions` | Records an interaction between two agents |
-| `/tasks` (+ `/assign`, `/complete`, `/move`, `/transitions`) | Kanban with role-based permissions |
+| `/tasks` (+ `/assign`, `/complete`, `/move`, `/owner`, `/priority`, `/transitions`) | Kanban with role-based permissions; `/move` accepts `owner_override` |
 | `/goals`, `/messages`, `/sessions/{id}/messages` | User goals and chat |
 | `/meetings` (+ `/finish`), `/goals/{id}/meetings` | Meetings and ceremonies |
 | `POST /research` | An agent searches the web and writes a `.md` |
