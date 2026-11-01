@@ -953,6 +953,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 120 | este commit | Formatação prettier do frontend (`make format-frontend`) commitada | alterações apenas de formato | `frontend/src/**`, `docs/SCRATCHPAD.md` |
 | 121 | este commit | Demitir, arrastar/editar tarefas, roteamento por área, diálogo PO–cliente, demissão aprovada pelo dono (ADR-054/055/056); prettier com plugin Svelte | backend 412 unit + 12 integração; frontend 79 testes | `backend/src/**`, `frontend/src/**`, `docs/adr/05[4-6]*`, `docs/SCRATCHPAD.md` |
 | 122 | este commit | Artefatos `.md` de pesquisa regenerados pelos agentes (`clean-architecture`, `kafka`, `tema`) commitados | apenas conteúdo gerado | `backend/workspace/projects/workspace/research/*.md`, `docs/SCRATCHPAD.md` |
+| 123 | este commit | `develop` mesclada na `master` (rodadas 121–122: poderes do dono, roteamento por área, diálogo PO–cliente, demissão aprovada) | merge sem conflitos | `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 
