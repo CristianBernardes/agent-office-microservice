@@ -31,7 +31,26 @@
 </form>
 
 <style>
-  textarea { width: 100%; box-sizing: border-box; background: var(--bg); color: inherit; border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
-  button { margin-top: 8px; background: var(--accent); color: #fff; border: 0; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg);
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+  }
+  button {
+    margin-top: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>

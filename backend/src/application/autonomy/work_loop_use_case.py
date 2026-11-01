@@ -15,7 +15,7 @@ from src.application.artifacts.write_artifact_use_case import (
 )
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.common.agent_status_publisher import publish_agent_status
-from src.application.tasks.task_use_cases import AssignTaskUseCase, MoveTaskUseCase
+from src.application.tasks.task_use_cases import AssignTaskUseCase, MoveTaskUseCase, open_load
 from src.domain.entities.agent import Agent, AgentStatus, Role
 from src.domain.entities.artifact import ArtifactType
 from src.domain.entities.chat import Session
@@ -25,6 +25,7 @@ from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.localization.language import Language, OfficeLanguage
+from src.domain.services.task_routing import EXECUTOR_ROLES, select_owner
 from src.domain.services.task_splitter import (
     distribute_extra_parts,
     parse_subtasks,
@@ -36,7 +37,6 @@ logger = logging.getLogger(__name__)
 
 _PLANNERS = (Role.PRODUCT_OWNER, Role.SCRUM_MASTER)
 _COORDINATORS = (Role.SCRUM_MASTER, Role.TECH_LEAD, Role.PRODUCT_OWNER)
-_WORKERS = (Role.DEV_SENIOR, Role.DEV_JUNIOR, Role.TECH_LEAD)
 _TESTERS = (Role.QA_ENGINEER,)
 _REVIEWERS = (Role.TECH_LEAD, Role.QA_ENGINEER)
 
@@ -150,7 +150,7 @@ class WorkLoopUseCase:
         workers = [
             a
             for a in await self._agents.list_all()
-            if a.role in _WORKERS and a.status != AgentStatus.OFFLINE
+            if a.role in EXECUTOR_ROLES and a.status != AgentStatus.OFFLINE
         ]
         open_count = len([t for t in await self._tasks.list_all() if t.status != TaskStatus.DONE])
         backlog = await self._split_for_team(backlog, max(0, len(workers) - open_count))
@@ -237,17 +237,19 @@ class WorkLoopUseCase:
             moved += 1
         return moved
 
-    # Bloco: respeita o responsável já definido; só troca se ele sumiu ou está offline.
+    # Bloco: respeita o responsável já definido; se sumiu ou está offline, usa um ocioso da área.
     async def _owner_or_idle(self, task: Task) -> Agent | None:
         owner = await self._assignee(task)
         if owner is not None and owner.status != AgentStatus.OFFLINE:
             return owner if owner.status == AgentStatus.IDLE else None
-        return await self._first(_WORKERS, idle=True)
+        return select_owner(
+            task, await self._agents.list_all(), await open_load(self._tasks), idle_only=True
+        )
 
     async def _work(self) -> int:
         for task in await self._tasks_in(TaskStatus.IN_PROGRESS):
             worker = await self._assignee(task)
-            if worker is None or worker.role not in _WORKERS:
+            if worker is None or worker.role not in EXECUTOR_ROLES:
                 continue
             prompt = _PROMPTS[self._language]["work"].format(
                 title=task.title, description=task.description

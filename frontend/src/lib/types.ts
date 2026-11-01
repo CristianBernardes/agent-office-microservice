@@ -81,6 +81,12 @@ export interface MoveTaskInput {
   to_status: TaskStatus;
   actor_id: string;
   actor_role: Role;
+  owner_override?: boolean;
+}
+
+export interface ActorInput {
+  actor_id: string;
+  actor_role: Role;
 }
 
 export const ROLES: readonly Role[] = [
@@ -103,3 +109,20 @@ export const KANBAN_COLUMNS: readonly TaskStatus[] = [
   "in_review",
   "done",
 ];
+
+export const PRIORITIES: readonly Priority[] = [
+  "urgent",
+  "high",
+  "medium",
+  "low",
+];
+
+export interface DismissalProposal {
+  proposal_id: string;
+  agent_id: string;
+  proposed_by: string;
+  reason: string;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+  decided_at: string | null;
+}

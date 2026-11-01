@@ -126,3 +126,17 @@ class MeetingId:
 
     def __str__(self) -> str:
         return str(self.value)
+
+
+# Bloco: identificador tipado de proposta de demissão.
+@dataclass(frozen=True, slots=True)
+class DismissalId:
+    value: UUID
+
+    @staticmethod
+    def generate() -> DismissalId:
+        """Cria um novo identificador de proposta de demissão, aleatório."""
+        return DismissalId(value=uuid4())
+
+    def __str__(self) -> str:
+        return str(self.value)

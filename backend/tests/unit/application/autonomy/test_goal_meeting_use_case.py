@@ -15,6 +15,7 @@ from src.application.autonomy.goal_meeting_use_case import (
     register_goal_autonomy,
 )
 from src.domain.entities.agent import Agent, Personality, Role
+from src.domain.entities.chat import MessageKind
 from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId, GoalId, SessionId
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
@@ -102,7 +103,7 @@ class TestGoalMeeting:
 
         await use_case.execute(data)
 
-        assert dispatch.languages == [Language.PT]
+        assert dispatch.languages == [Language.PT, Language.PT]  # fala + pergunta ao cliente
         assert "Objetivo do time" in dispatch.contexts[0]
 
     async def test_minutes_use_translated_role_names(self) -> None:
@@ -123,7 +124,8 @@ class TestGoalMeeting:
 
         order = [t.agent.role for t in turns]
         assert order == [r for r in MEETING_ORDER if r in roles]
-        assert len(chat.calls) == len(memory.calls) == 3
+        assert len(memory.calls) == 3
+        assert len(chat.calls) == 4  # 3 falas + a pergunta do PO ao cliente
         assert len(artifact.calls) == 1
         assert artifact.calls[0].path.endswith("/meeting.md")
         assert artifact.calls[0].author_role == Role.PRODUCT_OWNER
@@ -235,7 +237,7 @@ class TestDebateRounds:
         turns = await use_case.execute(_input())
 
         assert [t.agent.role for t in turns] == [Role.PRODUCT_OWNER, Role.TECH_LEAD] * 2
-        assert len(chat.calls) == 4
+        assert len(chat.calls) == 5  # 4 falas + a pergunta do PO ao cliente
         assert "Debate round 2" in dispatch.contexts[2]
         assert "Debate round" not in dispatch.contexts[0]
 
@@ -278,3 +280,28 @@ class TestSideEffectFailures:
         turns = await use_case.execute(_input())
 
         assert len(turns) == 2
+
+
+class TestClientQuestion:
+    async def test_po_takes_the_proposal_to_the_client_as_a_question(self) -> None:
+        use_case, dispatch, chat, *_ = await _build([Role.PRODUCT_OWNER, Role.TECH_LEAD])
+
+        await use_case.execute(_input())
+
+        assert chat.calls[-1].kind == MessageKind.QUESTION
+        assert chat.calls[-1].sender_id is not None
+        assert "client" in dispatch.contexts[-1].lower()
+
+    async def test_question_is_localized(self) -> None:
+        use_case, dispatch, *_ = await _build([Role.PRODUCT_OWNER], Language.PT)
+
+        await use_case.execute(_input())
+
+        assert "Como Product Owner" in dispatch.contexts[-1]
+
+    async def test_no_question_without_a_po(self) -> None:
+        use_case, _, chat, *_ = await _build([Role.TECH_LEAD])
+
+        await use_case.execute(_input())
+
+        assert all(c.kind != MessageKind.QUESTION for c in chat.calls)

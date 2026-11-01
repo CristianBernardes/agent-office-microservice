@@ -1,7 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ChatPanel from "./ChatPanel.svelte";
+import DismissalModal from "./DismissalModal.svelte";
 import DonationModal from "./DonationModal.svelte";
+import TaskEditModal from "./TaskEditModal.svelte";
 import HireForm from "./HireForm.svelte";
 import GoalForm from "./GoalForm.svelte";
 import KanbanBoard from "./KanbanBoard.svelte";
@@ -9,7 +11,7 @@ import LanguageSwitcher from "./LanguageSwitcher.svelte";
 import TaskForm from "./TaskForm.svelte";
 import TeamBoard from "./TeamBoard.svelte";
 import { i18n } from "../lib/i18n.svelte";
-import type { Agent, ChatMessage, Task } from "../lib/types";
+import type { Agent, ChatMessage, DismissalProposal, Task } from "../lib/types";
 
 const agent: Agent = {
   agent_id: "a1",
@@ -200,5 +202,195 @@ describe("componentes", () => {
       screen.getByRole("button", { name: "Contratar time padrão" }),
     );
     await waitFor(() => expect(onsubmit).toHaveBeenCalledTimes(6));
+  });
+});
+
+describe("poderes do dono do produto e demissões", () => {
+  it("TeamBoard demite só depois da confirmação", async () => {
+    const onfire = vi.fn().mockResolvedValue(undefined);
+    render(TeamBoard, {
+      agents: [agent],
+      tasks: [],
+      selectedId: null,
+      onselect: vi.fn(),
+      onfire,
+    });
+    await fireEvent.click(screen.getByRole("button", { name: /Demitir: Ana/ }));
+    expect(onfire).not.toHaveBeenCalled();
+    await fireEvent.click(screen.getByRole("button", { name: "Demitir" }));
+    await waitFor(() => expect(onfire).toHaveBeenCalledWith(agent));
+  });
+
+  it("TeamBoard cancela a demissão", async () => {
+    const onfire = vi.fn();
+    render(TeamBoard, {
+      agents: [agent],
+      tasks: [],
+      selectedId: null,
+      onselect: vi.fn(),
+      onfire,
+    });
+    await fireEvent.click(screen.getByRole("button", { name: /Demitir: Ana/ }));
+    await fireEvent.click(screen.getByRole("button", { name: "Cancelar" }));
+    expect(onfire).not.toHaveBeenCalled();
+  });
+
+  it("KanbanBoard move o cartão ao soltá-lo em outra coluna", async () => {
+    const onmove = vi.fn().mockResolvedValue(undefined);
+    render(KanbanBoard, { tasks: [task], agents: [agent], onmove });
+    const data = new Map<string, string>();
+    const dataTransfer = {
+      setData: (k: string, v: string) => data.set(k, v),
+      getData: (k: string) => data.get(k) ?? "",
+      effectAllowed: "",
+    };
+    await fireEvent.dragStart(
+      screen.getByText("Implementar API").closest("article")!,
+      {
+        dataTransfer,
+      },
+    );
+    await fireEvent.drop(screen.getByTestId("column-done"), { dataTransfer });
+    expect(onmove).toHaveBeenCalledWith(task, "done", agent);
+  });
+
+  it("KanbanBoard usa o PO como ator quando o responsável foi demitido", async () => {
+    const onmove = vi.fn().mockResolvedValue(undefined);
+    const po = { ...agent, agent_id: "po", role: "product_owner" } as Agent;
+    const fired = { ...agent, status: "offline" } as Agent;
+    render(KanbanBoard, { tasks: [task], agents: [fired, po], onmove });
+    await fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "done" },
+    });
+    expect(onmove).toHaveBeenCalledWith(task, "done", po);
+  });
+
+  it("KanbanBoard ordena por prioridade dentro da coluna", () => {
+    const low = {
+      ...task,
+      task_id: "l",
+      title: "Baixa",
+      priority: "low",
+    } as Task;
+    const urgent = {
+      ...task,
+      task_id: "u",
+      title: "Urgente!",
+      priority: "urgent",
+    } as Task;
+    render(KanbanBoard, {
+      tasks: [low, urgent],
+      agents: [agent],
+      onmove: vi.fn(),
+    });
+    const titles = screen
+      .getAllByRole("article")
+      .map((card) => card.querySelector("strong")?.textContent);
+    expect(titles).toEqual(["Urgente!", "Baixa"]);
+  });
+
+  it("TaskEditModal envia só o que mudou (responsável e prioridade)", async () => {
+    const onsave = vi.fn().mockResolvedValue(undefined);
+    const onclose = vi.fn();
+    const other = { ...agent, agent_id: "a2", name: "Bia" } as Agent;
+    render(TaskEditModal, { task, agents: [agent, other], onsave, onclose });
+    const [owner, priority] = screen.getAllByRole("combobox");
+    await fireEvent.change(owner, { target: { value: "a2" } });
+    await fireEvent.change(priority, { target: { value: "urgent" } });
+    await fireEvent.click(screen.getByRole("button", { name: "Salvar" }));
+    await waitFor(() =>
+      expect(onsave).toHaveBeenCalledWith(task, {
+        owner: "a2",
+        priority: "urgent",
+      }),
+    );
+    expect(onclose).toHaveBeenCalled();
+  });
+
+  it("TaskEditModal não chama a API sem mudanças", async () => {
+    const onsave = vi.fn();
+    const onclose = vi.fn();
+    render(TaskEditModal, { task, agents: [agent], onsave, onclose });
+    await fireEvent.click(screen.getByRole("button", { name: "Salvar" }));
+    expect(onsave).not.toHaveBeenCalled();
+    expect(onclose).toHaveBeenCalled();
+  });
+
+  it("ChatPanel deixa o cliente responder ao time", async () => {
+    const onsend = vi.fn().mockResolvedValue(undefined);
+    render(ChatPanel, { messages: [], agents: [agent], canSend: true, onsend });
+    const box = screen.getByRole("textbox");
+    await fireEvent.input(box, { target: { value: "Foque no Pix" } });
+    await fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+    await waitFor(() => expect(onsend).toHaveBeenCalledWith("Foque no Pix"));
+    expect((box as HTMLInputElement).value).toBe("");
+  });
+
+  it("ChatPanel bloqueia o envio sem objetivo aberto", () => {
+    render(ChatPanel, {
+      messages: [],
+      agents: [agent],
+      canSend: false,
+      onsend: vi.fn(),
+    });
+    expect(screen.getByRole("textbox")).toHaveProperty("disabled", true);
+  });
+
+  const proposal: DismissalProposal = {
+    proposal_id: "p1",
+    agent_id: "a1",
+    proposed_by: "hr",
+    reason: "Entregas atrasadas",
+    status: "pending",
+    created_at: "2026-01-01T00:00:00Z",
+    decided_at: null,
+  };
+  const hr = {
+    ...agent,
+    agent_id: "hr",
+    name: "Rita",
+    role: "hr_manager",
+  } as Agent;
+
+  it("DismissalModal mostra o motivo do RH e aprova", async () => {
+    const ondecide = vi.fn().mockResolvedValue(undefined);
+    render(DismissalModal, {
+      props: { proposal, target: agent, proposer: hr, ondecide },
+    });
+    expect(screen.getByRole("alertdialog")).toBeTruthy();
+    expect(document.body.textContent).toContain("Rita propõe demitir Ana");
+    expect(screen.getByTestId("dismissal-reason").textContent).toBe(
+      "Entregas atrasadas",
+    );
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Aprovar demissão" }),
+    );
+    await waitFor(() => expect(ondecide).toHaveBeenCalledWith(proposal, true));
+  });
+
+  it("DismissalModal rejeita e fala inglês quando o idioma é en", async () => {
+    i18n.set("en");
+    const ondecide = vi.fn().mockResolvedValue(undefined);
+    render(DismissalModal, {
+      props: { proposal, target: agent, proposer: hr, ondecide },
+    });
+    expect(document.body.textContent).toContain("Rita proposes dismissing Ana");
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Keep on the team" }),
+    );
+    await waitFor(() => expect(ondecide).toHaveBeenCalledWith(proposal, false));
+  });
+
+  it("DismissalModal não fecha no Esc e avisa quando a decisão falha", async () => {
+    const ondecide = vi.fn().mockRejectedValue(new Error("x"));
+    render(DismissalModal, {
+      props: { proposal, target: agent, proposer: hr, ondecide },
+    });
+    await fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.getByRole("alertdialog")).toBeTruthy();
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Aprovar demissão" }),
+    );
+    await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
   });
 });

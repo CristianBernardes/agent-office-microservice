@@ -15,6 +15,22 @@ entrega antes da revisão; reprovado, o cartão volta para `in_progress`. A migr
 `2026_10_31_000010_add_testing_task_status` amplia o domínio `task_status` (constraint `task_status_check`,
 validada em Postgres real).
 
+## Responsabilidades por cargo (ADR-054)
+
+| Cargo | Papel no fluxo |
+|---|---|
+| Product Owner | Conduz o planejamento, leva a proposta ao cliente (ADR-055), pode aprovar a entrega |
+| Scrum Master | Planeja e coordena (atribui e bloqueia cartões) |
+| Tech Lead | Executa tarefas de arquitetura/infra, coordena e revisa |
+| Dev Sênior / Júnior | Executam implementação (reserva para tarefas sem área definida) |
+| Analista de Dados | Executa tarefas de dados, SQL, métricas e estatística |
+| RH | Executa contratação/cultura; propõe demissões ao dono (ADR-056) |
+| Consultor de Produto | Executa pesquisa de mercado, concorrência e preço |
+| QA | Testa (`testing`) e revisa (`in_review`) |
+
+O dono do produto (usuário) pode mover qualquer cartão (`owner_override`), reatribuir, repriorizar e
+demitir; as ações são registradas em nome do PO.
+
 ## Princípios aplicados
 
 | Princípio | Onde |

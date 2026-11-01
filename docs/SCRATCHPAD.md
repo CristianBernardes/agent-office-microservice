@@ -823,7 +823,26 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 `master` fast-forward até `b95cfb6` (FUNDING.yml na branch padrão). Validação Mermaid pendente: exige instalar `mermaid`+`jsdom`, não autorizado.
 
-## Estado atual e ponto de retomada (após a Rodada 117)
+### Rodada 121 — Poderes do dono, roteamento por área, diálogo PO–cliente e demissão aprovada (ADR-054/055/056)
+
+- **Frontend:** botão "Demitir" (TeamBoard e mapa, com confirmação), Kanban com arrastar-e-soltar
+  (o dono ignora a matriz via `owner_override`), cartões ordenados por prioridade, modal de edição
+  (responsável/prioridade), resposta do cliente no chat e `DismissalModal` (pt/en) para aprovar/rejeitar
+  demissões propostas pelo RH.
+- **Backend:** `task_routing` (palavras-chave pt/en por cargo; RH/Analista/Consultor/Tech Lead/Dev
+  assumem o que é da sua área); `PUT /tasks/{id}/owner|priority`; `FireAgentUseCase` devolve o
+  trabalho ao fluxo e publica o status; `ClientDialogueUseCase`; `DismissalProposal` + migração
+  `000011` + rotas `/dismissals` + ferramenta `propose_dismissal` (só RH); prompts do RH pt/en.
+- **Ferramental:** `make format-frontend` falhava nos `.svelte` (prettier sem plugin): adicionados
+  `prettier` e `prettier-plugin-svelte` (devDependencies) e `frontend/.prettierrc.json`
+  (sem `;`, aspas simples, 120 colunas nos `.svelte`). Os `.svelte` foram reformatados uma vez.
+- **Validação:** backend 412 unit + 12 integração (Postgres real) ok, ruff/mypy limpos; frontend
+  `svelte-check` 0 erros, 79 testes, build ok.
+- **Limitações:** a resposta do cliente vira contexto/memória do PO, mas não reescreve o backlog já
+  criado; as demissões pendentes chegam ao frontend por polling (sem MQTT dedicado); a lista de
+  palavras-chave é fixa; o RH só propõe quando o LLM chama a ferramenta (sem rotina periódica).
+
+## Estado atual e ponto de retomada (após a Rodada 121)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -932,6 +951,9 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 118 | este commit | Makefile: alvos lint-go, test-go, build-go, lint-frontend, test-frontend, build-frontend, install-frontend e check-all | `make lint-go`, `make lint-frontend` e `make test-go` | `Makefile`, `docs/SCRATCHPAD.md` |
 | 119 | este commit | Containers recriados, banco refeito (`migrator fresh`) e seed de 11 agentes + 15 tarefas para testar a TAVILY_API_KEY | health 200, 11 agentes, 15 tarefas | `docs/SCRATCHPAD.md` |
 | 120 | este commit | Formatação prettier do frontend (`make format-frontend`) commitada | alterações apenas de formato | `frontend/src/**`, `docs/SCRATCHPAD.md` |
+| 121 | este commit | Demitir, arrastar/editar tarefas, roteamento por área, diálogo PO–cliente, demissão aprovada pelo dono (ADR-054/055/056); prettier com plugin Svelte | backend 412 unit + 12 integração; frontend 79 testes | `backend/src/**`, `frontend/src/**`, `docs/adr/05[4-6]*`, `docs/SCRATCHPAD.md` |
+| 122 | este commit | Artefatos `.md` de pesquisa regenerados pelos agentes (`clean-architecture`, `kafka`, `tema`) commitados | apenas conteúdo gerado | `backend/workspace/projects/workspace/research/*.md`, `docs/SCRATCHPAD.md` |
+| 123 | este commit | `develop` mesclada na `master` (rodadas 121–122: poderes do dono, roteamento por área, diálogo PO–cliente, demissão aprovada) | merge sem conflitos | `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 

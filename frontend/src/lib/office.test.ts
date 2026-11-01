@@ -36,6 +36,12 @@ function fakeApi(overrides: Partial<ApiClient> = {}): ApiClient {
     hireAgent: vi.fn(),
     listModels: vi.fn(),
     setOfficeLanguage: vi.fn(),
+    setTaskOwner: vi.fn(),
+    setTaskPriority: vi.fn(),
+    fireAgent: vi.fn(),
+    listPendingDismissals: vi.fn().mockResolvedValue([]),
+    decideDismissal: vi.fn(),
+    sendMessage: vi.fn(),
     ...overrides,
   };
 }
@@ -105,5 +111,18 @@ describe("OfficeStore", () => {
     store.replaceTask(task("t1", "done"));
     expect(store.tasksByStatus("done")).toHaveLength(1);
     expect(store.tasksByStatus("todo")).toHaveLength(0);
+  });
+
+  it("guarda a sessão do objetivo e as demissões pendentes", async () => {
+    const store = new OfficeStore();
+    const pending = [{ proposal_id: "p1" }];
+    await store.load(
+      fakeApi({
+        listGoals: vi.fn().mockResolvedValue([{ session_id: "s9" }]),
+        listPendingDismissals: vi.fn().mockResolvedValue(pending),
+      }),
+    );
+    expect(store.sessionId).toBe("s9");
+    expect(store.dismissals).toEqual(pending);
   });
 });
