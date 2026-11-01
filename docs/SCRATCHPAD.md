@@ -974,6 +974,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 123 | este commit | `develop` mesclada na `master` (rodadas 121–122: poderes do dono, roteamento por área, diálogo PO–cliente, demissão aprovada) | merge sem conflitos | `docs/SCRATCHPAD.md` |
 | 124 | este commit | READMEs pt/en: responsabilidades por cargo, poderes do dono do produto, demissão aprovada e rotas novas | documentação apenas | `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
 | 125 | este commit | Remove o CI/CD: workflow e selo de CI apagados; ADR-040/041 revogados | documentação e configuração | `.github/workflows/ci.yml`, `README*.md`, `docs/adr/*`, `docs/SCRATCHPAD.md` |
+| 126 | este commit | `develop` mesclada na `master`: o workflow de CI sai também da branch padrão | merge sem conflitos | `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 
