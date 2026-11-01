@@ -34,6 +34,7 @@ class CompleteTaskRequest(_ActorMixin):
 class MoveTaskRequest(_ActorMixin):
     to_status: TaskStatus
     note: str = Field(default="", max_length=1000)
+    owner_override: bool = False
 
 
 class TransitionResponse(BaseModel):
@@ -82,3 +83,11 @@ class TaskResponse(BaseModel):
             started_at=task.started_at,
             completed_at=task.completed_at,
         )
+
+
+class SetTaskOwnerRequest(_ActorMixin):
+    agent_id: UUID
+
+
+class SetTaskPriorityRequest(_ActorMixin):
+    priority: Priority

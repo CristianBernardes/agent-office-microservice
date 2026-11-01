@@ -20,9 +20,14 @@ from src.application.agents.hire_agent_use_case import HireAgentUseCase
 from src.application.artifacts.approve_artifact_use_case import ApproveArtifactUseCase
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
+from src.application.autonomy.client_dialogue_use_case import ClientDialogueUseCase
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.autonomy.work_loop_use_case import WorkLoopUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
+from src.application.dismissals.dismissal_use_cases import (
+    DecideDismissalUseCase,
+    ProposeDismissalUseCase,
+)
 from src.application.layout.layout_use_cases import GetLayoutUseCase, SaveLayoutUseCase
 from src.application.meetings.meeting_use_cases import (
     FinishMeetingUseCase,
@@ -40,12 +45,15 @@ from src.application.tasks.task_use_cases import (
     CompleteTaskUseCase,
     CreateTaskUseCase,
     MoveTaskUseCase,
+    SetTaskOwnerUseCase,
+    SetTaskPriorityUseCase,
 )
 from src.application.tools.tool_registry import ToolRegistry
 from src.domain.interfaces.activity_repository import IActivityRepository
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.artifact_repository import IArtifactRepository
 from src.domain.interfaces.chat_repository import IChatRepository
+from src.domain.interfaces.dismissal_repository import IDismissalRepository
 from src.domain.interfaces.layout_repository import ILayoutRepository
 from src.domain.interfaces.llm_adapter import ILlmAdapter
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
@@ -72,6 +80,9 @@ from src.infrastructure.persistence.in_memory_artifact_repository import (
     InMemoryArtifactRepository,
 )
 from src.infrastructure.persistence.in_memory_chat_repository import InMemoryChatRepository
+from src.infrastructure.persistence.in_memory_dismissal_repository import (
+    InMemoryDismissalRepository,
+)
 from src.infrastructure.persistence.in_memory_layout_repository import InMemoryLayoutRepository
 from src.infrastructure.persistence.in_memory_meeting_repository import (
     InMemoryMeetingRepository,
@@ -91,6 +102,9 @@ from src.infrastructure.persistence.postgres_artifact_repository import (
     PostgresArtifactRepository,
 )
 from src.infrastructure.persistence.postgres_chat_repository import PostgresChatRepository
+from src.infrastructure.persistence.postgres_dismissal_repository import (
+    PostgresDismissalRepository,
+)
 from src.infrastructure.persistence.postgres_layout_repository import PostgresLayoutRepository
 from src.infrastructure.persistence.postgres_meeting_repository import (
     PostgresMeetingRepository,
@@ -151,7 +165,11 @@ def get_hire_agent_use_case() -> HireAgentUseCase:
 # Bloco: factory do caso de uso de desligamento de agente.
 def get_fire_agent_use_case() -> FireAgentUseCase:
     """Monta o caso de uso de desligamento de agente com suas dependências."""
-    return FireAgentUseCase(agent_repository=get_agent_repository())
+    return FireAgentUseCase(
+        agent_repository=get_agent_repository(),
+        task_repository=get_task_repository(),
+        message_bus=get_message_bus(),
+    )
 
 
 # Bloco: exposição direta das configurações para rotas que precisem delas.
@@ -236,6 +254,30 @@ def get_get_layout_use_case() -> GetLayoutUseCase:
 
 def get_save_layout_use_case() -> SaveLayoutUseCase:
     return SaveLayoutUseCase(get_layout_repository())
+
+
+# Bloco: demissões propostas pelo RH e decididas pelo dono do produto (ADR-056).
+@lru_cache
+def get_dismissal_repository() -> IDismissalRepository:
+    if _use_postgres():
+        return PostgresDismissalRepository(_require_pool())
+    return InMemoryDismissalRepository()
+
+
+def get_propose_dismissal_use_case() -> ProposeDismissalUseCase:
+    return ProposeDismissalUseCase(
+        agent_repository=get_agent_repository(),
+        dismissal_repository=get_dismissal_repository(),
+        message_bus=get_message_bus(),
+    )
+
+
+def get_decide_dismissal_use_case() -> DecideDismissalUseCase:
+    return DecideDismissalUseCase(
+        dismissal_repository=get_dismissal_repository(),
+        fire_agent=get_fire_agent_use_case(),
+        message_bus=get_message_bus(),
+    )
 
 
 # Bloco: reuniões e cerimônias (ADR-028).
@@ -403,6 +445,20 @@ def get_move_task_use_case() -> MoveTaskUseCase:
     )
 
 
+def get_set_task_owner_use_case() -> SetTaskOwnerUseCase:
+    return SetTaskOwnerUseCase(
+        task_repository=get_task_repository(),
+        agent_repository=get_agent_repository(),
+        message_bus=get_message_bus(),
+    )
+
+
+def get_set_task_priority_use_case() -> SetTaskPriorityUseCase:
+    return SetTaskPriorityUseCase(
+        task_repository=get_task_repository(), message_bus=get_message_bus()
+    )
+
+
 # Bloco: registro de ferramentas (singleton por processo).
 # Composição central que liga os casos de uso de artefato e o adaptador de
 # busca web às ferramentas que os agentes podem invocar (ver Fase 3).
@@ -422,6 +478,7 @@ def get_tool_registry() -> ToolRegistry:
         default_llm_model=get_settings().ollama_model,
         start_ceremony_use_case=get_start_ceremony_use_case(),
         research_use_case=get_research_use_case(),
+        propose_dismissal_use_case=get_propose_dismissal_use_case(),
     )
 
 
@@ -493,6 +550,17 @@ def get_goal_meeting_use_case() -> GoalMeetingUseCase:
     )
 
 
+def get_client_dialogue_use_case() -> ClientDialogueUseCase:
+    return ClientDialogueUseCase(
+        agent_repository=get_agent_repository(),
+        chat_repository=get_chat_repository(),
+        dispatch_goal=get_dispatch_goal_use_case(),
+        send_message=get_send_message_use_case(),
+        remember=get_remember_use_case(),
+        language=get_settings().language(),
+    )
+
+
 # Bloco: factories de repositório com cache, descartadas quando a pool muda.
 _CACHED_REPOSITORY_FACTORIES = (
     get_agent_repository,
@@ -504,4 +572,5 @@ _CACHED_REPOSITORY_FACTORIES = (
     get_activity_repository,
     get_layout_repository,
     get_meeting_repository,
+    get_dismissal_repository,
 )

@@ -1,7 +1,9 @@
 import type {
   ActivityEvent,
+  ActorInput,
   Agent,
   ChatMessage,
+  DismissalProposal,
   Goal,
   HireAgentInput,
   Language,
@@ -41,6 +43,23 @@ export interface ApiClient {
   listMessages(sessionId: string): Promise<ChatMessage[]>;
   createGoal(text: string): Promise<Goal>;
   moveTask(taskId: string, input: MoveTaskInput): Promise<Task>;
+  setTaskOwner(
+    taskId: string,
+    agentId: string,
+    actor: ActorInput,
+  ): Promise<Task>;
+  setTaskPriority(
+    taskId: string,
+    priority: Priority,
+    actor: ActorInput,
+  ): Promise<Task>;
+  fireAgent(agentId: string): Promise<Agent>;
+  listPendingDismissals(): Promise<DismissalProposal[]>;
+  decideDismissal(
+    proposalId: string,
+    approved: boolean,
+  ): Promise<DismissalProposal>;
+  sendMessage(sessionId: string, content: string): Promise<ChatMessage>;
   createTask(input: CreateTaskInput): Promise<Task>;
   hireAgent(input: HireAgentInput): Promise<Agent>;
   listModels(): Promise<string[]>;
@@ -89,5 +108,25 @@ export function createApiClient(
     },
     hireAgent: (input) => post<Agent>("/agents", input),
     moveTask: (taskId, input) => post<Task>(`/tasks/${taskId}/move`, input),
+    setTaskOwner: (taskId, agentId, actor) =>
+      request<Task>(`/tasks/${taskId}/owner`, {
+        method: "PUT",
+        body: JSON.stringify({ agent_id: agentId, ...actor }),
+      }),
+    setTaskPriority: (taskId, priority, actor) =>
+      request<Task>(`/tasks/${taskId}/priority`, {
+        method: "PUT",
+        body: JSON.stringify({ priority, ...actor }),
+      }),
+    listPendingDismissals: () =>
+      request<DismissalProposal[]>("/dismissals?pending_only=true"),
+    decideDismissal: (proposalId, approved) =>
+      post<DismissalProposal>(
+        `/dismissals/${proposalId}/${approved ? "approve" : "reject"}`,
+        {},
+      ),
+    fireAgent: (agentId) => post<Agent>(`/agents/${agentId}/fire`, {}),
+    sendMessage: (sessionId, content) =>
+      post<ChatMessage>("/messages", { session_id: sessionId, content }),
   };
 }

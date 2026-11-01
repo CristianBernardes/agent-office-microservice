@@ -14,6 +14,8 @@ from src.application.tasks.task_use_cases import (
     CreateTaskInput,
     CreateTaskUseCase,
     MoveTaskUseCase,
+    SetTaskOwnerUseCase,
+    SetTaskPriorityUseCase,
 )
 from src.domain.exceptions.domain_exceptions import (
     InvalidStateTransitionError,
@@ -28,6 +30,8 @@ from src.presentation.api.task_schemas import (
     CompleteTaskRequest,
     CreateTaskRequest,
     MoveTaskRequest,
+    SetTaskOwnerRequest,
+    SetTaskPriorityRequest,
     TaskResponse,
     TransitionResponse,
 )
@@ -36,6 +40,8 @@ from src.presentation.dependencies import (
     get_complete_task_use_case,
     get_create_task_use_case,
     get_move_task_use_case,
+    get_set_task_owner_use_case,
+    get_set_task_priority_use_case,
     get_task_repository,
 )
 
@@ -135,6 +141,7 @@ async def move_task(
             AgentId(value=body.actor_id),
             body.actor_role,
             body.note,
+            body.owner_override,
         )
     except (TaskNotFoundError, InvalidStateTransitionError, PermissionDeniedError) as error:
         raise _http_error(error, language) from error
@@ -149,3 +156,40 @@ async def list_transitions(
     """Histórico de movimentos do cartão."""
     history = await repository.list_transitions(TaskId(value=task_id))
     return [TransitionResponse.from_entity(item) for item in history]
+
+
+@router.put("/{task_id}/owner", response_model=TaskResponse)
+async def set_task_owner(
+    task_id: UUID,
+    body: SetTaskOwnerRequest,
+    use_case: SetTaskOwnerUseCase = Depends(get_set_task_owner_use_case),
+    language: Language = Depends(get_request_language),
+) -> TaskResponse:
+    """Define o responsável sem mudar o estágio (404 inexistente, 409 agente offline)."""
+    try:
+        task = await use_case.execute(
+            TaskId(value=task_id),
+            AgentId(value=body.agent_id),
+            AgentId(value=body.actor_id),
+            body.actor_role,
+        )
+    except (TaskNotFoundError, AgentNotFoundError, InvalidStateTransitionError) as error:
+        raise _http_error(error, language) from error
+    return TaskResponse.from_entity(task)
+
+
+@router.put("/{task_id}/priority", response_model=TaskResponse)
+async def set_task_priority(
+    task_id: UUID,
+    body: SetTaskPriorityRequest,
+    use_case: SetTaskPriorityUseCase = Depends(get_set_task_priority_use_case),
+    language: Language = Depends(get_request_language),
+) -> TaskResponse:
+    """Redefine a prioridade da tarefa (404 se inexistente)."""
+    try:
+        task = await use_case.execute(
+            TaskId(value=task_id), body.priority, AgentId(value=body.actor_id), body.actor_role
+        )
+    except TaskNotFoundError as error:
+        raise _http_error(error, language) from error
+    return TaskResponse.from_entity(task)

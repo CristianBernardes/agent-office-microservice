@@ -21,6 +21,10 @@ from src.application.artifacts.write_artifact_use_case import (
     WriteArtifactUseCase,
 )
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
+from src.application.dismissals.dismissal_use_cases import (
+    ProposeDismissalInput,
+    ProposeDismissalUseCase,
+)
 from src.application.meetings.meeting_use_cases import (
     StartCeremonyInput,
     StartCeremonyUseCase,
@@ -88,6 +92,7 @@ class ToolRegistry:
         default_llm_model: str = "",
         start_ceremony_use_case: StartCeremonyUseCase | None = None,
         research_use_case: ResearchTopicUseCase | None = None,
+        propose_dismissal_use_case: ProposeDismissalUseCase | None = None,
     ) -> None:
         self._handlers: dict[ToolName, ToolHandler] = {
             ToolName.WRITE_ARTIFACT: self._make_write_artifact_handler(write_artifact_use_case),
@@ -111,6 +116,10 @@ class ToolRegistry:
             )
         if research_use_case is not None:
             self._handlers[ToolName.RESEARCH] = self._make_research_handler(research_use_case)
+        if propose_dismissal_use_case is not None:
+            self._handlers[ToolName.PROPOSE_DISMISSAL] = self._make_propose_dismissal_handler(
+                propose_dismissal_use_case
+            )
 
     async def execute(
         self,
@@ -262,6 +271,21 @@ class ToolRegistry:
                     role=Role(str(arguments["role"])),
                     personality=Personality(0.5, 0.5, 0.5, 0.5, 0.5),
                     llm_model=str(arguments.get("llm_model") or default_model),
+                )
+            )
+
+        return handler
+
+    @staticmethod
+    def _make_propose_dismissal_handler(use_case: ProposeDismissalUseCase) -> ToolHandler:
+        async def handler(
+            requester_id: AgentId, requester_role: Role, arguments: dict[str, object]
+        ) -> object:
+            return await use_case.execute(
+                ProposeDismissalInput(
+                    proposer_id=requester_id,
+                    agent_id=AgentId(value=UUID(str(arguments["agent_id"]))),
+                    reason=str(arguments.get("reason", "")),
                 )
             )
 

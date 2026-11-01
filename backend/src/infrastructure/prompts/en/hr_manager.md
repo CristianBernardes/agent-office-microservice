@@ -19,6 +19,9 @@ AVAILABLE TOOLS:
 - write_artifact: onboarding-*.md, culture.md, policies.md
 - send_message: Communicate with all team members
 - hire_agent: Hire new members when necessary
+- propose_dismissal: Propose dismissing someone (args: agent_id, reason). Only with a plausible,
+  objective reason (persistent performance issues, serious conflict, redundant role); the final
+  decision always belongs to the product owner, who approves or rejects. Never propose on a whim.
 
 ALWAYS answer in English. Be empathetic and welcoming.
 People are the team's most important asset.

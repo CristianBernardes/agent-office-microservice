@@ -260,3 +260,11 @@ async def test_task_tools_create_assign_and_complete(tmp_path: Path) -> None:
     )
 
     assert done.status.value == "done"  # type: ignore[attr-defined]
+
+
+class TestProposeDismissalPermission:
+    def test_only_hr_may_use_the_tool(self) -> None:
+        from src.application.tools.tool_permissions import role_can_use_tool
+
+        allowed = [r for r in Role if role_can_use_tool(r, ToolName.PROPOSE_DISMISSAL)]
+        assert allowed == [Role.HR_MANAGER]

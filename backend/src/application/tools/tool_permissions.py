@@ -30,6 +30,7 @@ class ToolName(str, Enum):
     HIRE_AGENT = "hire_agent"
     START_CEREMONY = "start_ceremony"
     RESEARCH = "research"
+    PROPOSE_DISMISSAL = "propose_dismissal"
 
 
 # Bloco: tabela de permissões por papel.
@@ -124,6 +125,7 @@ ROLE_TOOL_PERMISSIONS: dict[Role, frozenset[ToolName]] = {
             ToolName.COMPLETE_TASK,
             ToolName.SEND_MESSAGE,
             ToolName.HIRE_AGENT,
+            ToolName.PROPOSE_DISMISSAL,
         }
     ),
     Role.PRODUCT_CONSULTANT: frozenset(

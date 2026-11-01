@@ -48,10 +48,22 @@
 {/if}
 
 <style>
-  .switcher { display: inline-flex; gap: 4px; }
-  button {
-    border: 1px solid var(--border); background: var(--panel); color: inherit;
-    padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight: 600;
+  .switcher {
+    display: inline-flex;
+    gap: 4px;
   }
-  button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: inherit;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
 </style>

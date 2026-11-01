@@ -12,6 +12,8 @@ from src.application.tasks.task_use_cases import (
     CreateTaskInput,
     CreateTaskUseCase,
     MoveTaskUseCase,
+    SetTaskOwnerUseCase,
+    SetTaskPriorityUseCase,
 )
 from src.domain.entities.agent import Agent, AgentStatus, Personality, Role
 from src.domain.entities.task import Priority, TaskStatus
@@ -255,3 +257,83 @@ class TestOwnerRule:
         stored = await tasks.find_by_id(task_id)
         assert stored is not None and stored.status == TaskStatus.BACKLOG
         assert stored.assigned_to is None
+
+
+async def _specialist(repo: InMemoryAgentRepository, role: Role) -> Agent:
+    agent = Agent(AgentId.generate(), role.value, role, Personality(0.5, 0.5, 0.5, 0.5, 0.5), "m")
+    await repo.save(agent)
+    return agent
+
+
+class TestAreaRoutingAndOwnerOverride:
+    async def test_hiring_task_goes_to_hr_when_it_leaves_the_backlog(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        await _agent(agents)
+        hr = await _specialist(agents, Role.HR_MANAGER)
+        task = await CreateTaskUseCase(tasks, bus).execute(
+            CreateTaskInput("Contratar um DBA", "", Priority.HIGH, PO, Role.PRODUCT_OWNER)
+        )
+        moved = await MoveTaskUseCase(tasks, bus, agents).execute(
+            task.task_id, TaskStatus.TODO, PO, Role.PRODUCT_OWNER
+        )
+        assert moved.assigned_to == hr.agent_id
+
+    async def test_owner_override_ignores_the_permission_matrix(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        dev = await _agent(agents)
+        task_id = await _create(tasks, bus)
+        move = MoveTaskUseCase(tasks, bus, agents)
+        with pytest.raises(InvalidStateTransitionError):
+            await move.execute(task_id, TaskStatus.DONE, dev.agent_id, Role.DEV_SENIOR)
+        done = await move.execute(
+            task_id, TaskStatus.DONE, dev.agent_id, Role.DEV_SENIOR, owner_override=True
+        )
+        assert done.status == TaskStatus.DONE
+        assert done.completed_at is not None
+
+    async def test_override_back_to_todo_releases_the_working_owner(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        dev, task_id = await _agent(agents), await _create(tasks, bus)
+        await AssignTaskUseCase(tasks, agents, bus).execute(
+            task_id, dev.agent_id, PO, Role.PRODUCT_OWNER
+        )
+        await MoveTaskUseCase(tasks, bus, agents).execute(
+            task_id, TaskStatus.TODO, PO, Role.PRODUCT_OWNER, owner_override=True
+        )
+        refreshed = await agents.find_by_id(dev.agent_id)
+        assert refreshed is not None
+        assert refreshed.status == AgentStatus.IDLE
+
+    async def test_set_owner_keeps_the_stage(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        analyst = await _specialist(agents, Role.DATA_ANALYST)
+        task_id = await _create(tasks, bus)
+        updated = await SetTaskOwnerUseCase(tasks, agents, bus).execute(
+            task_id, analyst.agent_id, PO, Role.PRODUCT_OWNER
+        )
+        assert updated.assigned_to == analyst.agent_id
+        assert updated.status == TaskStatus.BACKLOG
+
+    async def test_set_owner_rejects_offline_and_unknown_agents(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        gone = await _specialist(agents, Role.HR_MANAGER)
+        gone.go_offline()
+        await agents.save(gone)
+        task_id = await _create(tasks, bus)
+        use_case = SetTaskOwnerUseCase(tasks, agents, bus)
+        with pytest.raises(InvalidStateTransitionError):
+            await use_case.execute(task_id, gone.agent_id, PO, Role.PRODUCT_OWNER)
+        with pytest.raises(AgentNotFoundError):
+            await use_case.execute(task_id, AgentId.generate(), PO, Role.PRODUCT_OWNER)
+
+    async def test_set_priority(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, _, bus = world
+        task_id = await _create(tasks, bus)
+        updated = await SetTaskPriorityUseCase(tasks, bus).execute(
+            task_id, Priority.URGENT, PO, Role.PRODUCT_OWNER
+        )
+        assert updated.priority == Priority.URGENT
+        with pytest.raises(TaskNotFoundError):
+            await SetTaskPriorityUseCase(tasks, bus).execute(
+                TaskId.generate(), Priority.LOW, PO, Role.PRODUCT_OWNER
+            )

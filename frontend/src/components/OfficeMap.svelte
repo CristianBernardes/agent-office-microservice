@@ -2,7 +2,16 @@
   import AgentSprite from './AgentSprite.svelte'
   import { i18n } from '../lib/i18n.svelte'
   import { onMount } from 'svelte'
-  import { MAP_HEIGHT, MAP_WIDTH, directionBetween, hueFor, meetingPoint, pickBreak, pickMeeting, placeAgents } from '../lib/layout'
+  import {
+    MAP_HEIGHT,
+    MAP_WIDTH,
+    directionBetween,
+    hueFor,
+    meetingPoint,
+    pickBreak,
+    pickMeeting,
+    placeAgents,
+  } from '../lib/layout'
   import type { Direction } from '../lib/sprites'
   import type { Agent } from '../lib/types'
 
@@ -50,7 +59,8 @@
     later(() => (trips[walker] = { ...point, phase: 'chatting', dir: 'down' }), walkMs)
     later(() => {
       const seat = placements.find((p) => p.agent.agent_id === walker)
-      if (seat) trips[walker] = { left: seat.left, top: seat.top, phase: 'returning', dir: directionBetween(point, seat) }
+      if (seat)
+        trips[walker] = { left: seat.left, top: seat.top, phase: 'returning', dir: directionBetween(point, seat) }
     }, walkMs + chatMs)
     later(() => delete trips[walker], 2 * walkMs + chatMs)
   }
@@ -103,7 +113,13 @@
           <span class="bubble break" role="status">{breaks[agent.agent_id].text}</span>
         {/if}
         <AgentSprite
-          agent={trip?.phase === 'chatting' ? { ...agent, status: 'talking' } : breaks[agent.agent_id]?.kind === 'think' ? { ...agent, status: 'thinking' } : breaks[agent.agent_id]?.kind === 'rest' ? { ...agent, status: 'idle' } : agent}
+          agent={trip?.phase === 'chatting'
+            ? { ...agent, status: 'talking' }
+            : breaks[agent.agent_id]?.kind === 'think'
+              ? { ...agent, status: 'thinking' }
+              : breaks[agent.agent_id]?.kind === 'rest'
+                ? { ...agent, status: 'idle' }
+                : agent}
           walking={trip?.phase === 'walking' || trip?.phase === 'returning'}
           hue={hueFor(variant)}
           direction={trip?.dir ?? 'down'}
@@ -120,29 +136,78 @@
 </section>
 
 <style>
-  .map-wrap { position: relative; }
+  .map-wrap {
+    position: relative;
+  }
   .map {
-    position: relative; width: 100%;
+    position: relative;
+    width: 100%;
     background: url('/images/sprites/office/escritorio_moderno.png') center / 100% 100% no-repeat;
-    image-rendering: pixelated; border-radius: 8px; overflow: hidden;
+    image-rendering: pixelated;
+    border-radius: 8px;
+    overflow: hidden;
   }
   .agent {
-    position: absolute; transform: translate(-50%, -100%) scale(0.7); transform-origin: bottom center;
-    display: flex; flex-direction: column; align-items: center;
-    background: none; border: 0; padding: 0; color: inherit; cursor: pointer;
+    position: absolute;
+    transform: translate(-50%, -100%) scale(0.7);
+    transform-origin: bottom center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
   }
-  .agent.moving { transition: left var(--walk) linear, top var(--walk) linear; z-index: 2; }
-  .role { font-size: 10px; background: rgba(0, 0, 0, 0.55); color: #ddd; padding: 0 5px; border-radius: 4px; white-space: nowrap; }
-  .agent.selected .name { background: var(--accent); }
+  .agent.moving {
+    transition:
+      left var(--walk) linear,
+      top var(--walk) linear;
+    z-index: 2;
+  }
+  .role {
+    font-size: 10px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ddd;
+    padding: 0 5px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .agent.selected .name {
+    background: var(--accent);
+  }
   .name {
-    font-size: 12px; background: rgba(0, 0, 0, 0.7); color: #fff; padding: 1px 6px;
-    border-radius: 4px; white-space: nowrap; margin-top: 2px;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
   }
   .bubble {
-    position: absolute; bottom: 110%; width: max-content; max-width: 220px;
-    background: #fff; color: #111; font-size: 12px; padding: 6px 8px; border-radius: 8px;
-    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical;
+    position: absolute;
+    bottom: 110%;
+    width: max-content;
+    max-width: 220px;
+    background: #fff;
+    color: #111;
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
   }
-  .bubble.break { background: #fff8e1; font-style: italic; }
-  .empty { text-align: center; opacity: 0.7; }
+  .bubble.break {
+    background: #fff8e1;
+    font-style: italic;
+  }
+  .empty {
+    text-align: center;
+    opacity: 0.7;
+  }
 </style>

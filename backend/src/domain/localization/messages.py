@@ -73,6 +73,38 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "Agent '{name}' is OFFLINE and cannot start thinking.",
         Language.PT: "Agente '{name}' está OFFLINE e não pode iniciar um pensamento.",
     },
+    "dismissal.propose_forbidden": {
+        Language.EN: "Role '{role}' cannot propose dismissals — only HR can.",
+        Language.PT: "O papel '{role}' não pode propor demissões — só o RH pode.",
+    },
+    "dismissal.reason_required": {
+        Language.EN: "A dismissal proposal needs a reason.",
+        Language.PT: "Uma proposta de demissão precisa de um motivo.",
+    },
+    "dismissal.cannot_propose_self": {
+        Language.EN: "HR cannot propose the dismissal of '{name}' (themselves).",
+        Language.PT: "O RH não pode propor a própria demissão ('{name}').",
+    },
+    "dismissal.already_offline": {
+        Language.EN: "Agent '{name}' is already OFFLINE.",
+        Language.PT: "O agente '{name}' já está OFFLINE.",
+    },
+    "dismissal.already_pending": {
+        Language.EN: "There is already a pending dismissal proposal for '{name}'.",
+        Language.PT: "Já existe uma proposta de demissão pendente para '{name}'.",
+    },
+    "dismissal.already_decided": {
+        Language.EN: "Dismissal proposal '{proposal_id}' was already decided ('{status}').",
+        Language.PT: "A proposta de demissão '{proposal_id}' já foi decidida ('{status}').",
+    },
+    "dismissal.not_found": {
+        Language.EN: "Dismissal proposal with ID '{proposal_id}' was not found.",
+        Language.PT: "Proposta de demissão com ID '{proposal_id}' não foi encontrada.",
+    },
+    "agent.offline_cannot_own": {
+        Language.EN: "Agent '{name}' is OFFLINE and cannot own tasks.",
+        Language.PT: "Agente '{name}' está OFFLINE e não pode ser responsável por tarefas.",
+    },
     "agent.not_thinking": {
         Language.EN: "Agent '{name}' is '{status}' and is not thinking.",
         Language.PT: "Agente '{name}' está '{status}' e não está pensando.",

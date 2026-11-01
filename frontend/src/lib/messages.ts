@@ -65,6 +65,23 @@ export interface Messages {
   taskCreate: string;
   taskNeedsAgent: string;
   taskCreated: string;
+  fire: string;
+  fireTitle: string;
+  fireMessage: string;
+  fireConfirm: string;
+  taskEdit: string;
+  taskOwner: string;
+  taskPriority: string;
+  taskSave: string;
+  taskDragHint: string;
+  chatPlaceholder: string;
+  chatSend: string;
+  chatNeedsGoal: string;
+  dismissalTitle: string;
+  dismissalMessage: string;
+  dismissalReason: string;
+  dismissalApprove: string;
+  dismissalReject: string;
   noMessages: string;
   logs: string;
   noLogs: string;
@@ -156,6 +173,25 @@ export const pt: Messages = {
   taskCreate: "Criar e enviar ao time",
   taskNeedsAgent: "Contrate um agente antes de criar tarefas.",
   taskCreated: "Tarefa criada e enviada ao time!",
+  fire: "Demitir",
+  fireTitle: "Demitir profissional?",
+  fireMessage:
+    '{name} sairá do time e as tarefas abertas dele voltarão para "A fazer" para outro profissional da mesma área. Deseja continuar?',
+  fireConfirm: "Demitir",
+  taskEdit: "Editar tarefa",
+  taskOwner: "Responsável",
+  taskPriority: "Prioridade",
+  taskSave: "Salvar",
+  taskDragHint: "Arraste o cartão para outra coluna",
+  chatPlaceholder: "Responda ao time (o Product Owner conversa com você aqui)…",
+  chatSend: "Enviar",
+  chatNeedsGoal: "Envie um objetivo para abrir a conversa com o time.",
+  dismissalTitle: "Proposta de demissão",
+  dismissalMessage:
+    "{hr} propõe demitir {name} ({role}). A decisão final é sua.",
+  dismissalReason: "Motivo apresentado pelo RH",
+  dismissalApprove: "Aprovar demissão",
+  dismissalReject: "Manter no time",
   noMessages: "Nenhuma conversa ainda.",
   logs: "Logs em tempo real",
   noLogs: "Aguardando eventos…",
@@ -277,6 +313,25 @@ export const en: Messages = {
   taskCreate: "Create and send to the team",
   taskNeedsAgent: "Hire an agent before creating tasks.",
   taskCreated: "Task created and sent to the team!",
+  fire: "Fire",
+  fireTitle: "Fire this professional?",
+  fireMessage:
+    '{name} will leave the team and their open tasks go back to "To do" for another professional in the same area. Do you want to continue?',
+  fireConfirm: "Fire",
+  taskEdit: "Edit task",
+  taskOwner: "Owner",
+  taskPriority: "Priority",
+  taskSave: "Save",
+  taskDragHint: "Drag the card to another column",
+  chatPlaceholder: "Reply to the team (the Product Owner talks to you here)…",
+  chatSend: "Send",
+  chatNeedsGoal: "Send a goal to open the conversation with the team.",
+  dismissalTitle: "Dismissal proposal",
+  dismissalMessage:
+    "{hr} proposes dismissing {name} ({role}). The final decision is yours.",
+  dismissalReason: "Reason given by HR",
+  dismissalApprove: "Approve dismissal",
+  dismissalReject: "Keep on the team",
   noMessages: "No conversations yet.",
   logs: "Live logs",
   noLogs: "Waiting for events…",
