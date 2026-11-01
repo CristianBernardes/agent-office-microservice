@@ -153,13 +153,33 @@ ferramentas permitidas:
 | **Dev Sênior** | Implementação, code review, mentoria |
 | **Dev Júnior** | Tarefas simples, aprendizado |
 | **QA Engineer** | Planos de teste, bug reports |
-| **Analista de Dados** | Métricas, KPIs, análises |
-| **Gerente de RH** | Onboarding, cultura, contratações |
-| **Consultor de Produto** | Validação de mercado, pesquisa |
+| **Analista de Dados** | Dados, SQL, métricas, KPIs, análises |
+| **Gerente de RH** | Contratações, onboarding, cultura; **propõe demissões** ao dono do produto |
+| **Consultor de Produto** | Validação de mercado, concorrência, preço, pesquisa |
 
 Cada papel só pode usar as ferramentas que lhe foram atribuídas (ex.: só Tech Lead e Product Owner
 podem `approve_artifact`; só Scrum Master pode `start_ceremony`) — a validação de permissão é
 centralizada e nunca delegada ao LLM.
+
+### Cada um pega o que é da sua área
+
+Ao sair do backlog, a tarefa vai para o profissional cuja área combina com ela, por palavras-chave em
+português e inglês: *contratar* → RH, *analisar dados / SQL* → Analista de Dados, *mercado /
+concorrentes* → Consultor de Produto, *arquitetura / deploy* → Tech Lead, *implementar / API* → Dev.
+Sem área reconhecida, a tarefa cai nos devs e no Tech Lead (o menos carregado). QA testa e revisa; PO e
+Scrum Master planejam e coordenam. Ver [ADR-054](docs/adr/054-responsabilidades-por-cargo-e-poderes-do-dono.md).
+
+### Você é o dono do produto
+
+- **Quadro Kanban:** arraste os cartões entre as colunas (você ignora a matriz de permissões por
+  cargo), reatribua o responsável e redefina a prioridade em "Editar tarefa".
+- **Conversa com o PO:** o time debate, e o PO leva a proposta a você como pergunta no chat; o time
+  segue com um plano provisório e você responde pelo campo do chat
+  ([ADR-055](docs/adr/055-dialogo-do-po-com-o-cliente.md)).
+- **Demissões:** o botão **Demitir** (lista do time e mapa) pede confirmação e devolve as tarefas
+  abertas ao fluxo. O RH também pode *propor* uma demissão com motivo: aparece um modal para você
+  aprovar ou manter a pessoa no time — nada é demitido sem a sua decisão
+  ([ADR-056](docs/adr/056-demissao-com-aprovacao-do-dono.md)).
 
 ## Como os Agentes Trabalham
 
@@ -397,8 +417,9 @@ Contrato completo: [RFC-004](docs/rfc/004-contrato-da-api-http.md).
 |---|---|
 | `GET /health` | Saúde do serviço |
 | `/agents` (+ `/fire`, `/think`, `/memories`, `/relationships`) | Time, raciocínio, memória e vínculos |
+| `/dismissals` (+ `/approve`, `/reject`) | Demissões propostas pelo RH, decididas pelo dono do produto |
 | `/relationships/interactions` | Registra interação entre dois agentes |
-| `/tasks` (+ `/assign`, `/complete`, `/move`, `/transitions`) | Kanban com permissões por papel |
+| `/tasks` (+ `/assign`, `/complete`, `/move`, `/owner`, `/priority`, `/transitions`) | Kanban com permissões por papel; `/move` aceita `owner_override` |
 | `/goals`, `/messages`, `/sessions/{id}/messages` | Objetivos do usuário e chat |
 | `/meetings` (+ `/finish`), `/goals/{id}/meetings` | Reuniões e cerimônias |
 | `POST /research` | Agente pesquisa na web e gera um `.md` |

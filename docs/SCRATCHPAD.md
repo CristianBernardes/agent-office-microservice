@@ -842,7 +842,15 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   criado; as demissões pendentes chegam ao frontend por polling (sem MQTT dedicado); a lista de
   palavras-chave é fixa; o RH só propõe quando o LLM chama a ferramenta (sem rotina periódica).
 
-## Estado atual e ponto de retomada (após a Rodada 121)
+### Rodada 124 — READMEs pt/en
+
+- Tabela do time atualizada (RH propõe demissões; Analista de Dados e Consultor com as novas áreas).
+- Novas seções "Cada um pega o que é da sua área" e "Você é o dono do produto" (arrastar cartões,
+  editar responsável/prioridade, conversa com o PO, demitir e aprovar/rejeitar propostas do RH).
+- Tabela da API: `/dismissals` e `/tasks` com `/owner`, `/priority` e `owner_override`.
+- Apenas documentação (sem testes a rodar).
+
+## Estado atual e ponto de retomada (após a Rodada 124)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -954,6 +962,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 121 | este commit | Demitir, arrastar/editar tarefas, roteamento por área, diálogo PO–cliente, demissão aprovada pelo dono (ADR-054/055/056); prettier com plugin Svelte | backend 412 unit + 12 integração; frontend 79 testes | `backend/src/**`, `frontend/src/**`, `docs/adr/05[4-6]*`, `docs/SCRATCHPAD.md` |
 | 122 | este commit | Artefatos `.md` de pesquisa regenerados pelos agentes (`clean-architecture`, `kafka`, `tema`) commitados | apenas conteúdo gerado | `backend/workspace/projects/workspace/research/*.md`, `docs/SCRATCHPAD.md` |
 | 123 | este commit | `develop` mesclada na `master` (rodadas 121–122: poderes do dono, roteamento por área, diálogo PO–cliente, demissão aprovada) | merge sem conflitos | `docs/SCRATCHPAD.md` |
+| 124 | este commit | READMEs pt/en: responsabilidades por cargo, poderes do dono do produto, demissão aprovada e rotas novas | documentação apenas | `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 
