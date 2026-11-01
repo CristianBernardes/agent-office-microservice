@@ -4,7 +4,6 @@
 
 <div align="center">
 
-[![CI](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml/badge.svg)](https://github.com/CristianBernardes/agent-office-microservice/actions/workflows/ci.yml)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-green.svg)](./LICENSE) [![Doar](https://img.shields.io/badge/apoie-Pix%20%7C%20PayPal-ff69b4.svg)](#-antes-de-clonar-ou-fazer-fork--ajude-a-manter-este-projeto-vivo)
 
 </div>

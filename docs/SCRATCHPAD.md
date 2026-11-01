@@ -850,7 +850,17 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - Tabela da API: `/dismissals` e `/tasks` com `/owner`, `/priority` e `owner_override`.
 - Apenas documentação (sem testes a rodar).
 
-## Estado atual e ponto de retomada (após a Rodada 124)
+### Rodada 125 — Remoção do CI/CD (ADR-040/041 revogados)
+
+- Decisão do dono do produto: o projeto **não terá CI/CD**. Removidos `.github/workflows/ci.yml` e o selo
+  de CI dos READMEs pt/en; ADR-040 e ADR-041 marcados como *Revogado* (histórico mantido). O item de
+  backlog "testes de integração no CI" foi apagado.
+- Mantidos: `.github/FUNDING.yml` (botão Sponsor) e o piso de cobertura de 85% do `pyproject` (rodado
+  localmente por `make check`). Os documentos históricos de `docs/migration-plan/` (fases 6 e 7) ainda
+  descrevem CI/CD como plano original e não foram reescritos.
+- Rodadas 43, 44 e 47 acima ficam como histórico.
+
+## Estado atual e ponto de retomada (após a Rodada 125)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -963,6 +973,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 122 | este commit | Artefatos `.md` de pesquisa regenerados pelos agentes (`clean-architecture`, `kafka`, `tema`) commitados | apenas conteúdo gerado | `backend/workspace/projects/workspace/research/*.md`, `docs/SCRATCHPAD.md` |
 | 123 | este commit | `develop` mesclada na `master` (rodadas 121–122: poderes do dono, roteamento por área, diálogo PO–cliente, demissão aprovada) | merge sem conflitos | `docs/SCRATCHPAD.md` |
 | 124 | este commit | READMEs pt/en: responsabilidades por cargo, poderes do dono do produto, demissão aprovada e rotas novas | documentação apenas | `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
+| 125 | este commit | Remove o CI/CD: workflow e selo de CI apagados; ADR-040/041 revogados | documentação e configuração | `.github/workflows/ci.yml`, `README*.md`, `docs/adr/*`, `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 
@@ -982,7 +993,6 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 
 1. Validar o Mermaid por renderização quando houver ambiente com Chromium.
 2. Mais guardas de saída de LLM (descrições, atas) além dos títulos.
-3. Testes de integração com Postgres real no CI.
 
 ### Regras a lembrar
 
