@@ -104,7 +104,13 @@
   {#if showCharts}<KaizenChartsModal {tasks} {now} onclose={() => (showCharts = false)} />{/if}
   {#if failed}<p role="alert">{i18n.t.loadError}</p>{/if}
   {#if editing}
-    <TaskEditModal task={editing} agents={active} onsave={saveEdit} ondelete={ondelete ? removeTask : undefined} onclose={() => (editing = null)} />
+    <TaskEditModal
+      task={editing}
+      agents={active}
+      onsave={saveEdit}
+      ondelete={ondelete ? removeTask : undefined}
+      onclose={() => (editing = null)}
+    />
   {/if}
   <div class="columns">
     {#each KANBAN_COLUMNS as column (column)}

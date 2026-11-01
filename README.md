@@ -171,7 +171,8 @@ Scrum Master planejam e coordenam. Ver [ADR-054](docs/adr/054-responsabilidades-
 ### Você é o dono do produto
 
 - **Quadro Kanban:** arraste os cartões entre as colunas (você ignora a matriz de permissões por
-  cargo), reatribua o responsável e redefina a prioridade em "Editar tarefa".
+  cargo), reatribua o responsável, redefina a prioridade e **exclua tarefas** (por exemplo, as que os
+  agentes alucinaram) em "Editar tarefa", com confirmação.
 - **Conversa com o PO:** o time debate, e o PO leva a proposta a você como pergunta no chat; o time
   segue com um plano provisório e você responde pelo campo do chat
   ([ADR-055](docs/adr/055-dialogo-do-po-com-o-cliente.md)).
@@ -418,7 +419,7 @@ Contrato completo: [RFC-004](docs/rfc/004-contrato-da-api-http.md).
 | `/agents` (+ `/fire`, `/think`, `/memories`, `/relationships`) | Time, raciocínio, memória e vínculos |
 | `/dismissals` (+ `/approve`, `/reject`) | Demissões propostas pelo RH, decididas pelo dono do produto |
 | `/relationships/interactions` | Registra interação entre dois agentes |
-| `/tasks` (+ `/assign`, `/complete`, `/move`, `/owner`, `/priority`, `/transitions`) | Kanban com permissões por papel; `/move` aceita `owner_override` |
+| `/tasks` (+ `/assign`, `/complete`, `/move`, `/owner`, `/priority`, `/transitions`, `DELETE /tasks/{id}`) | Kanban com permissões por papel; `/move` aceita `owner_override`; `DELETE` exclui a tarefa |
 | `/goals`, `/messages`, `/sessions/{id}/messages` | Objetivos do usuário e chat |
 | `/meetings` (+ `/finish`), `/goals/{id}/meetings` | Reuniões e cerimônias |
 | `POST /research` | Agente pesquisa na web e gera um `.md` |
