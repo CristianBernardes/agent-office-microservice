@@ -36,8 +36,12 @@ _PROMPT_FILENAME_BY_ROLE: dict[Role, str] = {
 # Bloco: diretiva final e explícita de idioma — modelos tendem a derivar para o inglês.
 _LANGUAGE_DIRECTIVE: dict[Language, str] = {
     Language.PT: "\n\nIMPORTANTE: responda SEMPRE em português do Brasil, mesmo que o "
-    "contexto ou os termos técnicos estejam em inglês.",
-    Language.EN: "\n\nIMPORTANT: ALWAYS answer in English.",
+    "contexto ou os termos técnicos estejam em inglês. Escreva somente o resultado final "
+    "pedido, diretamente, sem comentar como você vai responder, sem discutir formato de "
+    "ferramentas e sem nenhum texto de raciocínio interno antes do conteúdo.",
+    Language.EN: "\n\nIMPORTANT: ALWAYS answer in English. Write only the final requested "
+    "result, directly, with no commentary about how you will answer, no discussion of tool "
+    "formats, and no internal reasoning text before the content.",
 }
 
 

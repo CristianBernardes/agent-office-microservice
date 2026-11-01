@@ -10,12 +10,14 @@
     agents,
     onmove,
     onupdate,
+    ondelete,
     wipLimits = {},
   }: {
     tasks: Task[]
     agents: Agent[]
     onmove: (task: Task, to: TaskStatus, actor: Agent) => Promise<void>
     onupdate?: (task: Task, changes: { owner?: string; priority?: Priority }) => Promise<void>
+    ondelete?: (task: Task) => Promise<void>
     wipLimits?: WipLimits
   } = $props()
 
@@ -77,6 +79,10 @@
     if (task) await move(task, column)
   }
 
+  async function removeTask(task: Task) {
+    await ondelete?.(task)
+  }
+
   async function saveEdit(task: Task, changes: { owner?: string; priority?: Priority }) {
     await onupdate?.(task, changes)
   }
@@ -98,7 +104,7 @@
   {#if showCharts}<KaizenChartsModal {tasks} {now} onclose={() => (showCharts = false)} />{/if}
   {#if failed}<p role="alert">{i18n.t.loadError}</p>{/if}
   {#if editing}
-    <TaskEditModal task={editing} agents={active} onsave={saveEdit} onclose={() => (editing = null)} />
+    <TaskEditModal task={editing} agents={active} onsave={saveEdit} ondelete={ondelete ? removeTask : undefined} onclose={() => (editing = null)} />
   {/if}
   <div class="columns">
     {#each KANBAN_COLUMNS as column (column)}

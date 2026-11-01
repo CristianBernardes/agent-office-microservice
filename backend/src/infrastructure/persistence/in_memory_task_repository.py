@@ -25,6 +25,11 @@ class InMemoryTaskRepository(ITaskRepository):
         """Retorna todas as tarefas persistidas."""
         return list(self._tasks_by_id.values())
 
+    async def delete(self, task_id: TaskId) -> None:
+        """Remove a tarefa e seu histórico."""
+        self._tasks_by_id.pop(task_id, None)
+        self._transitions = [t for t in self._transitions if t.task_id != task_id]
+
     async def add_transition(self, transition: TaskTransition) -> None:
         """Acrescenta o movimento ao histórico em memória."""
         self._transitions.append(transition)

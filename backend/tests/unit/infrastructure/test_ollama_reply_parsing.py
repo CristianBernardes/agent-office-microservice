@@ -24,3 +24,13 @@ def test_plain_text_becomes_thought() -> None:
 
 def test_non_object_json_falls_back_to_text() -> None:
     assert _parse_structured_reply("[1, 2]")["thought"] == "[1, 2]"
+
+
+def test_leaked_reasoning_preamble_is_stripped_before_parsing() -> None:
+    raw = (
+        "We need to answer directly. Let's write the markdown now.\n"
+        "**Resultado Final**\n\nTudo certo, entrega concluída."
+    )
+    parsed = _parse_structured_reply(raw)
+    assert parsed["thought"].startswith("**Resultado Final**")
+    assert "We need to" not in parsed["thought"]

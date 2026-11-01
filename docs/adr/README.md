@@ -71,3 +71,4 @@
 | [054](./054-responsabilidades-por-cargo-e-poderes-do-dono.md) | Responsabilidades por cargo e poderes do dono do produto | Aceito |
 | [055](./055-dialogo-do-po-com-o-cliente.md) | Diálogo do PO com o cliente | Aceito |
 | [056](./056-demissao-com-aprovacao-do-dono.md) | Demissão proposta pelo RH com aprovação do dono | Aceito |
+| [057](./057-bloquear-raciocinio-do-llm-em-outro-idioma.md) | Bloquear o raciocínio do LLM em outro idioma no texto final | Aceito |

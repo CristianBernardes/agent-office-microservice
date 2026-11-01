@@ -81,6 +81,13 @@
     if (changes.priority) store.replaceTask(await api.setTaskPriority(task.task_id, changes.priority, who))
   }
 
+  async function deleteTask(task: Task) {
+    const actor = ownerActor()
+    if (!actor) throw new Error('no agent')
+    await api.deleteTask(task.task_id, { actor_id: actor.agent_id, actor_role: actor.role })
+    store.removeTask(task.task_id)
+  }
+
   async function fireAgent(agent: Agent) {
     await api.fireAgent(agent.agent_id)
     if (store.selectedAgentId === agent.agent_id) store.select(null)
@@ -170,6 +177,7 @@
     agents={store.agents}
     onmove={moveTask}
     onupdate={updateTask}
+    ondelete={deleteTask}
     wipLimits={config.wipLimits}
   />
   {#if store.error}<p role="alert">{i18n.t.loadError}</p>{/if}

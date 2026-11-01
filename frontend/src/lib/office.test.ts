@@ -38,6 +38,7 @@ function fakeApi(overrides: Partial<ApiClient> = {}): ApiClient {
     setOfficeLanguage: vi.fn(),
     setTaskOwner: vi.fn(),
     setTaskPriority: vi.fn(),
+    deleteTask: vi.fn(),
     fireAgent: vi.fn(),
     listPendingDismissals: vi.fn().mockResolvedValue([]),
     decideDismissal: vi.fn(),
