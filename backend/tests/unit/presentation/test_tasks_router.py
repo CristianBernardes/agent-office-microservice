@@ -130,3 +130,32 @@ class TestMoveRoute:
 
     def test_unknown_status_is_422(self) -> None:
         assert self._move(_create(), "nope", "product_owner").status_code == 422
+
+
+class TestOwnerPowers:
+    def test_owner_override_moves_to_any_column(self) -> None:
+        _hire()
+        task_id = _create()
+        denied = client.post(f"/tasks/{task_id}/move", json={"to_status": "done", **ACTOR})
+        assert denied.status_code == 409
+        moved = client.post(
+            f"/tasks/{task_id}/move", json={"to_status": "done", "owner_override": True, **ACTOR}
+        )
+        assert moved.status_code == 200
+        assert moved.json()["status"] == "done"
+
+    def test_set_owner_and_priority(self) -> None:
+        agent_id, task_id = _hire(), _create()
+        owner = client.put(f"/tasks/{task_id}/owner", json={"agent_id": agent_id, **ACTOR})
+        assert owner.json()["assigned_to"] == agent_id
+        assert owner.json()["status"] == "backlog"
+        priority = client.put(f"/tasks/{task_id}/priority", json={"priority": "urgent", **ACTOR})
+        assert priority.json()["priority"] == "urgent"
+
+    def test_set_owner_unknown_task_is_404(self) -> None:
+        response = client.put(
+            f"/tasks/{uuid4()}/priority",
+            json={"priority": "low", **ACTOR},
+            headers={"Accept-Language": "en"},
+        )
+        assert response.status_code == 404

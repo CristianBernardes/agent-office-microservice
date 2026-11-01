@@ -65,8 +65,29 @@
 </form>
 
 <style>
-  .row { display: flex; gap: 8px; flex-wrap: wrap; }
-  input, select { background: var(--bg); color: inherit; border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
-  button { background: var(--accent); color: #fff; border: 0; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  input,
+  select {
+    background: var(--bg);
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+  }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>

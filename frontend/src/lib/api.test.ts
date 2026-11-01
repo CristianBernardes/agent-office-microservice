@@ -102,4 +102,53 @@ describe("createApiClient", () => {
     );
     await expect(api.listTasks()).rejects.toBeInstanceOf(ApiError);
   });
+
+  it("move com owner_override e edita responsável e prioridade", async () => {
+    const fetchMock = reply({});
+    const api = createApiClient("http://api", () => "pt", fetchMock);
+    const actor = { actor_id: "a", actor_role: "product_owner" as const };
+    await api.moveTask("t1", {
+      to_status: "done",
+      ...actor,
+      owner_override: true,
+    });
+    await api.setTaskOwner("t1", "a2", actor);
+    await api.setTaskPriority("t1", "urgent", actor);
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).owner_override).toBe(
+      true,
+    );
+    expect(fetchMock.mock.calls[1][0]).toBe("http://api/tasks/t1/owner");
+    expect(fetchMock.mock.calls[1][1].method).toBe("PUT");
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({
+      agent_id: "a2",
+      ...actor,
+    });
+    expect(fetchMock.mock.calls[2][0]).toBe("http://api/tasks/t1/priority");
+    expect(JSON.parse(fetchMock.mock.calls[2][1].body)).toEqual({
+      priority: "urgent",
+      ...actor,
+    });
+  });
+
+  it("demite, envia mensagem e decide demissões", async () => {
+    const fetchMock = reply({});
+    const api = createApiClient("http://api", () => "en", fetchMock);
+    await api.fireAgent("a1");
+    await api.sendMessage("s1", "oi");
+    await api.listPendingDismissals();
+    await api.decideDismissal("p1", true);
+    await api.decideDismissal("p2", false);
+    const urls = fetchMock.mock.calls.map((c: unknown[]) => c[0]);
+    expect(urls).toEqual([
+      "http://api/agents/a1/fire",
+      "http://api/messages",
+      "http://api/dismissals?pending_only=true",
+      "http://api/dismissals/p1/approve",
+      "http://api/dismissals/p2/reject",
+    ]);
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({
+      session_id: "s1",
+      content: "oi",
+    });
+  });
 });

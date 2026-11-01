@@ -13,6 +13,7 @@ from src.domain.entities.activity_event import ActivityEvent
 from src.domain.entities.agent import Agent, Personality, Role
 from src.domain.entities.artifact import Artifact, ArtifactType
 from src.domain.entities.chat import ChatMessage, Goal, GoalStatus, Session
+from src.domain.entities.dismissal import DismissalProposal, DismissalStatus
 from src.domain.entities.meeting import Meeting, MeetingKind, MeetingStatus
 from src.domain.entities.memory import Memory
 from src.domain.entities.office_layout import OfficeLayout
@@ -21,6 +22,7 @@ from src.domain.entities.task import Task, TaskStatus
 from src.domain.value_objects.identifiers import (
     AgentId,
     ArtifactId,
+    DismissalId,
     GoalId,
     MeetingId,
     MemoryId,
@@ -38,6 +40,9 @@ from src.infrastructure.persistence.postgres_artifact_repository import (
 )
 from src.infrastructure.persistence.postgres_chat_repository import PostgresChatRepository
 from src.infrastructure.persistence.postgres_connection import create_postgres_pool
+from src.infrastructure.persistence.postgres_dismissal_repository import (
+    PostgresDismissalRepository,
+)
 from src.infrastructure.persistence.postgres_layout_repository import PostgresLayoutRepository
 from src.infrastructure.persistence.postgres_meeting_repository import PostgresMeetingRepository
 from src.infrastructure.persistence.postgres_memory_repository import PostgresMemoryRepository
@@ -153,6 +158,19 @@ class TestSocialRepositoriesIntegration:
         assert loaded is not None
         assert loaded.decisions == ("d1",)
         assert set(loaded.participants) == set(meeting.participants)
+
+    async def test_dismissal_proposal_roundtrip(self, pool: object) -> None:
+        hr, dev = await _agent(pool, "HR"), await _agent(pool, "Dev")
+        repository = PostgresDismissalRepository(pool)  # type: ignore[arg-type]
+        proposal = DismissalProposal(DismissalId.generate(), dev.agent_id, hr.agent_id, "motivo")
+        await repository.save(proposal)
+        proposal.decide(approved=False)
+        await repository.save(proposal)
+
+        loaded = await repository.get(proposal.proposal_id)
+        assert loaded is not None
+        assert loaded.status == DismissalStatus.REJECTED and loaded.decided_at is not None
+        assert [p.proposal_id for p in await repository.list_all()] == [proposal.proposal_id]
 
     async def test_layout_upsert(self, pool: object) -> None:
         repository = PostgresLayoutRepository(pool)  # type: ignore[arg-type]

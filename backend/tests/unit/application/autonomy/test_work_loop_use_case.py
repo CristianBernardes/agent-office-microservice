@@ -191,3 +191,33 @@ async def test_planning_states_the_sprint_day_limit() -> None:
         await loop.tick()
     assert "15 dias fictícios" in dispatch.prompts[0]
     assert "15 dias fictícios" in artifacts.calls[0].content
+
+
+async def test_hiring_task_is_owned_and_worked_by_hr() -> None:
+    loop, tasks, agents, dispatch, _ = await _build(
+        [Role.PRODUCT_OWNER, Role.DEV_SENIOR, Role.HR_MANAGER, Role.QA_ENGINEER]
+    )
+    task = (await tasks.list_all())[0]
+    task.title = "Contratar um DBA"
+    await tasks.save(task)
+    hr = next(a for a in await agents.list_all() if a.role == Role.HR_MANAGER)
+
+    for _ in range(3):
+        await loop.tick()
+
+    assert {t.assigned_to for t in await tasks.list_all()} == {hr.agent_id}
+    assert any("You are working" in p for p in dispatch.prompts)
+
+
+async def test_fired_owner_hands_the_task_to_another_professional() -> None:
+    loop, tasks, agents, _, _ = await _build([Role.PRODUCT_OWNER, Role.DEV_SENIOR, Role.DEV_JUNIOR])
+    await loop.tick()
+    task = (await tasks.list_all())[0]
+    task.assigned_to = None
+    task.status = TaskStatus.TODO
+    await tasks.save(task)
+
+    await loop.tick()
+
+    owner = (await tasks.list_all())[0].assigned_to
+    assert owner is not None

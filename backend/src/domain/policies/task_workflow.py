@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from src.domain.entities.agent import Role
 from src.domain.entities.task import TaskStatus
+from src.domain.services.task_routing import EXECUTOR_ROLES
 
-_DEVS = frozenset({Role.DEV_SENIOR, Role.DEV_JUNIOR, Role.TECH_LEAD})
+_DEVS = EXECUTOR_ROLES
 _COORDINATORS = frozenset({Role.SCRUM_MASTER, Role.TECH_LEAD, Role.PRODUCT_OWNER})
 _PLANNERS = frozenset({Role.PRODUCT_OWNER, Role.SCRUM_MASTER})
 _TESTERS = frozenset({Role.QA_ENGINEER})

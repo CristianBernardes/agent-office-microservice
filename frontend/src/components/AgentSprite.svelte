@@ -2,8 +2,13 @@
   import { FRAME_HEIGHT, FRAME_WIDTH, spriteFor, type Direction } from '../lib/sprites'
   import type { Agent } from '../lib/types'
 
-  let { agent, walking = false, hue = 0, alt = false, direction = 'down' }: { agent: Agent; walking?: boolean; hue?: number; alt?: boolean; direction?: Direction } =
-    $props()
+  let {
+    agent,
+    walking = false,
+    hue = 0,
+    alt = false,
+    direction = 'down',
+  }: { agent: Agent; walking?: boolean; hue?: number; alt?: boolean; direction?: Direction } = $props()
   const sheet = $derived(spriteFor(agent.role, agent.status, walking, alt, direction))
 </script>
 
@@ -29,6 +34,14 @@
     image-rendering: pixelated;
     animation: play 1.2s steps(var(--frames), jump-none) infinite;
   }
-  @keyframes play { to { background-position-x: calc((var(--start) + var(--frames) - 1) * var(--w) * -1); } }
-  @media (prefers-reduced-motion: reduce) { .sprite { animation: none; } }
+  @keyframes play {
+    to {
+      background-position-x: calc((var(--start) + var(--frames) - 1) * var(--w) * -1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sprite {
+      animation: none;
+    }
+  }
 </style>

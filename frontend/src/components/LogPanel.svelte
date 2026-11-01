@@ -27,10 +27,33 @@
 </section>
 
 <style>
-  ul { list-style: none; margin: 0; padding: 0; max-height: 300px; overflow: auto; font-family: ui-monospace, monospace; }
-  li { display: flex; gap: 8px; padding: 3px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
-  time { opacity: 0.6; flex: none; }
-  strong { flex: none; }
-  .text { opacity: 0.85; word-break: break-word; }
-  .empty { opacity: 0.7; }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 300px;
+    overflow: auto;
+    font-family: ui-monospace, monospace;
+  }
+  li {
+    display: flex;
+    gap: 8px;
+    padding: 3px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  time {
+    opacity: 0.6;
+    flex: none;
+  }
+  strong {
+    flex: none;
+  }
+  .text {
+    opacity: 0.85;
+    word-break: break-word;
+  }
+  .empty {
+    opacity: 0.7;
+  }
 </style>

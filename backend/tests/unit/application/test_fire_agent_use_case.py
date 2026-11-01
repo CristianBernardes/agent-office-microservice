@@ -9,10 +9,13 @@ from src.application.agents.fire_agent_use_case import (
     FireAgentUseCase,
 )
 from src.domain.entities.agent import Agent, AgentStatus, Personality, Role
-from src.domain.value_objects.identifiers import AgentId
+from src.domain.entities.task import Task, TaskStatus
+from src.domain.value_objects.identifiers import AgentId, TaskId
+from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
 from src.infrastructure.persistence.in_memory_agent_repository import (
     InMemoryAgentRepository,
 )
+from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
 
 pytestmark = pytest.mark.unit
 
@@ -44,3 +47,36 @@ class TestFireAgentUseCase:
 
         with pytest.raises(AgentNotFoundError):
             await use_case.execute(AgentId.generate())
+
+
+class TestFireReturnsWorkToTheFlow:
+    async def test_open_tasks_are_unassigned_and_status_is_published(
+        self, existing_agent: Agent
+    ) -> None:
+        agents, tasks, bus = (
+            InMemoryAgentRepository(),
+            InMemoryTaskRepository(),
+            InMemoryMessageBus(),
+        )
+        await agents.save(existing_agent)
+        mine = Task(TaskId.generate(), "T", "d", TaskStatus.IN_PROGRESS)
+        mine.assigned_to = existing_agent.agent_id
+        done = Task(TaskId.generate(), "D", "d", TaskStatus.DONE)
+        done.assigned_to = existing_agent.agent_id
+        await tasks.save(mine)
+        await tasks.save(done)
+        received: list[str] = []
+
+        async def handler(topic: str, _: dict[str, object]) -> None:
+            received.append(topic)
+
+        await bus.subscribe("office/agents/+/status", handler)
+
+        await FireAgentUseCase(agents, tasks, bus).execute(existing_agent.agent_id)
+
+        reloaded = await tasks.find_by_id(mine.task_id)
+        assert reloaded is not None
+        assert (reloaded.assigned_to, reloaded.status) == (None, TaskStatus.TODO)
+        kept = await tasks.find_by_id(done.task_id)
+        assert kept is not None and kept.assigned_to == existing_agent.agent_id
+        assert received == [f"office/agents/{existing_agent.agent_id}/status"]

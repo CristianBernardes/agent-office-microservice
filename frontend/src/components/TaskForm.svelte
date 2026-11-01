@@ -5,7 +5,8 @@
   let {
     hasAgents,
     onsubmit,
-  }: { hasAgents: boolean; onsubmit: (title: string, description: string, priority: Priority) => Promise<void> } = $props()
+  }: { hasAgents: boolean; onsubmit: (title: string, description: string, priority: Priority) => Promise<void> } =
+    $props()
 
   let title = $state('')
   let description = $state('')
@@ -33,7 +34,8 @@
 <form class="panel" onsubmit={submit}>
   <h2>{i18n.t.taskFormTitle}</h2>
   <input bind:value={title} placeholder={i18n.t.taskName} aria-label={i18n.t.taskName} />
-  <textarea rows="3" bind:value={description} placeholder={i18n.t.taskDescription} aria-label={i18n.t.taskDescription}></textarea>
+  <textarea rows="3" bind:value={description} placeholder={i18n.t.taskDescription} aria-label={i18n.t.taskDescription}
+  ></textarea>
   <select bind:value={priority} aria-label="priority">
     {#each priorities as p (p)}<option value={p}>{i18n.t.priority[p]}</option>{/each}
   </select>
@@ -44,7 +46,28 @@
 </form>
 
 <style>
-  input, textarea, select { width: 100%; box-sizing: border-box; margin-bottom: 8px; background: var(--bg); color: inherit; border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
-  button { background: var(--accent); color: #fff; border: 0; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  input,
+  textarea,
+  select {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+    background: var(--bg);
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+  }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>

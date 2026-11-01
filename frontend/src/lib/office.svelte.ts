@@ -1,6 +1,12 @@
 import type { ApiClient } from "./api";
 import type { RealtimeEvent } from "./realtime";
-import type { ActivityEvent, Agent, ChatMessage, Task } from "./types";
+import type {
+  ActivityEvent,
+  Agent,
+  ChatMessage,
+  DismissalProposal,
+  Task,
+} from "./types";
 
 const ACTIVITY_LIMIT = 50;
 const LOG_LIMIT = 100;
@@ -21,6 +27,8 @@ export class OfficeStore {
   logs = $state<LogEntry[]>([]);
   thoughts = $state<Record<string, string>>({});
   selectedAgentId = $state<string | null>(null);
+  sessionId = $state<string | null>(null);
+  dismissals = $state<DismissalProposal[]>([]);
   connected = $state(false);
   error = $state(false);
   private logSeq = 0;
@@ -28,19 +36,21 @@ export class OfficeStore {
   // Bloco: carga/atualização via REST; as mensagens vêm da sessão do objetivo mais recente.
   async load(api: ApiClient): Promise<void> {
     try {
-      const [agents, tasks, activity, goals] = await Promise.all([
+      const [agents, tasks, activity, goals, dismissals] = await Promise.all([
         api.listAgents(),
         api.listTasks(),
         api.listActivity(ACTIVITY_LIMIT),
         api.listGoals(),
+        api.listPendingDismissals(),
       ]);
       this.agents = agents;
       this.tasks = tasks;
       this.activity = activity;
+      this.dismissals = dismissals;
+      this.sessionId =
+        goals.length > 0 ? goals[goals.length - 1].session_id : null;
       this.messages =
-        goals.length > 0
-          ? await api.listMessages(goals[goals.length - 1].session_id)
-          : [];
+        this.sessionId !== null ? await api.listMessages(this.sessionId) : [];
       this.error = false;
     } catch {
       this.error = true;

@@ -21,6 +21,7 @@ from src.application.relationships.relationship_use_cases import RecordInteracti
 from src.application.tasks.task_use_cases import CreateTaskInput, CreateTaskUseCase
 from src.domain.entities.agent import Agent, Role
 from src.domain.entities.artifact import ArtifactType
+from src.domain.entities.chat import MessageKind
 from src.domain.entities.meeting import Meeting, MeetingKind, MeetingStatus
 from src.domain.entities.memory import MemoryType
 from src.domain.entities.task import Priority
@@ -50,21 +51,30 @@ _LABELS = {
     Language.PT: {
         "goal": "Objetivo do time",
         "minutes": "Ata da reunião até agora",
-        "turn": "Sua vez de falar, como {role}. Contribua com o seu papel.",
+        "turn": "Sua vez de falar, como {role}. Diga o que, na sua área, deve realmente ser "
+        "entregue e o que você precisa dos colegas.",
         "debate": "Rodada {round} de debate, como {role}. Responda aos colegas, concorde ou "
-        "discorde com argumentos e refine a proposta.",
+        "discorde com argumentos e refine o que deve realmente ser entregue.",
         "title": "Ata da reunião — {goal}",
+        "client_question": "Objetivo do cliente: {goal}\nAta da reunião:\n{minutes}\n\n"
+        "Como Product Owner, fale com o cliente: resuma em poucas linhas o que o time propõe "
+        "entregar e faça as perguntas de que precisa para fechar o escopo. "
+        "O time segue com um plano provisório até a resposta do cliente.",
     },
     Language.EN: {
         "goal": "Team goal",
         "minutes": "Meeting minutes so far",
-        "turn": "Your turn to speak, as {role}. Contribute from your role.",
+        "turn": "Your turn to speak, as {role}. Say what, in your area, should really be "
+        "delivered and what you need from your colleagues.",
         "debate": "Debate round {round}, as {role}. Reply to your colleagues, agree or "
-        "disagree with arguments and refine the proposal.",
+        "disagree with arguments and refine what should really be delivered.",
         "title": "Meeting minutes — {goal}",
+        "client_question": "Client goal: {goal}\nMeeting minutes:\n{minutes}\n\n"
+        "As Product Owner, talk to the client: summarize in a few lines what the team "
+        "proposes to deliver and ask the questions you need to close the scope. "
+        "The team proceeds with a provisional plan until the client answers.",
     },
 }
-
 
 # Bloco: nomes de cargo localizados para os cabeçalhos da ata.
 _ROLE_NAMES: dict[Language, dict[Role, str]] = {
@@ -146,6 +156,7 @@ class GoalMeetingUseCase:
         if turns:
             await self._write_minutes(data, turns)
             await self._create_backlog(turns, data.goal_id)
+            await self._ask_client(data, turns)
             await self._bond(turns)
             await self._register_meeting(data, turns)
         return turns
@@ -228,6 +239,28 @@ class GoalMeetingUseCase:
             )
         except Exception:
             logger.exception("Falha ao registrar relacionamentos da reunião")
+
+    # Bloco: o PO leva a proposta ao cliente (o usuário) como pergunta no chat; a resposta
+    # chega depois, de forma assíncrona, pelo ClientDialogueUseCase (ADR-055).
+    async def _ask_client(self, data: GoalMeetingInput, turns: list[MeetingTurn]) -> None:
+        owner = next((t.agent for t in turns if t.agent.role == Role.PRODUCT_OWNER), None)
+        if owner is None:
+            return
+        labels = _LABELS[data.language or self._language]
+        minutes = "\n".join(f"- {t.agent.name} ({t.agent.role.value}): {t.thought}" for t in turns)
+        prompt = labels["client_question"].format(goal=data.text, minutes=minutes)
+        try:
+            response = await self._dispatch.execute(owner.agent_id, prompt, data.language)
+            await self._send_message.execute(
+                SendMessageInput(
+                    session_id=data.session_id,
+                    content=response.thought,
+                    sender_id=owner.agent_id,
+                    kind=MessageKind.QUESTION,
+                )
+            )
+        except Exception:
+            logger.exception("Falha ao levar a proposta ao cliente no objetivo %s", data.goal_id)
 
     async def _create_backlog(self, turns: list[MeetingTurn], goal_id: GoalId) -> None:
         owner = next((t.agent for t in turns if t.agent.role == Role.PRODUCT_OWNER), None)

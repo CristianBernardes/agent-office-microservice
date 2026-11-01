@@ -13,6 +13,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.application.activity.activity_feed import register_activity_feed
+from src.application.autonomy.client_dialogue_use_case import register_client_dialogue
 from src.application.autonomy.goal_meeting_use_case import register_goal_autonomy
 from src.application.autonomy.work_loop_use_case import start_work_loop, stop_work_loop
 from src.infrastructure.config.settings import Settings, get_settings
@@ -21,6 +22,7 @@ from src.infrastructure.persistence.postgres_connection import create_postgres_p
 from src.presentation.api.activity_router import router as activity_router
 from src.presentation.api.agents_router import router as agents_router
 from src.presentation.api.chat_router import router as chat_router
+from src.presentation.api.dismissals_router import router as dismissals_router
 from src.presentation.api.health_router import router as health_router
 from src.presentation.api.layout_router import router as layout_router
 from src.presentation.api.memory_router import router as memory_router
@@ -33,6 +35,7 @@ from src.presentation.api.social_router import router as social_router
 from src.presentation.api.tasks_router import router as tasks_router
 from src.presentation.dependencies import (
     get_activity_repository,
+    get_client_dialogue_use_case,
     get_goal_meeting_use_case,
     get_message_bus,
     get_work_loop_use_case,
@@ -51,6 +54,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     await register_activity_feed(bus, get_activity_repository)()
     if settings.autonomy_enabled:
         await register_goal_autonomy(bus, get_goal_meeting_use_case)()
+        await register_client_dialogue(bus, get_client_dialogue_use_case)()
     loop = (
         start_work_loop(get_work_loop_use_case, settings.work_loop_interval_seconds)
         if settings.work_loop_interval_seconds > 0
@@ -103,6 +107,7 @@ app.include_router(office_router)
 app.include_router(agents_router)
 app.include_router(tasks_router)
 app.include_router(chat_router)
+app.include_router(dismissals_router)
 app.include_router(memory_router)
 app.include_router(social_router)
 app.include_router(layout_router)

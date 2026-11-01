@@ -68,3 +68,6 @@
 | [051](./051-idioma-do-escritorio-em-tempo-de-execucao.md) | Idioma do escritório em tempo de execução | Aceito |
 | [052](./052-observabilidade-prometheus-grafana-kafka-ui.md) | Observabilidade: Prometheus, Grafana e Kafka UI | Aceito |
 | [053](./053-postgres-e-mqtt-por-padrao.md) | Postgres e MQTT por padrão | Aceito |
+| [054](./054-responsabilidades-por-cargo-e-poderes-do-dono.md) | Responsabilidades por cargo e poderes do dono do produto | Aceito |
+| [055](./055-dialogo-do-po-com-o-cliente.md) | Diálogo do PO com o cliente | Aceito |
+| [056](./056-demissao-com-aprovacao-do-dono.md) | Demissão proposta pelo RH com aprovação do dono | Aceito |
