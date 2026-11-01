@@ -285,6 +285,36 @@ class SetTaskOwnerUseCase:
         return task
 
 
+# Bloco: o dono do produto exclui uma tarefa (ex.: alucinação de agente) e libera o responsável.
+class DeleteTaskUseCase:
+    def __init__(
+        self,
+        task_repository: ITaskRepository,
+        agent_repository: IAgentRepository,
+        message_bus: IMessageBus,
+    ) -> None:
+        self._task_repository = task_repository
+        self._agent_repository = agent_repository
+        self._message_bus = message_bus
+
+    async def execute(self, task_id: TaskId, actor_id: AgentId, actor_role: Role) -> None:
+        task = await self._task_repository.find_by_id(task_id)
+        if task is None:
+            raise TaskNotFoundError("task.not_found", task_id=task_id)
+        if task.assigned_to is not None:
+            agent = await self._agent_repository.find_by_id(task.assigned_to)
+            if agent is not None and agent.current_task_id == task.task_id:
+                agent.complete_task()
+                await self._agent_repository.save(agent)
+        await self._task_repository.delete(task_id)
+        envelope = build_message_envelope(
+            agent_id=str(actor_id),
+            agent_role=actor_role.value,
+            payload={"task_id": str(task_id), "title": task.title, "deleted": True},
+        )
+        await self._message_bus.publish("office/tasks/deleted", envelope, qos=1)
+
+
 # Bloco: o dono do produto redefine a prioridade de uma tarefa (ADR-054).
 class SetTaskPriorityUseCase:
     def __init__(self, task_repository: ITaskRepository, message_bus: IMessageBus) -> None:

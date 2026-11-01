@@ -7,11 +7,13 @@
     task,
     agents,
     onsave,
+    ondelete,
     onclose,
   }: {
     task: Task
     agents: Agent[]
     onsave: (task: Task, changes: { owner?: string; priority?: Priority }) => Promise<void>
+    ondelete?: (task: Task) => Promise<void>
     onclose: () => void
   } = $props()
 
@@ -20,6 +22,22 @@
   // svelte-ignore state_referenced_locally
   let priority = $state<Priority>(task.priority)
   let failed = $state(false)
+  let confirmingDelete = $state(false)
+
+  // Bloco: excluir é irreversível, então exige um segundo clique de confirmação.
+  async function remove() {
+    if (!confirmingDelete) {
+      confirmingDelete = true
+      return
+    }
+    failed = false
+    try {
+      await ondelete?.(task)
+      onclose()
+    } catch {
+      failed = true
+    }
+  }
 
   // Bloco: só envia o que mudou, para não gerar histórico desnecessário.
   async function save(event: SubmitEvent) {
@@ -66,6 +84,11 @@
       </label>
       {#if failed}<p role="alert">{i18n.t.loadError}</p>{/if}
       <div class="actions">
+        {#if ondelete}
+          <button type="button" class="danger" onclick={remove}>
+            {confirmingDelete ? i18n.t.taskDeleteConfirm : i18n.t.taskDelete}
+          </button>
+        {/if}
         <button type="button" class="ghost" onclick={onclose}>{i18n.t.cancel}</button>
         <button type="submit">{i18n.t.taskSave}</button>
       </div>
@@ -137,6 +160,12 @@
     border: 1px solid var(--accent);
     background: var(--accent);
     color: #fff;
+  }
+  .danger {
+    margin-right: auto;
+    background: transparent;
+    border-color: #d9534f;
+    color: #d9534f;
   }
   .ghost {
     background: transparent;

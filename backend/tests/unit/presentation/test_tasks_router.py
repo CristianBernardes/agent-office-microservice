@@ -159,3 +159,12 @@ class TestOwnerPowers:
             headers={"Accept-Language": "en"},
         )
         assert response.status_code == 404
+
+
+def test_delete_task_removes_it_and_404_when_missing() -> None:
+    created = client.post("/tasks", json={"title": "Alucinada", "description": "", **ACTOR}).json()
+    url = f"/tasks/{created['task_id']}"
+    params = {"actor_id": ACTOR["actor_id"], "actor_role": ACTOR["actor_role"]}
+    assert client.delete(url, params=params).status_code == 204
+    assert client.get("/tasks").json() == []
+    assert client.delete(url, params=params).status_code == 404

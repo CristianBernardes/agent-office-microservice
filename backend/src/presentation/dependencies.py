@@ -44,6 +44,7 @@ from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
     CreateTaskUseCase,
+    DeleteTaskUseCase,
     MoveTaskUseCase,
     SetTaskOwnerUseCase,
     SetTaskPriorityUseCase,
@@ -447,6 +448,14 @@ def get_move_task_use_case() -> MoveTaskUseCase:
 
 def get_set_task_owner_use_case() -> SetTaskOwnerUseCase:
     return SetTaskOwnerUseCase(
+        task_repository=get_task_repository(),
+        agent_repository=get_agent_repository(),
+        message_bus=get_message_bus(),
+    )
+
+
+def get_delete_task_use_case() -> DeleteTaskUseCase:
+    return DeleteTaskUseCase(
         task_repository=get_task_repository(),
         agent_repository=get_agent_repository(),
         message_bus=get_message_bus(),
