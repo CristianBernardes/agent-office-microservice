@@ -35,6 +35,8 @@ function fakeApi(overrides: Partial<ApiClient> = {}): ApiClient {
     createTask: vi.fn(),
     hireAgent: vi.fn(),
     listModels: vi.fn(),
+    getBoardSettings: vi.fn(),
+    setBoardSettings: vi.fn(),
     setOfficeLanguage: vi.fn(),
     setTaskOwner: vi.fn(),
     setTaskPriority: vi.fn(),

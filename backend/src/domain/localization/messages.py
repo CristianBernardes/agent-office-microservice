@@ -27,6 +27,10 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.PT: "A tarefa '{title}' não pode sair do backlog: nenhum profissional "
         "disponível para ser o responsável.",
     },
+    "task.creation_blocked": {
+        Language.EN: "Task creation by agents is disabled (role '{role}').",
+        Language.PT: "A criação de tarefas por agentes está desabilitada (papel '{role}').",
+    },
     "task.assign_forbidden": {
         Language.EN: "Role '{role}' is not allowed to assign tasks.",
         Language.PT: "O papel '{role}' não pode atribuir tarefas.",

@@ -20,6 +20,7 @@ _FACTORIES = [
     (deps.get_relationship_repository, "PostgresRelationshipRepository"),
     (deps.get_activity_repository, "PostgresActivityRepository"),
     (deps.get_layout_repository, "PostgresLayoutRepository"),
+    (deps.get_settings_repository, "PostgresSettingsRepository"),
     (deps.get_meeting_repository, "PostgresMeetingRepository"),
     (deps.get_dismissal_repository, "PostgresDismissalRepository"),
 ]
