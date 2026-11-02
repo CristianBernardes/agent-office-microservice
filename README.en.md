@@ -470,6 +470,60 @@ Every relevant architectural decision is documented before being implemented:
   ([ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md))
 - (Optional) free [Tavily](https://app.tavily.com) key for `web_search`
 
+### Running on Windows (WSL2 + Docker Desktop)
+
+On Windows, the project runs inside a **WSL2** distro (not native Windows), with **Docker
+Desktop** using that distro as its backend. Recommended distro: **Ubuntu 24.04**.
+
+1. **Install WSL2 with Ubuntu 24.04** (PowerShell as administrator):
+
+   ```powershell
+   wsl --install -d Ubuntu-24.04
+   ```
+
+2. **Install Docker Desktop** for Windows and, under **Settings → Resources → WSL Integration**,
+   enable integration with the **Ubuntu-24.04** distro. Do not install Docker Engine inside WSL
+   separately — Docker Desktop already exposes `docker`/`docker compose` inside the distro.
+3. **Open a terminal in the Ubuntu-24.04 distro** (`wsl -d Ubuntu-24.04`) and install the
+   development tools the project needs — none of them come pre-installed on Ubuntu:
+
+   ```bash
+   # System packages (backend build, git, utilities)
+   sudo apt update && sudo apt upgrade -y
+   sudo apt install -y build-essential git curl wget unzip python3-venv python3-pip
+
+   # Poetry (Python backend dependency manager)
+   curl -sSL https://install.python-poetry.org | python3 -
+   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+   source ~/.bashrc
+   poetry --version
+
+   # Node.js 20+ (frontend) — via NodeSource
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt install -y nodejs
+   node --version
+
+   # Go 1.22+ (gateway; also required for `make format-go`/`gofmt`)
+   curl -fsSL https://go.dev/dl/go1.23.4.linux-amd64.tar.gz -o /tmp/go.tar.gz
+   sudo rm -rf /usr/local/go
+   sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+   echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+   source ~/.bashrc
+   go version
+   ```
+
+4. **Clone the project inside the WSL filesystem** (e.g. `~/projects/`) or access it under
+   `/mnt/c/Users/<your-user>/...` if you prefer to keep it on the Windows disk — both work, but
+   file operations are faster inside WSL itself.
+5. **Ollama still runs on native Windows** (never inside WSL/a container — see
+   [ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md)). With Docker Desktop, containers
+   reach the Windows Ollama via `http://host.docker.internal:11434` — set
+   `OLLAMA_URL_IN_CONTAINER` (root `.env`) and `OLLAMA_BASE_URL` (`backend/.env`) to that value;
+   `172.17.0.1` (native Linux Docker Engine bridge) does **not** work with Docker Desktop for
+   Windows.
+6. After that, follow the [Quick Start](#quick-start) as usual (`make up`, `make migrate`)
+   inside the Ubuntu-24.04 distro terminal.
+
 ### Installing Ollama
 
 **Linux**
