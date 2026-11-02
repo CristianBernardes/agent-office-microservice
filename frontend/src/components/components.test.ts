@@ -67,16 +67,34 @@ describe("componentes", () => {
 
   it("TaskForm envia título, descrição e prioridade", async () => {
     const onsubmit = vi.fn().mockResolvedValue(undefined);
-    render(TaskForm, { hasAgents: true, onsubmit });
+    render(TaskForm, { hasAgents: true, agents: [agent], onsubmit });
     await fireEvent.input(screen.getByLabelText("Título"), {
       target: { value: "Produto X" },
     });
     await fireEvent.submit(screen.getByRole("button").closest("form")!);
-    expect(onsubmit).toHaveBeenCalledWith("Produto X", "", "medium");
+    expect(onsubmit).toHaveBeenCalledWith("Produto X", "", "medium", "");
+  });
+
+  it("TaskForm permite selecionar um responsável já contratado", async () => {
+    const onsubmit = vi.fn().mockResolvedValue(undefined);
+    render(TaskForm, { hasAgents: true, agents: [agent], onsubmit });
+    await fireEvent.input(screen.getByLabelText("Título"), {
+      target: { value: "Produto X" },
+    });
+    await fireEvent.change(screen.getByLabelText("Responsável"), {
+      target: { value: "a1" },
+    });
+    await fireEvent.submit(screen.getByRole("button").closest("form")!);
+    expect(onsubmit).toHaveBeenCalledWith("Produto X", "", "medium", "a1");
+  });
+
+  it("TaskForm não exibe select de responsável sem agentes contratados", () => {
+    render(TaskForm, { hasAgents: false, agents: [], onsubmit: vi.fn() });
+    expect(screen.queryByLabelText("Responsável")).toBeNull();
   });
 
   it("TaskForm bloqueia sem agentes", () => {
-    render(TaskForm, { hasAgents: false, onsubmit: vi.fn() });
+    render(TaskForm, { hasAgents: false, agents: [], onsubmit: vi.fn() });
     expect(screen.getByRole("button")).toHaveProperty("disabled", true);
   });
 
