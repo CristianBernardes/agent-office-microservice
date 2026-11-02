@@ -55,10 +55,13 @@
   }
 
   // Bloco: a tarefa é criada em nome do Product Owner (ou do primeiro agente) e o texto vira objetivo do time.
-  async function createTask(title: string, description: string, priority: Priority) {
+  // Se um responsável foi selecionado no formulário, ele é atribuído em seguida (ADR-016).
+  async function createTask(title: string, description: string, priority: Priority, ownerId: string) {
     const actor = ownerActor()
     if (!actor) throw new Error('no agent')
-    await api.createTask({ title, description, priority, actor_id: actor.agent_id, actor_role: actor.role })
+    const who = { actor_id: actor.agent_id, actor_role: actor.role }
+    const created = await api.createTask({ title, description, priority, ...who })
+    if (ownerId) await api.setTaskOwner(created.task_id, ownerId, who)
     await api.createGoal(description ? `${title}\n\n${description}` : title)
     await store.load(api)
   }
@@ -154,7 +157,7 @@
   <HireForm defaultModel={config.defaultLlmModel} {models} onsubmit={hireAgent} />
   <div class="grid">
     <GoalForm onsubmit={createGoal} />
-    <TaskForm hasAgents={team.length > 0} onsubmit={createTask} />
+    <TaskForm hasAgents={team.length > 0} agents={team} onsubmit={createTask} />
   </div>
   <div class="grid">
     <TeamBoard

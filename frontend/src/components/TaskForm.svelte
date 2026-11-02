@@ -1,16 +1,21 @@
 <script lang="ts">
   import { i18n } from '../lib/i18n.svelte'
-  import type { Priority } from '../lib/types'
+  import type { Agent, Priority } from '../lib/types'
 
   let {
     hasAgents,
+    agents,
     onsubmit,
-  }: { hasAgents: boolean; onsubmit: (title: string, description: string, priority: Priority) => Promise<void> } =
-    $props()
+  }: {
+    hasAgents: boolean
+    agents: Agent[]
+    onsubmit: (title: string, description: string, priority: Priority, ownerId: string) => Promise<void>
+  } = $props()
 
   let title = $state('')
   let description = $state('')
   let priority = $state<Priority>('medium')
+  let owner = $state('')
   let done = $state(false)
   let failed = $state(false)
   const priorities: Priority[] = ['low', 'medium', 'high', 'urgent']
@@ -21,9 +26,10 @@
     done = false
     failed = false
     try {
-      await onsubmit(title.trim(), description.trim(), priority)
+      await onsubmit(title.trim(), description.trim(), priority, owner)
       title = ''
       description = ''
+      owner = ''
       done = true
     } catch {
       failed = true
@@ -39,6 +45,14 @@
   <select bind:value={priority} aria-label="priority">
     {#each priorities as p (p)}<option value={p}>{i18n.t.priority[p]}</option>{/each}
   </select>
+  {#if agents.length > 0}
+    <select bind:value={owner} aria-label={i18n.t.taskOwner}>
+      <option value="">{i18n.t.unassigned}</option>
+      {#each agents as a (a.agent_id)}
+        <option value={a.agent_id}>{a.name} · {i18n.t.roles[a.role]}</option>
+      {/each}
+    </select>
+  {/if}
   <button type="submit" disabled={!title.trim() || !hasAgents}>{i18n.t.taskCreate}</button>
   {#if !hasAgents}<p>{i18n.t.taskNeedsAgent}</p>{/if}
   {#if done}<p role="status">{i18n.t.taskCreated}</p>{/if}

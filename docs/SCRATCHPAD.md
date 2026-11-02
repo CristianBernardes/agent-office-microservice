@@ -890,7 +890,48 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - **Validação:** 420 unit (backend), mypy/ruff limpos, 79 testes e svelte-check (frontend).
 - **Limitação:** o frontend não escuta `office/tasks/deleted`; outra aba só atualiza no reload.
 
-## Estado atual e ponto de retomada (após a Rodada 128)
+### Rodada 129 — Ambiente Windows do dono do produto (sem código)
+
+- **Pedido:** o dono do produto passou a rodar o projeto no Windows (antes só Linux/WSL puro,
+  sem Docker Desktop); `OLLAMA_URL_IN_CONTAINER`/`OLLAMA_BASE_URL` apontavam para
+  `172.17.0.1` (bridge do Docker Engine no Linux), que não existe no Docker Desktop for Windows.
+- **Ajuste (apenas `.env` reais, nunca `.env.example`):** `.env` (raiz) e `backend/.env` passam a
+  usar `http://host.docker.internal:11434` (porta padrão do Ollama no Windows) em vez de
+  `172.17.0.1`. `host.docker.internal` resolve tanto para o container do backend (via
+  `OLLAMA_URL_IN_CONTAINER`, sobrescrito pelo `docker-compose.yml`) quanto para execução local
+  fora de container no mesmo host Windows.
+- **Suporte adicional (sem alterar código do projeto):** diagnóstico e correção de ambiente —
+  habilitar "Add the `*.docker.internal` names to the host's hosts file" nas configurações do
+  Docker Desktop; habilitar a integração WSL com a distro `Ubuntu-24.04`; reinício de
+  `wsl --shutdown` + Docker Desktop após erro transitório `Wsl/Service/0x8007274c` na integração;
+  localização e inicialização do executável per-user (`%LOCALAPPDATA%\Programs\DockerDesktop\`)
+  quando o atalho do menu Iniciar não abria a janela.
+- **Validação:** nenhum teste automatizado aplicável (mudança de configuração local/ambiente,
+  não de código versionado além dos dois `.env`, que são ignorados pelo git).
+- **Limitação:** o ADR-009 documenta `172.17.0.1` como valor padrão para Linux/Docker Engine
+  nativo; o Windows com Docker Desktop precisa de `host.docker.internal` — isso é uma divergência
+  de ambiente local, não uma mudança na documentação/padrão do projeto (`.env.example` inalterado).
+
+### Rodada 130 — Selecionar responsável já na criação da tarefa
+
+- **Pedido:** no formulário de nova tarefa, se já houver profissionais contratados, deve ser
+  possível selecionar o responsável no momento da criação (não só depois, editando a tarefa). O
+  `select` de responsável só deve aparecer se houver ao menos um agente contratado.
+- **Frontend:** `TaskForm.svelte` recebe a lista de `agents` (antes só recebia `hasAgents:
+  boolean`); exibe um `<select>` de responsável (com opção "Sem responsável") somente quando
+  `agents.length > 0`, no mesmo padrão já usado em `TaskEditModal.svelte`; o `ownerId` escolhido
+  é enviado ao callback `onsubmit`. `App.svelte` passa `agents={team}` ao `TaskForm` e, em
+  `createTask`, após criar a tarefa via `POST /tasks`, chama `api.setTaskOwner` (endpoint já
+  existente, reaproveitado do fluxo de edição) se um responsável foi selecionado.
+- **Backend:** nenhuma mudança — o endpoint `PUT /tasks/{id}/owner` (`SetTaskOwnerUseCase`) já
+  cobria a atribuição de responsável sem mudar o estágio da tarefa.
+- **Validação:** `npm run test` (frontend) 81 testes verdes, incluindo 2 novos cenários
+  (selecionar responsável no formulário; `select` ausente sem agentes) e 1 teste existente
+  ajustado para a nova assinatura do callback `onsubmit`; `npm run check` (svelte-check + tsc)
+  sem erros ou avisos.
+- **Limitação:** nenhuma identificada; o fluxo reutiliza integralmente a API existente.
+
+## Estado atual e ponto de retomada (após a Rodada 130)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -1007,11 +1048,13 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 126 | este commit | `develop` mesclada na `master`: o workflow de CI sai também da branch padrão | merge sem conflitos | `docs/SCRATCHPAD.md` |
 | 127 | este commit | Bloqueia vazamento do raciocínio do LLM em inglês no balão de pensamento e nos artefatos (ADR-057) | 422 unit (backend); validação manual com gpt-oss real | `backend/src/domain/services/llm_output_guard.py`, `backend/src/infrastructure/llm/ollama_adapter.py`, `backend/src/infrastructure/prompts/file_prompt_provider.py`, `docs/adr/057*`, `docs/SCRATCHPAD.md` |
 | 128 | este commit | Exclusão de tarefas do board pelo dono do produto | 420 unit (backend); 79 (frontend) | `backend/src/application/tasks/task_use_cases.py`, `backend/src/presentation/api/tasks_router.py`, `frontend/src/components/TaskEditModal.svelte`, `README*.md`, `docs/SCRATCHPAD.md` |
+| 129 | este commit | `.env`/`backend/.env` ajustados para `host.docker.internal:11434` (Windows + Docker Desktop, sem Docker Desktop antes); `.env.example` inalterado | sem testes aplicáveis (config local) | `.env`, `backend/.env`, `docs/SCRATCHPAD.md` |
+| 130 | este commit | Seleção de responsável já na criação da tarefa (select só aparece com agentes contratados) | 81 testes (frontend), svelte-check limpo | `frontend/src/components/TaskForm.svelte`, `frontend/src/App.svelte`, `frontend/src/components/components.test.ts`, `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 
 290 testes unitários + 13 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
-ruff e mypy limpos. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
+ruff e mypy limpos. Frontend: 81 testes (vitest) e svelte-check sem erros. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
 activity, research; agentes têm a ferramenta research. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
 Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 001–004.
 
@@ -1021,6 +1064,9 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 - Qualidade das respostas depende do modelo Ollama local; saídas ruins são higienizadas só nos títulos.
 - Sprites verificados por testes unitários e inspeção no navegador; novos sheets exigem conferir quadros.
 - Ollama é externo (não vai no compose).
+- ADR-009 documenta `172.17.0.1` como padrão do projeto para Linux/Docker Engine nativo; no
+  ambiente Windows do dono do produto (Docker Desktop), os `.env` reais usam
+  `host.docker.internal` (Rodada 129) — divergência de ambiente local, não do padrão documentado.
 
 ### Backlog
 
