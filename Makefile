@@ -16,7 +16,7 @@ POETRY      := poetry
 
 .PHONY: help install run up down restart logs ps \
         test test-unit test-integration coverage \
-        migrate migrate-rollback migrate-status migrate-fresh make-migration \
+        migrate migrate-rollback migrate-status migrate-fresh make-migration ensure-backend-up \
         lint format format-go format-frontend format-all type-check check \
         lint-go test-go build-go lint-frontend test-frontend build-frontend \
         install-frontend check-all \
@@ -178,25 +178,33 @@ test-unit: check-poetry
 test-integration: check-poetry
 	cd $(BACKEND_DIR) && $(POETRY) run pytest -m integration -v
 
+## ensure-backend-up: Garante que o container `backend` (e suas dependências,
+## como o postgres) estejam de pé antes de qualquer comando de migration.
+## Idempotente: se já estiver em execução, não reinicia nada.
+ensure-backend-up:
+	@$(COMPOSE) up -d backend
+
 ## migrate: Aplica as migrações pendentes (ADR-018).
-migrate: check-poetry
-	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator migrate
+# Executa dentro do container `backend` (via Poetry já instalado na imagem —
+# ver backend/Dockerfile), dispensando Poetry no host.
+migrate: ensure-backend-up
+	$(COMPOSE) exec backend poetry run python -m src.infrastructure.persistence.migrator migrate
 
 ## migrate-rollback: Desfaz o último batch de migrações.
-migrate-rollback: check-poetry
-	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator rollback
+migrate-rollback: ensure-backend-up
+	$(COMPOSE) exec backend poetry run python -m src.infrastructure.persistence.migrator rollback
 
 ## migrate-status: Lista migrações aplicadas e pendentes.
-migrate-status: check-poetry
-	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator status
+migrate-status: ensure-backend-up
+	$(COMPOSE) exec backend poetry run python -m src.infrastructure.persistence.migrator status
 
 ## migrate-fresh: DESTRUTIVO — recria o schema e reaplica todas as migrações.
-migrate-fresh: check-poetry
-	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator fresh
+migrate-fresh: ensure-backend-up
+	$(COMPOSE) exec backend poetry run python -m src.infrastructure.persistence.migrator fresh
 
 ## make-migration: Cria um par de migração vazio (uso: make make-migration name=create_x_table).
-make-migration: check-poetry
-	cd $(BACKEND_DIR) && $(POETRY) run python -m src.infrastructure.persistence.migrator make $(name)
+make-migration: ensure-backend-up
+	$(COMPOSE) exec backend poetry run python -m src.infrastructure.persistence.migrator make $(name)
 
 ## coverage: Roda os testes unitários com relatório de cobertura no terminal.
 coverage: check-poetry

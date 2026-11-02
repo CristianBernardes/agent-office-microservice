@@ -931,7 +931,55 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   sem erros ou avisos.
 - **Limitação:** nenhuma identificada; o fluxo reutiliza integralmente a API existente.
 
-## Estado atual e ponto de retomada (após a Rodada 130)
+### Rodada 131 — Containers autossuficientes: Poetry e npm sem instalação externa
+
+- **Pedido:** o dono do produto não queria precisar de Poetry nem de Node.js/npm instalados fora
+  do Docker para subir a stack e rodar migrations — tudo deveria funcionar só com `docker`/`docker
+  compose` no host.
+- **Backend (`backend/Dockerfile`):** o estágio final (runtime) passou a instalar também o Poetry
+  (reaproveitando o `site-packages` já populado pelo estágio builder) e a copiar
+  `pyproject.toml`/`poetry.lock*`, permitindo rodar `poetry run ...` **dentro do container**, sem
+  precisar de venv nem de Poetry no host.
+- **`Makefile`:** os alvos `migrate`, `migrate-rollback`, `migrate-status`, `migrate-fresh` e
+  `make-migration` deixaram de depender de `check-poetry`/Poetry local e passaram a executar via
+  `docker compose exec backend poetry run python -m
+  src.infrastructure.persistence.migrator ...`. Novo alvo auxiliar `ensure-backend-up` (idempotente,
+  `docker compose up -d backend`) é pré-requisito dos cinco alvos de migration, garantindo que o
+  container (e o `postgres`, via `depends_on: condition: service_healthy`) esteja de pé antes do
+  comando — dispensando `make up` manual antes de migrar.
+- **Frontend (`frontend/Dockerfile`, novo `frontend/entrypoint.sh`, novo `frontend/nginx.conf`):**
+  o Dockerfile deixou de ser multi-stage (`node:24-alpine` builder → `nginx:1.27-alpine` runtime,
+  com `npm ci`/`npm run build` só em build-time da imagem) e passou a ser uma imagem única
+  `node:24-alpine` com `nginx` instalado via `apk add`. O `entrypoint.sh` roda a cada **subida do
+  container**: `npm install`, `npm run build` (vite build) e publica o `dist/` em
+  `/usr/share/nginx/html` antes de iniciar `nginx -g "daemon off;"`. Como o pacote `nginx` do
+  Alpine vem com um `default.conf` que retorna 404 para tudo (diferente da imagem oficial
+  `nginx:alpine`), foi adicionado `frontend/nginx.conf` servindo `/usr/share/nginx/html` com
+  fallback de SPA (`try_files $uri $uri/ /index.html`).
+- **`docker-compose.yml`:** como o build do frontend agora acontece em runtime (dentro do
+  container), as variáveis `VITE_*` do serviço `frontend` migraram de `build.args` (só existem em
+  build-time da imagem) para `environment:` (lidas pelo Vite via `process.env` quando o
+  `entrypoint.sh` roda `npm run build`).
+- **READMEs (`README.md`, `README.en.md`):** seção "Requisitos"/"Requirements" reescrita —
+  Poetry/Node.js/Go deixam de ser pré-requisitos para **subir o projeto** (`make up`), permanecendo
+  apenas como requisito opcional para desenvolvimento fora do Docker; o roteiro WSL2 no Windows foi
+  simplificado para instalar só `git`/`curl` na distro (nenhuma ferramenta de linguagem). Seção
+  "Desenvolvimento"/"Development" agora separa claramente os alvos de migration (via container, sem
+  Poetry no host) dos alvos de desenvolvimento local do backend (`install`/`lint`/`format`/`test*`,
+  que continuam exigindo Poetry no host por rodarem fora de container).
+- **Validação:** rebuild completo das duas imagens (`docker compose build backend frontend`) e
+  recriação dos containers; `make migrate-status` testado com o `backend` previamente parado,
+  confirmando que `ensure-backend-up` o sobe automaticamente (aguardando o `postgres` ficar
+  healthy) antes de listar as 12 migrações aplicadas; frontend verificado com `curl` (HTTP 200,
+  bundle com as variáveis `VITE_*` do `.env` da raiz corretamente embutidas) e com os logs do
+  `entrypoint.sh` mostrando `npm install`/`vite build` rodando a cada `docker compose up`/`restart`.
+- **Limitação:** o build do frontend agora roda a cada subida do container (sem cache de camada
+  Docker para `node_modules`), adicionando alguns segundos de latência à inicialização em troca de
+  não depender de Node.js no host — trade-off aceito explicitamente pelo dono do produto. O
+  `node_modules` instalado existe apenas dentro do container (não há bind mount do código do
+  frontend no `docker-compose.yml`, decisão também mantida a pedido do dono do produto).
+
+## Estado atual e ponto de retomada (após a Rodada 131)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -1050,13 +1098,17 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 128 | este commit | Exclusão de tarefas do board pelo dono do produto | 420 unit (backend); 79 (frontend) | `backend/src/application/tasks/task_use_cases.py`, `backend/src/presentation/api/tasks_router.py`, `frontend/src/components/TaskEditModal.svelte`, `README*.md`, `docs/SCRATCHPAD.md` |
 | 129 | este commit | `.env`/`backend/.env` ajustados para `host.docker.internal:11434` (Windows + Docker Desktop, sem Docker Desktop antes); `.env.example` inalterado | sem testes aplicáveis (config local) | `.env`, `backend/.env`, `docs/SCRATCHPAD.md` |
 | 130 | este commit | Seleção de responsável já na criação da tarefa (select só aparece com agentes contratados) | 81 testes (frontend), svelte-check limpo | `frontend/src/components/TaskForm.svelte`, `frontend/src/App.svelte`, `frontend/src/components/components.test.ts`, `docs/SCRATCHPAD.md` |
+| 131 | não commitado | Backend roda Poetry dentro do container (migrations via `docker compose exec`, sem Poetry no host); frontend instala npm e builda via `entrypoint.sh` a cada subida (sem Node.js no host); READMEs ajustados | `make migrate-status` com backend parado (sobe via `ensure-backend-up`), `curl` no frontend com `VITE_*` embutidas no bundle | `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/entrypoint.sh`, `frontend/nginx.conf`, `docker-compose.yml`, `Makefile`, `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
 
 ### O que funciona
 
 290 testes unitários + 13 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
 ruff e mypy limpos. Frontend: 81 testes (vitest) e svelte-check sem erros. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
 activity, research; agentes têm a ferramenta research. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
-Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 001–004.
+Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 001–004. Backend e
+frontend sobem via `docker compose up` sem exigir Poetry/Node.js instalados no host (Rodada 131) —
+migrations rodam dentro do container `backend` via `poetry run`; o frontend instala npm e builda via
+`entrypoint.sh` em toda subida do container.
 
 ### Limitações conhecidas
 
@@ -1067,6 +1119,11 @@ Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 00
 - ADR-009 documenta `172.17.0.1` como padrão do projeto para Linux/Docker Engine nativo; no
   ambiente Windows do dono do produto (Docker Desktop), os `.env` reais usam
   `host.docker.internal` (Rodada 129) — divergência de ambiente local, não do padrão documentado.
+- Frontend builda a cada subida do container (`npm install` + `vite build` no `entrypoint.sh`,
+  Rodada 131), sem cache de camada Docker para `node_modules` — adiciona alguns segundos de
+  latência à inicialização, trade-off aceito explicitamente pelo dono do produto em troca de não
+  precisar de Node.js no host; `node_modules` existe só dentro do container (sem bind mount do
+  código do frontend no compose, também decidido pelo dono do produto).
 
 ### Backlog
 

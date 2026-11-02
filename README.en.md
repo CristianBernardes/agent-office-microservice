@@ -463,12 +463,21 @@ Every relevant architectural decision is documented before being implemented:
 
 ### Software
 
+To **bring up the project via `make up`/`docker compose up`** you only need:
+
 - [Docker](https://docs.docker.com/get-docker/) + Docker Compose
-- [Poetry](https://python-poetry.org/docs/#installation) 2.x (local backend development)
-- Node.js 20+ (frontend development) and Go 1.22+ (gateway, optional)
 - [Ollama](https://ollama.com) on the **host** — the project never runs Ollama in a container
   ([ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md))
 - (Optional) free [Tavily](https://app.tavily.com) key for `web_search`
+
+Poetry, Node.js, and Go are **not required** to run the containers: the backend installs its
+dependencies via Poetry inside the image itself (see [`backend/Dockerfile`](backend/Dockerfile)),
+the frontend installs npm packages and builds inside the container on startup (see
+[`frontend/Dockerfile`](frontend/Dockerfile) and [`frontend/entrypoint.sh`](frontend/entrypoint.sh)),
+and the Go gateway is already compiled during `docker build` (see
+[`gateway/Dockerfile`](gateway/Dockerfile)). These tools are only needed if you want to **develop
+outside Docker** (local lint/type-check in your editor, Vite hot-reload, `go vet`/`gofmt`) — see
+the [Development](#development) section.
 
 ### Running on Windows (WSL2 + Docker Desktop)
 
@@ -484,34 +493,17 @@ Desktop** using that distro as its backend. Recommended distro: **Ubuntu 24.04**
 2. **Install Docker Desktop** for Windows and, under **Settings → Resources → WSL Integration**,
    enable integration with the **Ubuntu-24.04** distro. Do not install Docker Engine inside WSL
    separately — Docker Desktop already exposes `docker`/`docker compose` inside the distro.
-3. **Open a terminal in the Ubuntu-24.04 distro** (`wsl -d Ubuntu-24.04`) and install the
-   development tools the project needs — none of them come pre-installed on Ubuntu:
+3. **Open a terminal in the Ubuntu-24.04 distro** (`wsl -d Ubuntu-24.04`) and install only `git`
+   (none of them come pre-installed on Ubuntu). Poetry, Node.js, and Go are **not required**
+   here — the containers already install/compile everything on their own (see [Software](#software)):
 
    ```bash
-   # System packages (backend build, git, utilities)
    sudo apt update && sudo apt upgrade -y
-   sudo apt install -y build-essential git curl wget unzip python3-venv python3-pip
-
-   # Poetry (Python backend dependency manager)
-   curl -sSL https://install.python-poetry.org | python3 -
-   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-   source ~/.bashrc
-   poetry --version
-
-   # Node.js 20+ (frontend) — via NodeSource
-   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-   sudo apt install -y nodejs
-   node --version
-
-   # Go 1.22+ (gateway; also required for `make format-go`/`gofmt`)
-   curl -fsSL https://go.dev/dl/go1.23.4.linux-amd64.tar.gz -o /tmp/go.tar.gz
-   sudo rm -rf /usr/local/go
-   sudo tar -C /usr/local -xzf /tmp/go.tar.gz
-   echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-   source ~/.bashrc
-   go version
+   sudo apt install -y git curl
    ```
 
+   These tools are only needed if you want to develop outside Docker — see
+   [Development](#development) for optional Poetry/Node.js/Go installation in that case.
 4. **Clone the project inside the WSL filesystem** (e.g. `~/projects/`) or access it under
    `/mnt/c/Users/<your-user>/...` if you prefer to keep it on the Windows disk — both work, but
    file operations are faster inside WSL itself.
@@ -619,19 +611,32 @@ All external (host) ports of this project follow the `70` prefix convention — 
 
 ## Development
 
-All development, testing, and quality commands are centralized in the
-[`Makefile`](Makefile):
+All development, testing, quality, and migration commands are centralized in the
+[`Makefile`](Makefile). Migration commands (`make migrate`, `make migrate-status`, etc.) run
+**inside the `backend` container** (via `docker compose exec`), without requiring Poetry on the
+host — the container just needs to be up (the `Makefile` itself ensures that automatically).
+
+`make install`, `make lint`, `make format`, `make type-check`, and `make test*` run locally and
+require Poetry installed on the host — use them only if you're developing the backend outside
+Docker (live lint/type-check in your editor, local debugging, etc.):
 
 ```bash
 make help              # list all available commands
-make install           # install backend dependencies
+make install           # install backend dependencies (requires Poetry on the host)
 make test-unit         # unit tests (fast, no external dependencies)
 make test-integration  # integration tests (requires 'make up')
-make lint              # lint (ruff)
-make format            # automatic formatting (ruff format)
-make type-check        # static type checking (mypy --strict)
-make check             # runs format + lint + type-check + test
+make lint               # lint (ruff)
+make format             # automatic formatting (ruff format)
+make type-check         # static type checking (mypy --strict)
+make check              # runs format + lint + type-check + test
+make migrate             # apply database migrations (via container, no Poetry on host)
 ```
+
+Frontend (Svelte 5, pt/en, config via `frontend/.env`): the container already installs
+dependencies (`npm install`) and builds itself on every startup (see
+[`frontend/entrypoint.sh`](frontend/entrypoint.sh)), with no Node.js required on the host. For
+local development with hot-reload outside Docker:
+`cd frontend && cp .env.example .env && npm ci && npm run dev`; tests with `npx vitest run`.
 
 More details about the backend structure in [`backend/README.md`](backend/README.md).
 
