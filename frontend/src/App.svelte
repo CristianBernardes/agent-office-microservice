@@ -125,7 +125,10 @@
 
   onMount(() => {
     store.load(api).catch(() => {})
-    api.listModels().catch(() => {})
+    api
+      .listModels()
+      .then((list) => (models = list))
+      .catch(() => {})
     api
       .getBoardSettings()
       .then((s) => (agentsCanCreateTasks = s.agents_can_create_tasks))
