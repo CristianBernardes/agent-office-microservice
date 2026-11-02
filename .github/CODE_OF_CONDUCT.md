@@ -1,3 +1,5 @@
+[English version](CODE_OF_CONDUCT.en.md)
+
 # Código de Conduta
 
 ## Compromisso
