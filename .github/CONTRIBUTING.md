@@ -1,3 +1,5 @@
+[English version](CONTRIBUTING.en.md)
+
 # Como contribuir
 
 ## Fluxo

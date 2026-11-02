@@ -1,3 +1,5 @@
+[English version](SECURITY.en.md)
+
 # Política de Segurança
 
 ## Como reportar uma vulnerabilidade

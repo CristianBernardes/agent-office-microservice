@@ -1,16 +1,16 @@
-## O que mudou
+## O que mudou / What changed
 
-<!-- Descreva a mudança de forma objetiva -->
+<!-- Descreva a mudança de forma objetiva / Describe the change concisely -->
 
-## Por quê
+## Por quê / Why
 
-<!-- Motivo ou issue relacionada (ex.: Closes #123) -->
+<!-- Motivo ou issue relacionada / Reason or related issue (e.g. Closes #123) -->
 
-## Como testar
+## Como testar / How to test
 
-<!-- Passos para validar a mudança -->
+<!-- Passos para validar a mudança / Steps to validate the change -->
 
 ## Checklist
 
-- [ ] Os testes passam localmente
-- [ ] A documentação foi atualizada, se necessário
+- [ ] Os testes passam localmente / Tests pass locally
+- [ ] A documentação foi atualizada, se necessário / Documentation updated, if needed
