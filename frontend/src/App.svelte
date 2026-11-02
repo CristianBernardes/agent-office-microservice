@@ -26,6 +26,18 @@
   const api = createApiClient(config.apiUrl, () => i18n.language)
   const store = new OfficeStore()
   let models = $state<string[]>([])
+  let agentsCanCreateTasks = $state(true)
+
+  async function toggleAgentTaskCreation(allowed: boolean) {
+    const previous = agentsCanCreateTasks
+    agentsCanCreateTasks = allowed
+    try {
+      const saved = await api.setBoardSettings({ agents_can_create_tasks: allowed })
+      agentsCanCreateTasks = saved.agents_can_create_tasks
+    } catch {
+      agentsCanCreateTasks = previous
+    }
+  }
 
   let showDonation = $state(shouldShowReminder(readLastShown(), new Date(), config.donationReminderDays))
   const lines = $derived(mergeLogs(store.logs, store.activity))
@@ -113,9 +125,10 @@
 
   onMount(() => {
     store.load(api).catch(() => {})
+    api.listModels().catch(() => {})
     api
-      .listModels()
-      .then((list) => (models = list))
+      .getBoardSettings()
+      .then((s) => (agentsCanCreateTasks = s.agents_can_create_tasks))
       .catch(() => {})
     const stop = connectRealtime(config.mqttWsUrl, {
       onEvent: (event) => store.apply(event),
@@ -157,7 +170,17 @@
   <HireForm defaultModel={config.defaultLlmModel} {models} onsubmit={hireAgent} />
   <div class="grid">
     <GoalForm onsubmit={createGoal} />
-    <TaskForm hasAgents={team.length > 0} agents={team} onsubmit={createTask} />
+    <div>
+      <label class="board-setting">
+        <input
+          type="checkbox"
+          checked={agentsCanCreateTasks}
+          onchange={(e) => toggleAgentTaskCreation(e.currentTarget.checked)}
+        />
+        {i18n.t.agentsCanCreateTasks}
+      </label>
+      <TaskForm hasAgents={team.length > 0} agents={team} onsubmit={createTask} />
+    </div>
   </div>
   <div class="grid">
     <TeamBoard
@@ -250,5 +273,12 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 16px;
+  }
+  .board-setting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
   }
 </style>

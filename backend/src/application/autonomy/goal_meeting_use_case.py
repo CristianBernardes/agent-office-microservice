@@ -18,6 +18,7 @@ from src.application.autonomy.task_title import clean_body, clean_title
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.memory.memory_use_cases import RememberInput, RememberUseCase
 from src.application.relationships.relationship_use_cases import RecordInteractionUseCase
+from src.application.settings.board_settings_use_cases import TaskCreationBlockedError
 from src.application.tasks.task_use_cases import CreateTaskInput, CreateTaskUseCase
 from src.domain.entities.agent import Agent, Role
 from src.domain.entities.artifact import ArtifactType
@@ -284,6 +285,9 @@ class GoalMeetingUseCase:
                         goal_id=goal_id,
                     )
                 )
+            except TaskCreationBlockedError:
+                logger.info("Criação de tarefas por agentes desabilitada; backlog não criado.")
+                return
             except Exception:
                 logger.exception("Falha ao criar tarefa de %s", turn.agent.name)
 
