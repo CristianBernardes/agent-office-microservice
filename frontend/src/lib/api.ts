@@ -27,6 +27,10 @@ export class ApiError extends Error {
   }
 }
 
+export interface BoardSettings {
+  agents_can_create_tasks: boolean;
+}
+
 export interface CreateTaskInput {
   title: string;
   description: string;
@@ -64,6 +68,8 @@ export interface ApiClient {
   createTask(input: CreateTaskInput): Promise<Task>;
   hireAgent(input: HireAgentInput): Promise<Agent>;
   listModels(): Promise<string[]>;
+  getBoardSettings(): Promise<BoardSettings>;
+  setBoardSettings(settings: BoardSettings): Promise<BoardSettings>;
   setOfficeLanguage(language: Language): Promise<void>;
 }
 
@@ -102,6 +108,12 @@ export function createApiClient(
     createGoal: (text) => post<Goal>("/goals", { text }),
     createTask: (input) => post<Task>("/tasks", input),
     listModels: () => request<string[]>("/models"),
+    getBoardSettings: () => request<BoardSettings>("/settings/board"),
+    setBoardSettings: (settings) =>
+      request<BoardSettings>("/settings/board", {
+        method: "PUT",
+        body: JSON.stringify(settings),
+      }),
     setOfficeLanguage: async (language) => {
       await request("/office/language", {
         method: "PUT",

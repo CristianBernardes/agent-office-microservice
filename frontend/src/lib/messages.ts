@@ -50,6 +50,7 @@ export interface Messages {
   goalSubmit: string;
   goalSent: string;
   support: string;
+  agentsCanCreateTasks: string;
   donationTitle: string;
   donationPix: string;
   donationPaypal: string;
@@ -158,6 +159,7 @@ export const pt: Messages = {
   goalSubmit: "Enviar ao time",
   goalSent: "Objetivo enviado!",
   support: "Apoiar o projeto",
+  agentsCanCreateTasks: "Permitir que agentes criem tarefas",
   donationTitle: "Apoie o Agent Office",
   donationPix: "Escaneie o QR code com o app do seu banco para doar via Pix.",
   donationPaypal: "Doe pelo PayPal.",
@@ -300,6 +302,7 @@ export const en: Messages = {
   goalSubmit: "Send to the team",
   goalSent: "Goal sent!",
   support: "Support the project",
+  agentsCanCreateTasks: "Allow agents to create tasks",
   donationTitle: "Support Agent Office",
   donationPix: "Scan the QR code with your bank app to donate via Pix.",
   donationPaypal: "Donate through PayPal.",

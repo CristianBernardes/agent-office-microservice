@@ -40,6 +40,11 @@ from src.application.relationships.relationship_use_cases import (
     RecordInteractionUseCase,
 )
 from src.application.research.research_use_case import ResearchTopicUseCase
+from src.application.settings.board_settings_use_cases import (
+    AgentCreateTaskUseCase,
+    GetBoardSettingsUseCase,
+    UpdateBoardSettingsUseCase,
+)
 from src.application.tasks.task_use_cases import (
     AssignTaskUseCase,
     CompleteTaskUseCase,
@@ -63,6 +68,7 @@ from src.domain.interfaces.memory_repository import IMemoryRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
 from src.domain.interfaces.relationship_repository import IRelationshipRepository
+from src.domain.interfaces.settings_repository import ISettingsRepository
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter
 from src.domain.localization.language import OfficeLanguage
@@ -94,6 +100,9 @@ from src.infrastructure.persistence.in_memory_memory_repository import (
 from src.infrastructure.persistence.in_memory_relationship_repository import (
     InMemoryRelationshipRepository,
 )
+from src.infrastructure.persistence.in_memory_settings_repository import (
+    InMemorySettingsRepository,
+)
 from src.infrastructure.persistence.in_memory_task_repository import InMemoryTaskRepository
 from src.infrastructure.persistence.postgres_activity_repository import (
     PostgresActivityRepository,
@@ -115,6 +124,9 @@ from src.infrastructure.persistence.postgres_memory_repository import (
 )
 from src.infrastructure.persistence.postgres_relationship_repository import (
     PostgresRelationshipRepository,
+)
+from src.infrastructure.persistence.postgres_settings_repository import (
+    PostgresSettingsRepository,
 )
 from src.infrastructure.persistence.postgres_task_repository import PostgresTaskRepository
 from src.infrastructure.prompts.file_prompt_provider import FilePromptProvider
@@ -257,6 +269,22 @@ def get_save_layout_use_case() -> SaveLayoutUseCase:
     return SaveLayoutUseCase(get_layout_repository())
 
 
+# Bloco: configurações do quadro (bloqueio de criação de tarefas pelos agentes).
+@lru_cache
+def get_settings_repository() -> ISettingsRepository:
+    if _use_postgres():
+        return PostgresSettingsRepository(_require_pool())
+    return InMemorySettingsRepository()
+
+
+def get_get_board_settings_use_case() -> GetBoardSettingsUseCase:
+    return GetBoardSettingsUseCase(get_settings_repository())
+
+
+def get_update_board_settings_use_case() -> UpdateBoardSettingsUseCase:
+    return UpdateBoardSettingsUseCase(get_settings_repository())
+
+
 # Bloco: demissões propostas pelo RH e decididas pelo dono do produto (ADR-056).
 @lru_cache
 def get_dismissal_repository() -> IDismissalRepository:
@@ -394,6 +422,10 @@ def get_create_task_use_case() -> CreateTaskUseCase:
     return CreateTaskUseCase(task_repository=get_task_repository(), message_bus=get_message_bus())
 
 
+def get_agent_create_task_use_case() -> CreateTaskUseCase:
+    return AgentCreateTaskUseCase(get_create_task_use_case(), get_get_board_settings_use_case())
+
+
 def get_assign_task_use_case() -> AssignTaskUseCase:
     return AssignTaskUseCase(
         task_repository=get_task_repository(),
@@ -479,7 +511,7 @@ def get_tool_registry() -> ToolRegistry:
         review_artifact_use_case=get_review_artifact_use_case(),
         approve_artifact_use_case=get_approve_artifact_use_case(),
         web_search_adapter=get_web_search_adapter(),
-        create_task_use_case=get_create_task_use_case(),
+        create_task_use_case=get_agent_create_task_use_case(),
         assign_task_use_case=get_assign_task_use_case(),
         complete_task_use_case=get_complete_task_use_case(),
         send_message_use_case=get_send_message_use_case(),
@@ -552,7 +584,7 @@ def get_goal_meeting_use_case() -> GoalMeetingUseCase:
         remember=get_remember_use_case(),
         write_artifact=get_write_artifact_use_case(),
         language=get_settings().language(),
-        create_task=get_create_task_use_case(),
+        create_task=get_agent_create_task_use_case(),
         record_interaction=get_record_interaction_use_case(),
         meeting_repository=get_meeting_repository(),
         rounds=get_settings().meeting_rounds,
@@ -580,6 +612,7 @@ _CACHED_REPOSITORY_FACTORIES = (
     get_relationship_repository,
     get_activity_repository,
     get_layout_repository,
+    get_settings_repository,
     get_meeting_repository,
     get_dismissal_repository,
 )
