@@ -15,6 +15,7 @@ from src.application.artifacts.write_artifact_use_case import (
 )
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.common.agent_status_publisher import publish_agent_status
+from src.application.settings.board_settings_use_cases import GetBoardSettingsUseCase
 from src.application.tasks.task_use_cases import AssignTaskUseCase, MoveTaskUseCase, open_load
 from src.domain.entities.agent import Agent, AgentStatus, Role
 from src.domain.entities.artifact import ArtifactType
@@ -99,6 +100,7 @@ class WorkLoopUseCase:
         language: Language | OfficeLanguage,
         chat_repository: IChatRepository,
         sprint_max_days: int = 15,
+        board_settings: GetBoardSettingsUseCase | None = None,
     ) -> None:
         self._agents = agent_repository
         self._tasks = task_repository
@@ -113,6 +115,7 @@ class WorkLoopUseCase:
         )
         self._chat = chat_repository
         self._sprint_max_days = sprint_max_days
+        self._board_settings = board_settings
 
     @property
     def _language(self) -> Language:
@@ -153,7 +156,12 @@ class WorkLoopUseCase:
             if a.role in EXECUTOR_ROLES and a.status != AgentStatus.OFFLINE
         ]
         open_count = len([t for t in await self._tasks.list_all() if t.status != TaskStatus.DONE])
-        backlog = await self._split_for_team(backlog, max(0, len(workers) - open_count))
+        missing = max(0, len(workers) - open_count)
+        # Dividir tarefas cria tarefas novas: respeita o bloqueio de criação por agentes.
+        settings = self._board_settings
+        if settings is not None and not await settings.agents_can_create_tasks():
+            missing = 0
+        backlog = await self._split_for_team(backlog, missing)
         await self._hold_planning(planner, backlog, workers)
         for task in backlog:
             await self._move.execute(task.task_id, TaskStatus.TODO, planner.agent_id, planner.role)
