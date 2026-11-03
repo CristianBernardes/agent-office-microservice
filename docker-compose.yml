@@ -84,21 +84,25 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: http://localhost:${HOST_PORT_BACKEND}
-        VITE_MQTT_WS_URL: ws://localhost:${HOST_PORT_MQTT_WS}
-        VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE}
-        VITE_PIX_LABEL: ${VITE_PIX_LABEL}
-        VITE_DEFAULT_LLM_MODEL: ${VITE_DEFAULT_LLM_MODEL}
-        VITE_PAYPAL_URL: ${VITE_PAYPAL_URL}
-        VITE_DONATION_REMINDER_DAYS: ${VITE_DONATION_REMINDER_DAYS}
-        VITE_REFRESH_INTERVAL_MS: ${VITE_REFRESH_INTERVAL_MS}
-        VITE_WANDER_INTERVAL_MS: ${VITE_WANDER_INTERVAL_MS}
-        VITE_WIP_LIMIT_TODO: ${VITE_WIP_LIMIT_TODO}
-        VITE_WIP_LIMIT_IN_PROGRESS: ${VITE_WIP_LIMIT_IN_PROGRESS}
-        VITE_WIP_LIMIT_TESTING: ${VITE_WIP_LIMIT_TESTING}
-        VITE_WIP_LIMIT_IN_REVIEW: ${VITE_WIP_LIMIT_IN_REVIEW}
     restart: unless-stopped
+    # `npm install` e `vite build` agora rodam dentro do container, no
+    # entrypoint.sh, a cada subida — por isso as variáveis VITE_* precisam
+    # ser environment variables do container (lidas pelo Vite via
+    # process.env em tempo de execução), não mais build args.
+    environment:
+      VITE_API_URL: http://localhost:${HOST_PORT_BACKEND}
+      VITE_MQTT_WS_URL: ws://localhost:${HOST_PORT_MQTT_WS}
+      VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE}
+      VITE_PIX_LABEL: ${VITE_PIX_LABEL}
+      VITE_DEFAULT_LLM_MODEL: ${VITE_DEFAULT_LLM_MODEL}
+      VITE_PAYPAL_URL: ${VITE_PAYPAL_URL}
+      VITE_DONATION_REMINDER_DAYS: ${VITE_DONATION_REMINDER_DAYS}
+      VITE_REFRESH_INTERVAL_MS: ${VITE_REFRESH_INTERVAL_MS}
+      VITE_WANDER_INTERVAL_MS: ${VITE_WANDER_INTERVAL_MS}
+      VITE_WIP_LIMIT_TODO: ${VITE_WIP_LIMIT_TODO}
+      VITE_WIP_LIMIT_IN_PROGRESS: ${VITE_WIP_LIMIT_IN_PROGRESS}
+      VITE_WIP_LIMIT_TESTING: ${VITE_WIP_LIMIT_TESTING}
+      VITE_WIP_LIMIT_IN_REVIEW: ${VITE_WIP_LIMIT_IN_REVIEW}
     ports:
       - "${HOST_PORT_FRONTEND}:80"
     depends_on:

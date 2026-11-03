@@ -4,6 +4,9 @@
 # Estágio 1 (builder): instala dependências de produção via Poetry, sem
 # dependências de desenvolvimento/teste, para manter a imagem final enxuta.
 # Estágio 2 (runtime): copia apenas o necessário para executar o serviço.
+# O Poetry também é instalado no runtime (sem venv, mesmo site-packages) para
+# permitir rodar `poetry run ...` dentro do container — em particular os
+# comandos de migration do Makefile, sem depender de Poetry no host.
 # ─────────────────────────────────────────────────────────────────────────
 
 FROM python:3.12-slim AS builder
@@ -26,8 +29,15 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# O binário e os pacotes do Poetry já vêm junto na cópia abaixo (o builder o
+# instalou via pip no mesmo site-packages). Falta apenas o pyproject.toml,
+# que o Poetry exige para identificar o projeto ao rodar `poetry run ...`
+# dentro do container (ex.: `make migrate` via `docker compose exec backend`).
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
+
+COPY pyproject.toml poetry.lock* ./
+RUN poetry config virtualenvs.create false
 
 COPY src/ ./src/
 

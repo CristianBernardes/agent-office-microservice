@@ -456,12 +456,21 @@ Toda decisão arquitetural relevante é documentada antes de ser implementada:
 
 ### Software
 
+Para **subir o projeto via `make up`/`docker compose up`** você só precisa de:
+
 - [Docker](https://docs.docker.com/get-docker/) + Docker Compose
-- [Poetry](https://python-poetry.org/docs/#installation) 2.x (desenvolvimento local do backend)
-- Node.js 20+ (desenvolvimento do frontend) e Go 1.22+ (gateway, opcional)
 - [Ollama](https://ollama.com) no **host** — o projeto nunca sobe Ollama em container
   ([ADR-009](docs/adr/009-ollama-externo-ao-docker-compose.md))
 - (Opcional) chave gratuita da [Tavily](https://app.tavily.com) para `web_search`
+
+Poetry, Node.js e Go **não são necessários** para rodar os containers: o backend instala suas
+dependências via Poetry dentro da própria imagem (ver [`backend/Dockerfile`](backend/Dockerfile)),
+o frontend instala os pacotes npm e gera o build dentro do próprio container na subida (ver
+[`frontend/Dockerfile`](frontend/Dockerfile) e [`frontend/entrypoint.sh`](frontend/entrypoint.sh)),
+e o gateway Go já é compilado durante o `docker build` (ver [`gateway/Dockerfile`](gateway/Dockerfile)).
+Essas ferramentas só são necessárias se você quiser **desenvolver fora do Docker** (editor com
+lint/type-check local, hot-reload do Vite, `go vet`/`gofmt`) — veja a seção
+[Desenvolvimento](#desenvolvimento).
 
 ### Rodando no Windows (WSL2 + Docker Desktop)
 
@@ -477,34 +486,17 @@ No Windows, o projeto roda dentro de uma distro **WSL2** (não no Windows nativo
 2. **Instale o Docker Desktop** para Windows e, em **Settings → Resources → WSL Integration**,
    habilite a integração com a distro **Ubuntu-24.04**. Não instale Docker Engine dentro do WSL
    separadamente — o Docker Desktop já disponibiliza o `docker`/`docker compose` dentro da distro.
-3. **Abra um terminal na distro Ubuntu-24.04** (`wsl -d Ubuntu-24.04`) e instale as ferramentas de
-   desenvolvimento que o projeto usa — nenhuma delas vem pré-instalada no Ubuntu:
+3. **Abra um terminal na distro Ubuntu-24.04** (`wsl -d Ubuntu-24.04`) e instale apenas o `git`
+   (nenhum deles vem pré-instalado no Ubuntu). Poetry, Node.js e Go **não são necessários** aqui —
+   os containers já instalam/compilam tudo sozinhos (ver [Software](#software)):
 
    ```bash
-   # Pacotes de sistema (build do backend, git, utilitários)
    sudo apt update && sudo apt upgrade -y
-   sudo apt install -y build-essential git curl wget unzip python3-venv python3-pip
-
-   # Poetry (gerenciador de dependências do backend Python)
-   curl -sSL https://install.python-poetry.org | python3 -
-   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-   source ~/.bashrc
-   poetry --version
-
-   # Node.js 20+ (frontend) — via NodeSource
-   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-   sudo apt install -y nodejs
-   node --version
-
-   # Go 1.22+ (gateway; necessário também para `make format-go`/`gofmt`)
-   curl -fsSL https://go.dev/dl/go1.23.4.linux-amd64.tar.gz -o /tmp/go.tar.gz
-   sudo rm -rf /usr/local/go
-   sudo tar -C /usr/local -xzf /tmp/go.tar.gz
-   echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-   source ~/.bashrc
-   go version
+   sudo apt install -y git curl
    ```
 
+   Essas ferramentas só são necessárias se você quiser desenvolver fora do Docker — veja
+   [Desenvolvimento](#desenvolvimento) para a instalação opcional de Poetry/Node.js/Go nesse caso.
 4. **Clone o projeto dentro do sistema de arquivos do WSL** (ex.: `~/projects/`) ou acesse o
    projeto em `/mnt/c/Users/<seu-usuário>/...` se preferir mantê-lo no disco do Windows — ambos
    funcionam, mas operações de arquivo são mais rápidas dentro do próprio WSL.
@@ -616,21 +608,31 @@ Todas as portas externas (host) deste projeto seguem a convenção de prefixo `7
 
 ## Desenvolvimento
 
-Todos os comandos de desenvolvimento, teste e qualidade estão centralizados no
-[`Makefile`](Makefile):
+Todos os comandos de desenvolvimento, teste, qualidade e migrations estão centralizados no
+[`Makefile`](Makefile). Os comandos de migration (`make migrate`, `make migrate-status`, etc.)
+rodam **dentro do container** `backend` (via `docker compose exec`), sem exigir Poetry no host —
+apenas o container precisa estar de pé (o próprio `Makefile` garante isso automaticamente).
+
+Já `make install`, `make lint`, `make format`, `make type-check` e `make test*` rodam localmente e
+exigem Poetry instalado no host — use-os apenas se for desenvolver o backend fora do Docker (editor
+com lint/type-check ao vivo, depuração local, etc.):
 
 ```bash
 make help              # lista todos os comandos disponíveis
-make install           # instala as dependências do backend
+make install           # instala as dependências do backend (requer Poetry no host)
 make test-unit         # testes unitários (rápidos, sem dependências externas)
 make test-integration  # testes de integração (requer 'make up')
-make lint              # lint (ruff)
-make format            # formatação automática (ruff format)
-make type-check        # verificação de tipos estática (mypy --strict)
-make check             # roda format + lint + type-check + test
+make lint               # lint (ruff)
+make format             # formatação automática (ruff format)
+make type-check         # verificação de tipos estática (mypy --strict)
+make check              # roda format + lint + type-check + test
+make migrate            # aplica as migrações do banco (via container, sem Poetry no host)
 ```
 
-Frontend (Svelte 5, pt/en, config via `frontend/.env`): `cd frontend && cp .env.example .env && npm ci && npm run dev`; testes com `npx vitest run`.
+Frontend (Svelte 5, pt/en, config via `frontend/.env`): o container já instala as dependências
+(`npm install`) e builda sozinho a cada subida (ver [`frontend/entrypoint.sh`](frontend/entrypoint.sh)),
+sem exigir Node.js no host. Para desenvolvimento local com hot-reload fora do Docker:
+`cd frontend && cp .env.example .env && npm ci && npm run dev`; testes com `npx vitest run`.
 
 Mais detalhes sobre a estrutura do backend em [`backend/README.md`](backend/README.md).
 
