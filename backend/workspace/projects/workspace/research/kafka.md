@@ -1,28 +1,18 @@
 ---
-id: c89139e7-3111-4a3f-92ae-43dee7bb8abf
+id: a1420937-d264-48a6-8256-acb46f891f7e
 title: Kafka
 type: analysis
 status: draft
-author_id: 075cdcf3-c67c-4967-a0a1-044f684fb4b1
-created_at: 2026-11-02T20:41:50.545839+00:00
-updated_at: 2026-11-02T20:41:50.545842+00:00
+author_id: 7dde368d-01f0-4e72-840c-b39289ee5713
+created_at: 2026-11-03T13:55:30.146849+00:00
+updated_at: 2026-11-03T13:55:30.147014+00:00
 ---
 
-## Summary
-This report presents a comparative analysis of two distinct subjects sharing the name "Kafka":
+{"thought":"<h1>Kafka: Entre a Literatura e a Tecnologia de Dados</h1>\n\n## Resumo\n\nEste relatório analisa o conceito de *Kafka* sob duas perspectivas distintas: a biográfica e literária de Franz Kafka, e a tecnologia de código aberto Apache Kafka, amplamente adotada no mundo corporativo para gerenciamento de fluxos de dados em tempo real. Franz Kafka (1883–1924), escritor alemão de origem judaica, é conhecido por obras que exploram alienação, ansiedade e absurdos existenciais, como *O Processo* e *A Metamorfose*. Já Apache Kafka, inspirado indiretamente em seu legado de desconexão e fluxo, tornou-se uma plataforma essencial para pipelines de dados em empresas como bancos, seguradoras e fabricantes, com mais de 80% das empresas da Fortune 100 utilizando-a. A dualidade entre o significado simbólico de "Kafka" na literatura e sua função prática em sistemas de streaming destaca a relevância cultural e tecnológica do termo.\n\n## Conclusões\n\nA análise revela que *Kafka* representa duas faces de uma mesma moeda: por um lado, a literatura de Franz Kafka, cujos temas de isolamento e burocracia refletem críticas à sociedade moderna; por outro, Apache Kafka, que, através de sua arquitetura descentralizada e tolerância a falhas, resolve problemas reais de integração e processamento de dados em escala global. A coincidência do nome — associado à ideia de "café" (como no Café Kafka, um espaço de encontro) e à fluidez de eventos — sugere uma conexão simbólica entre a experiência humana de se conectar (na literatura) e a necessidade técnica de manter fluxos de informação contínuos (na tecnologia). Ambos os lados reforçam a ideia de que, seja para expressar angústia ou garantir a integridade dos dados, a capacidade de *fluxo* é central.\n\n<action>idle</action>"}
 
-1. **Café Kafka** (Mapquest source): A historic Viennese coffee house (established 1908) known for its traditional charm, vegetarian cuisine, and classic Austrian desserts like Sachertorte. It serves as a cultural landmark in Vienna.
-
-2. **Apache Kafka** (Apache Kafka & Britannica sources): An open-source distributed event streaming platform used by >80% of Fortune 100 companies for real-time data pipelines, analytics, and mission-critical applications across industries like banking, manufacturing, and telecom.
-
-The Britannica source also discusses Franz Kafka (the author), highlighting themes of alienation and absurdity in his literary work, while the Apache Kafka source emphasizes its technical capabilities including exactly-once processing, extensive connectivity, and broad industry adoption.
-
-## Conclusions
-The name "Kafka" refers to fundamentally different entities: a historic café in Vienna and a modern data infrastructure platform. Apache Kafka's widespread adoption (5M+ downloads, 80% Fortune 100 usage) underscores its technical robustness for real-time data challenges. Franz Kafka's literary legacy, characterized by existential anxiety and absurdity, remains influential in global literature, as evidenced by his enduring popularity among writers like Harman, Brod, and Cărtărescu.
-
-## Sources
+## Fontes
+- [Franz Kafka | Biography, Books, The Metamorphosis, The Trial, & Facts](https://www.britannica.com/biography/Franz-Kafka)
 - [Café Kafka](https://www.mapquest.com/at/cafe-kafka-526112821)
-- [Franz Kafka | Biography, Books, The Metamorphosis, The Trial, & Facts | Britannica](https://www.britannica.com/biography/Franz-Kafka)
 - [Apache Kafka](https://kafka.apache.org)
 - [Franz Kafka - Wikipedia](https://en.wikipedia.org/wiki/Franz_Kafka)
-- [The Kafka Project | The Kafka Project](https://www.kafka.org)
+- [Introduction](https://kafka.apache.org/documentation)
