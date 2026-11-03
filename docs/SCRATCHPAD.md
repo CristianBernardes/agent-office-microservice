@@ -979,7 +979,63 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   `node_modules` instalado existe apenas dentro do container (não há bind mount do código do
   frontend no `docker-compose.yml`, decisão também mantida a pedido do dono do produto).
 
-## Estado atual e ponto de retomada (após a Rodada 131)
+### Rodada 132 — README: roteiro de instalação no Windows (WSL2 + Docker Desktop)
+
+- Nova seção "Rodando no Windows (WSL2 + Docker Desktop)" no `README.md` (commit `c08ed10`):
+  instalar WSL2 com Ubuntu 24.04, habilitar a integração do Docker Desktop com essa distro (sem
+  instalar Docker Engine dentro do WSL) e, dentro da distro, instalar as ferramentas de
+  desenvolvimento opcionais (`build-essential`, Poetry, Node.js 20+, Go 1.22+) — nenhuma vem
+  pré-instalada no Ubuntu. Reforça que o Ollama continua rodando no Windows nativo, nunca dentro
+  do WSL/container.
+- Apenas documentação; sem testes aplicáveis.
+
+### Rodada 133 — Bloquear criação de tarefas por agentes
+
+- **Pedido:** o dono do produto quer poder impedir que agentes autônomos criem novas tarefas no
+  backlog (ex.: durante a divisão de tarefas do planejamento), sem depender só da regra textual
+  da ata de reunião.
+- **Backend (`37f5f03`):** nova tabela `office_settings` (migração `000012`) e
+  `ISettingsRepository` (`backend/src/domain/interfaces/settings_repository.py`) com implementações
+  em memória e Postgres; `BoardSettingsUseCases` (get/update) e rotas
+  `GET`/`PUT /settings/board` (`agents_can_create_tasks`); mensagens i18n para o bloqueio.
+- **Frontend:** toggle em `App.svelte` para o dono ligar/desligar a criação de tarefas pelos
+  agentes, consumindo as novas rotas.
+- **Validação:** `test_agent_task_creation_block.py` cobre o bloqueio; `test_dependencies_postgres.py`
+  ajustado para o novo repositório.
+- **Limitação (resolvida na Rodada 136):** o `WorkLoopUseCase` ainda não consultava essa
+  configuração ao dividir tarefas — a tarefa de divisão podia gerar novas tarefas mesmo com o
+  toggle desligado.
+
+### Rodada 134 — Regressão no select de modelos do formulário de contratação
+
+- **Bug:** o select de modelo de IA no formulário de contratar agente parou de ser preenchido a
+  partir de `GET /models`. Corrigido em `frontend/src/App.svelte` (commits `f550275`/`102f4c6`,
+  aplicados de forma equivalente em três branches/merges paralelos de `develop` — por isso o
+  mesmo diff aparece sob três hashes diferentes no histórico).
+
+### Rodada 135 — Community standards do GitHub
+
+- `.github/CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md` e templates de issue/PR em
+  português (commit `4ea12f8`), depois complementados com as versões em inglês
+  (`CODE_OF_CONDUCT.en.md`, `CONTRIBUTING.en.md`, `SECURITY.en.md`,
+  `ISSUE_TEMPLATE/*.en.md`) e links cruzados pt↔en no topo de cada arquivo (commit `f3759bd`).
+  Apenas documentação de comunidade; sem testes aplicáveis.
+
+### Rodada 136 — `WorkLoopUseCase` respeita o bloqueio de criação de tarefas
+
+- Fecha a limitação da Rodada 133: `WorkLoopUseCase` (`backend/src/application/autonomy/work_loop_use_case.py`)
+  agora consulta `agents_can_create_tasks` antes de dividir uma tarefa em subtarefas; se a criação
+  estiver bloqueada, a divisão (que poderia gerar novas tarefas) é evitada. Ajuste também em
+  `backend/src/presentation/dependencies.py` para injetar a dependência de configurações no caso
+  de uso. Sem teste unitário novo dedicado a este ajuste pontual.
+
+### Rodada 137 — `.env.example` do backend atualizado
+
+- `backend/.env.example` atualizado (commit `dc99ffc`) para refletir variáveis adicionadas nas
+  rodadas recentes (ex.: configuração de bloqueio de tarefas). Apenas documentação de
+  configuração; `.env` reais não versionados não são alterados por este commit.
+
+## Estado atual e ponto de retomada (após a Rodada 137)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -1025,33 +1081,33 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 55 | `dd3d2cc` | README: Quick Start copia os três .env.example |
 | 56 | `4f637a6` | ADR-045: idempotência de activity_events por event_id; conftest movido para tests/unit |
 | 57 | `bce6183` | ADR-046: consumidor Kafka→MQTT fora do escopo (YAGNI, risco de laço) |
-| 58 | este commit | ADR-047: frontend Svelte 5 (mapa, kanban, time, chat, logs, doação pt/en) |
-| 59 | este commit | Dockerfile/compose/CI do frontend e README |
-| 60 | este commit | Frontend: formulário de contratação, `VITE_DEFAULT_LLM_MODEL`, verificação visual |
-| 61 | este commit | Botão "Contratar time padrão" (criar tarefa exige agentes) |
-| 62 | este commit | `GET /models` (Ollama) e seleção do modelo de IA ao contratar |
-| 63 | este commit | Idioma por objetivo (Accept-Language → reunião/prompts) e `/models` sem embeddings |
-| 64 | este commit | ciclo de trabalho autônomo (ADR-048) + escritório vivo no mapa: caminhadas, conversas, sprites distintos, cargo no rótulo |
-| 65 | este commit | Responsável obrigatório fora do backlog + diretiva de idioma nos prompts |
-| 66 | este commit | Poses alternativas dos sprites (interagindo_com_objetos, outra_postura_de_trabalho) |
-| 67 | este commit | Cargos traduzidos nas atas |
-| 68 | este commit | Correção do sprite bugado (interagindo_com_objetos) |
-| 69 | este commit | Reset do banco/workspace, time completo contratado e backlog inicial |
-| 70 | este commit | Kanban: WIP/limites, métricas de fluxo, cargo no cartão, timestamps de task; PayPal visível também em pt |
-| 71 | este commit | Sprint planning conduzido por PO/SM, divisão de tarefas, ADR-049 |
-| 72 | este commit | Refatoração SRP/DRY (task_splitter, _speak), RFC-005 e design doc do ciclo |
-| 73 | este commit | Remove texto de debug `wanderIntervalMs` solto no App.svelte |
-| 74 | f66141a | Timeout do Ollama via .env (`OLLAMA_REQUEST_TIMEOUT_SECONDS`) |
-| 75 | este commit | Modal de doação com a história do projeto (pt/en) |
-| 76 | este commit | Planejamento gera subtarefas distintas (título + entregável) via LLM; título do `.md` de planejamento no idioma do escritório |
-| 77 | este commit | Corrige sessão do chão do escritório inexistente (ciclo falhava em toda fala); recriação do time/tarefas |
-| 78 | fe9850a | Makefile: format-go, format-frontend e format-all |
-| 79 | 4250ad1 | Etapa de teste (QA) antes da revisão — ADR-050 |
-| 80 | (commit anterior) | Kanban: grade com 6 colunas (Concluído visível) |
-| 81 | fa5efa5 | Sprint com no máximo 15 dias fictícios (`SPRINT_MAX_DAYS`) |
-| 82 | 1f0b956 | Kanban: 6 colunas compactas em uma única linha |
-| 83 | 8d87e88 | Workspace fixo (nunca criado em runtime, 777) + `.gitkeep` |
-| 84 | 8d87e88 | Personagens vivos (pausas de descanso/reflexão) + modal de gráficos Kaizen |
+| 58 | `bfd7674` | ADR-047: frontend Svelte 5 (mapa, kanban, time, chat, logs, doação pt/en) |
+| 59 | `5b9d28f` | Dockerfile/compose/CI do frontend e README |
+| 60 | `72b57c2` | Frontend: formulário de contratação, `VITE_DEFAULT_LLM_MODEL`, verificação visual |
+| 61 | `00c3848` | Botão "Contratar time padrão" (criar tarefa exige agentes) |
+| 62 | `3481ea7` | `GET /models` (Ollama) e seleção do modelo de IA ao contratar |
+| 63 | `55fd2b7` | Idioma por objetivo (Accept-Language → reunião/prompts) e `/models` sem embeddings |
+| 64 | `af89e77` | ciclo de trabalho autônomo (ADR-048) + escritório vivo no mapa: caminhadas, conversas, sprites distintos, cargo no rótulo |
+| 65 | `a536e8f` | Responsável obrigatório fora do backlog + diretiva de idioma nos prompts |
+| 66 | `7a7c044` | Poses alternativas dos sprites (interagindo_com_objetos, outra_postura_de_trabalho) |
+| 67 | `71a8e84` | Cargos traduzidos nas atas |
+| 68 | `01b6b55` | Correção do sprite bugado (interagindo_com_objetos) |
+| 69 | `9b50022` | Reset do banco/workspace, time completo contratado e backlog inicial |
+| 70 | `7c989bb` | Kanban: WIP/limites, métricas de fluxo, cargo no cartão, timestamps de task; PayPal visível também em pt |
+| 71 | `e165023` | Sprint planning conduzido por PO/SM, divisão de tarefas, ADR-049 |
+| 72 | `e7a1d43` | Refatoração SRP/DRY (task_splitter, _speak), RFC-005 e design doc do ciclo |
+| 73 | `3a8882d` | Remove texto de debug `wanderIntervalMs` solto no App.svelte |
+| 74 | `f66141a` | Timeout do Ollama via .env (`OLLAMA_REQUEST_TIMEOUT_SECONDS`) |
+| 75 | `fe3fce8` | Modal de doação com a história do projeto (pt/en) |
+| 76 | `84671cb` | Planejamento gera subtarefas distintas (título + entregável) via LLM; título do `.md` de planejamento no idioma do escritório |
+| 77 | `5fb7e7b` | Corrige sessão do chão do escritório inexistente (ciclo falhava em toda fala); recriação do time/tarefas |
+| 78 | `fe9850a` | Makefile: format-go, format-frontend e format-all |
+| 79 | `4250ad1` | Etapa de teste (QA) antes da revisão — ADR-050 |
+| 80 | `3615f39` | Kanban: grade com 6 colunas (Concluído visível) |
+| 81 | `fa5efa5` | Sprint com no máximo 15 dias fictícios (`SPRINT_MAX_DAYS`) |
+| 82 | `1f0b956` | Kanban: 6 colunas compactas em uma única linha |
+| 83 | `8d87e88` | Workspace fixo (nunca criado em runtime, 777) + `.gitkeep` |
+| 84 | `8d87e88` | Personagens vivos (pausas de descanso/reflexão) + modal de gráficos Kaizen |
 | 85 | `1781cfb` | Pendências finais registradas no SCRATCHPAD |
 | 86 | `8bec86a` | ADR-051: idioma do escritório em tempo de execução + trava avisando que trocar pode corromper arquivos |
 | 87 | `2768a1c` | ADR-052: observabilidade completa (Kafka UI, Prometheus, Grafana, exporters, cAdvisor, `/metrics` no backend e no gateway) |
@@ -1072,33 +1128,39 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 102 | `2c16021` | LICENSE (MIT) em inglês e português, com nota de doações voluntárias; links nos READMEs |
 | 103 | `19b9668` | `FUNDING.yml`, badges de licença/doação e rascunhos de divulgação (`docs/divulgacao/`) |
 | 104 | `b95cfb6` | GitHub Sponsors (`CristianBernardes`) no `FUNDING.yml` e nos READMEs |
-| 105 | este commit | `develop` mesclada na `master` (botão Sponsor ativo); Mermaid dos READMEs segue sem validação por renderização (instalação não autorizada) |
-| 106 | este commit | PayPal (link de doação já usado nos READMEs) incluído no `FUNDING.yml` |
-| 107 | este commit | Vídeo de demonstração do YouTube no topo dos READMEs |
-| 108 | este commit | Tentativa de embed (iframe) do vídeo nos READMEs, com a miniatura clicável como alternativa |
-| 109 | este commit | Iframe removido dos READMEs (GitHub não renderiza); aguardando URL `user-attachments` do vídeo para player inline |
-| 110 | este commit | Link simples do YouTube abaixo da miniatura nos READMEs |
-| 111 | este commit | Vídeo de demonstração (`videos/video_demo.mp4`, convertido de HEVC para H.264) em tag `<video>` nos READMEs |
-| 112 | este commit | Tag `<video>` e `videos/video_demo.mp4` removidos (não tocava no GitHub); ficam miniatura e link do YouTube |
-| 113 | este commit | Link simples do YouTube removido dos READMEs (fica só a miniatura clicável) |
-| 114 | este commit | Imagem Agent_Office_2.png como chamada clicável para o vídeo nos READMEs |
-| 115 | este commit | Todas as imagens (badges, vídeo e capturas de tela) centralizadas nos READMEs |
-| 116 | este commit | READMEs: removidas afirmações obsoletas (frontend "não implementado", Phaser, fases pendentes) |
-| 117 | este commit | Verificação final: backend 363 unit, frontend 64 testes verdes; estado atual atualizado. Pendências só do autor: Stripe/Sponsors, conta Apoia-se (trocar [LINK-APOIA-SE] no artigo), publicar divulgação, validar Mermaid |
-| 118 | este commit | Makefile: alvos lint-go, test-go, build-go, lint-frontend, test-frontend, build-frontend, install-frontend e check-all | `make lint-go`, `make lint-frontend` e `make test-go` | `Makefile`, `docs/SCRATCHPAD.md` |
-| 119 | este commit | Containers recriados, banco refeito (`migrator fresh`) e seed de 11 agentes + 15 tarefas para testar a TAVILY_API_KEY | health 200, 11 agentes, 15 tarefas | `docs/SCRATCHPAD.md` |
-| 120 | este commit | Formatação prettier do frontend (`make format-frontend`) commitada | alterações apenas de formato | `frontend/src/**`, `docs/SCRATCHPAD.md` |
-| 121 | este commit | Demitir, arrastar/editar tarefas, roteamento por área, diálogo PO–cliente, demissão aprovada pelo dono (ADR-054/055/056); prettier com plugin Svelte | backend 412 unit + 12 integração; frontend 79 testes | `backend/src/**`, `frontend/src/**`, `docs/adr/05[4-6]*`, `docs/SCRATCHPAD.md` |
-| 122 | este commit | Artefatos `.md` de pesquisa regenerados pelos agentes (`clean-architecture`, `kafka`, `tema`) commitados | apenas conteúdo gerado | `backend/workspace/projects/workspace/research/*.md`, `docs/SCRATCHPAD.md` |
-| 123 | este commit | `develop` mesclada na `master` (rodadas 121–122: poderes do dono, roteamento por área, diálogo PO–cliente, demissão aprovada) | merge sem conflitos | `docs/SCRATCHPAD.md` |
-| 124 | este commit | READMEs pt/en: responsabilidades por cargo, poderes do dono do produto, demissão aprovada e rotas novas | documentação apenas | `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
-| 125 | este commit | Remove o CI/CD: workflow e selo de CI apagados; ADR-040/041 revogados | documentação e configuração | `.github/workflows/ci.yml`, `README*.md`, `docs/adr/*`, `docs/SCRATCHPAD.md` |
-| 126 | este commit | `develop` mesclada na `master`: o workflow de CI sai também da branch padrão | merge sem conflitos | `docs/SCRATCHPAD.md` |
-| 127 | este commit | Bloqueia vazamento do raciocínio do LLM em inglês no balão de pensamento e nos artefatos (ADR-057) | 422 unit (backend); validação manual com gpt-oss real | `backend/src/domain/services/llm_output_guard.py`, `backend/src/infrastructure/llm/ollama_adapter.py`, `backend/src/infrastructure/prompts/file_prompt_provider.py`, `docs/adr/057*`, `docs/SCRATCHPAD.md` |
-| 128 | este commit | Exclusão de tarefas do board pelo dono do produto | 420 unit (backend); 79 (frontend) | `backend/src/application/tasks/task_use_cases.py`, `backend/src/presentation/api/tasks_router.py`, `frontend/src/components/TaskEditModal.svelte`, `README*.md`, `docs/SCRATCHPAD.md` |
-| 129 | este commit | `.env`/`backend/.env` ajustados para `host.docker.internal:11434` (Windows + Docker Desktop, sem Docker Desktop antes); `.env.example` inalterado | sem testes aplicáveis (config local) | `.env`, `backend/.env`, `docs/SCRATCHPAD.md` |
-| 130 | este commit | Seleção de responsável já na criação da tarefa (select só aparece com agentes contratados) | 81 testes (frontend), svelte-check limpo | `frontend/src/components/TaskForm.svelte`, `frontend/src/App.svelte`, `frontend/src/components/components.test.ts`, `docs/SCRATCHPAD.md` |
-| 131 | não commitado | Backend roda Poetry dentro do container (migrations via `docker compose exec`, sem Poetry no host); frontend instala npm e builda via `entrypoint.sh` a cada subida (sem Node.js no host); READMEs ajustados | `make migrate-status` com backend parado (sobe via `ensure-backend-up`), `curl` no frontend com `VITE_*` embutidas no bundle | `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/entrypoint.sh`, `frontend/nginx.conf`, `docker-compose.yml`, `Makefile`, `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
+| 105 | `9f326cb`/`9ecb95d` | `develop` mesclada na `master` (botão Sponsor ativo); Mermaid dos READMEs segue sem validação por renderização (instalação não autorizada) |
+| 106 | `2b46abe` | PayPal (link de doação já usado nos READMEs) incluído no `FUNDING.yml` |
+| 107 | `197e260` | Vídeo de demonstração do YouTube no topo dos READMEs |
+| 108 | `3c4c315` | Tentativa de embed (iframe) do vídeo nos READMEs, com a miniatura clicável como alternativa |
+| 109 | `bed16c5` | Iframe removido dos READMEs (GitHub não renderiza); aguardando URL `user-attachments` do vídeo para player inline |
+| 110 | `f909388` | Link simples do YouTube abaixo da miniatura nos READMEs |
+| 111 | `8f341c9` | Vídeo de demonstração (`videos/video_demo.mp4`, convertido de HEVC para H.264) em tag `<video>` nos READMEs |
+| 112 | `9db4282` | Tag `<video>` e `videos/video_demo.mp4` removidos (não tocava no GitHub); ficam miniatura e link do YouTube |
+| 113 | `b5499ef` | Link simples do YouTube removido dos READMEs (fica só a miniatura clicável) |
+| 114 | `424eccd` | Imagem Agent_Office_2.png como chamada clicável para o vídeo nos READMEs |
+| 115 | `da154f5` | Todas as imagens (badges, vídeo e capturas de tela) centralizadas nos READMEs |
+| 116 | `b25ddaf` | READMEs: removidas afirmações obsoletas (frontend "não implementado", Phaser, fases pendentes) |
+| 117 | `ed874cb` | Verificação final: backend 363 unit, frontend 64 testes verdes; estado atual atualizado. Pendências só do autor: Stripe/Sponsors, conta Apoia-se (trocar [LINK-APOIA-SE] no artigo), publicar divulgação, validar Mermaid |
+| 118 | `7ca1918` | Makefile: alvos lint-go, test-go, build-go, lint-frontend, test-frontend, build-frontend, install-frontend e check-all | `make lint-go`, `make lint-frontend` e `make test-go` | `Makefile`, `docs/SCRATCHPAD.md` |
+| 119 | `0b6e9e9` | Containers recriados, banco refeito (`migrator fresh`) e seed de 11 agentes + 15 tarefas para testar a TAVILY_API_KEY | health 200, 11 agentes, 15 tarefas | `docs/SCRATCHPAD.md` |
+| 120 | `b68add4` | Formatação prettier do frontend (`make format-frontend`) commitada | alterações apenas de formato | `frontend/src/**`, `docs/SCRATCHPAD.md` |
+| 121 | `947f741` | Demitir, arrastar/editar tarefas, roteamento por área, diálogo PO–cliente, demissão aprovada pelo dono (ADR-054/055/056); prettier com plugin Svelte | backend 412 unit + 12 integração; frontend 79 testes | `backend/src/**`, `frontend/src/**`, `docs/adr/05[4-6]*`, `docs/SCRATCHPAD.md` |
+| 122 | `303bc22` | Artefatos `.md` de pesquisa regenerados pelos agentes (`clean-architecture`, `kafka`, `tema`) commitados | apenas conteúdo gerado | `backend/workspace/projects/workspace/research/*.md`, `docs/SCRATCHPAD.md` |
+| 123 | `cd5cf42`/`7d9d258` | `develop` mesclada na `master` (rodadas 121–122: poderes do dono, roteamento por área, diálogo PO–cliente, demissão aprovada) | merge sem conflitos | `docs/SCRATCHPAD.md` |
+| 124 | `742a62d` | READMEs pt/en: responsabilidades por cargo, poderes do dono do produto, demissão aprovada e rotas novas | documentação apenas | `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
+| 125 | `e3945c8` | Remove o CI/CD: workflow e selo de CI apagados; ADR-040/041 revogados | documentação e configuração | `.github/workflows/ci.yml`, `README*.md`, `docs/adr/*`, `docs/SCRATCHPAD.md` |
+| 126 | `d068a8a`/`e749501` | `develop` mesclada na `master`: o workflow de CI sai também da branch padrão | merge sem conflitos | `docs/SCRATCHPAD.md` |
+| 127 | `8b2e029` | Bloqueia vazamento do raciocínio do LLM em inglês no balão de pensamento e nos artefatos (ADR-057) | 422 unit (backend); validação manual com gpt-oss real | `backend/src/domain/services/llm_output_guard.py`, `backend/src/infrastructure/llm/ollama_adapter.py`, `backend/src/infrastructure/prompts/file_prompt_provider.py`, `docs/adr/057*`, `docs/SCRATCHPAD.md` |
+| 128 | `1838b94`/`f912538` | Exclusão de tarefas do board pelo dono do produto | 420 unit (backend); 79 (frontend) | `backend/src/application/tasks/task_use_cases.py`, `backend/src/presentation/api/tasks_router.py`, `frontend/src/components/TaskEditModal.svelte`, `README*.md`, `docs/SCRATCHPAD.md` |
+| 129 | (sem código versionado) | `.env`/`backend/.env` ajustados para `host.docker.internal:11434` (Windows + Docker Desktop, sem Docker Desktop antes); `.env.example` inalterado | sem testes aplicáveis (config local) | `.env`, `backend/.env` (ambos ignorados pelo git) |
+| 130 | `e806442` | Seleção de responsável já na criação da tarefa (select só aparece com agentes contratados) | 81 testes (frontend), svelte-check limpo | `frontend/src/components/TaskForm.svelte`, `frontend/src/App.svelte`, `frontend/src/components/components.test.ts`, `docs/SCRATCHPAD.md` |
+| 131 | `6372256` | Backend roda Poetry dentro do container (migrations via `docker compose exec`, sem Poetry no host); frontend instala npm e builda via `entrypoint.sh` a cada subida (sem Node.js no host); READMEs ajustados | `make migrate-status` com backend parado (sobe via `ensure-backend-up`), `curl` no frontend com `VITE_*` embutidas no bundle | `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/entrypoint.sh`, `frontend/nginx.conf`, `docker-compose.yml`, `Makefile`, `README.md`, `README.en.md`, `docs/SCRATCHPAD.md` |
+| 132 | `c08ed10` | README: roteiro de instalação no Windows via WSL2 + Docker Desktop (distro Ubuntu 24.04, ferramentas de dev dentro da distro) | documentação apenas | `README.md` |
+| 133 | `37f5f03` | Configuração `agents_can_create_tasks` do quadro: nova tabela `office_settings`, rotas `GET/PUT /settings/board`, UI para o dono ligar/desligar a criação de tarefas pelos agentes | teste de bloqueio de criação por agente | `backend/src/application/settings/**`, `backend/src/domain/interfaces/settings_repository.py`, `backend/src/infrastructure/persistence/*settings_repository.py`, `backend/src/presentation/api/settings_router.py`, `frontend/src/App.svelte` |
+| 134 | `f550275`/`102f4c6` | Corrige regressão: select de modelos do formulário de contratação parou de ser populado por `GET /models` (três commits equivalentes em merges paralelos de `develop`) | correção visual (frontend) | `frontend/src/App.svelte` |
+| 135 | `4ea12f8`/`f3759bd` | Community standards: `CODE_OF_CONDUCT`, `CONTRIBUTING`, `SECURITY`, templates de issue/PR (pt/en com links cruzados) | documentação apenas | `.github/CODE_OF_CONDUCT*.md`, `.github/CONTRIBUTING*.md`, `.github/SECURITY*.md`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
+| 136 | `c4e9b27` | `WorkLoopUseCase` passa a respeitar a configuração `agents_can_create_tasks` do quadro: a divisão de tarefas (que poderia criar novas) é evitada quando a criação está bloqueada | ajuste de comportamento, sem teste novo dedicado | `backend/src/application/autonomy/work_loop_use_case.py`, `backend/src/presentation/dependencies.py` |
+| 137 | `dc99ffc` | Atualização de `backend/.env.example` com variáveis adicionadas nas rodadas recentes | documentação de configuração | `backend/.env.example` |
 
 ### O que funciona
 
@@ -1135,9 +1197,14 @@ migrations rodam dentro do container `backend` via `poetry run`; o frontend inst
 ADR antes do código; `make format` a cada mudança; SCRATCHPAD em **todo** commit; sem trailer do
 Copilot; commit e push sempre; responder em português; não parar para perguntar.
 
-## Apêndice — histórico completo do git (auditado na Rodada 92)
+## Apêndice — histórico completo do git (auditado na Rodada 92; atualizado na Rodada 137)
 
-Auditoria: todos os commits do `git log` listados abaixo, em ordem cronológica (alguns não tinham hash na tabela de rodadas).
+Auditoria: todos os commits do `git log --all` listados abaixo, em ordem cronológica (alguns não
+tinham hash na tabela de rodadas). A partir da Rodada 92 passam a aparecer também commits de
+infraestrutura do agente (`Agent host session ... baseline checkpoint/turn N/turn N start`) e
+merges (`Merge pull request`, `Merge branch`, `Merge develop into master`) — mantidos aqui por
+completude do `git log`, mesmo sem narrativa de rodada própria, já que não alteram código de
+produto por si só.
 
 | Hash | Data | Mensagem |
 |---|---|---|
@@ -1272,3 +1339,163 @@ Auditoria: todos os commits do `git log` listados abaixo, em ordem cronológica 
 | `5237cc0` | 2026-10-31 | Rodada 90: seed do time, migração testing validada, design doc do ciclo |
 | `09cf9f6` | 2026-10-31 | Rodada 90: checklist final concluído (conferência no navegador) |
 | `3e75623` | 2026-10-31 | Rodada 91: READMEs detalhados com capturas, Ollama e hardware |
+| `f45e3ea` | 2026-10-31 | Rodada 92: auditoria do git log e apêndice completo no SCRATCHPAD |
+| `96488a8` | 2026-10-31 | Rodada 93: texto de doação transparente no modal e nos READMEs |
+| `b04ff45` | 2026-10-31 | Rodada 94: modal de confirmação profissional na troca de idioma |
+| `d31ab04` | 2026-10-31 | Rodada 95: corrige sprites girando (anima só uma direção da folha) |
+| `cd39667` | 2026-10-31 | Rodada 96: README com alerta de idioma e fluxo Mermaid dos containers |
+| `76f091c` | 2026-10-31 | Rodada 97: corrige sprite do carrinho de props e adiciona sql/ com tarefas pt/en |
+| `bf8793b` | 2026-10-31 | feat: Postgres e MQTT por padrão, testes isolados, títulos de tarefa higienizados (ADR-053) |
+| `9424777` | 2026-10-31 | docs: imagem do Grafana nos READMEs pt/en |
+| `2e3ce57` | 2026-10-31 | docs: legendas das imagens nos READMEs |
+| `42dc1d9` | 2026-10-31 | docs: corrige renderização das legendas das imagens nos READMEs |
+| `927edb3` | 2026-10-31 | docs: centraliza a seção de doação nos READMEs |
+| `3998ea9` | 2026-10-31 | feat: higieniza descrições de tarefas, isola testes de integração e verifica fluxo MQTT→Kafka |
+| `2c16021` | 2026-10-31 | docs: adiciona LICENSE MIT em inglês e português com nota de doações voluntárias |
+| `19b9668` | 2026-10-31 | docs: FUNDING.yml, badges de licença/doação e rascunhos de divulgação |
+| `b95cfb6` | 2026-10-31 | docs: adiciona GitHub Sponsors ao FUNDING.yml e aos READMEs |
+| `9f326cb` | 2026-10-31 | docs: registra rodada 105 (merge na master) |
+| `9ecb95d` | 2026-10-31 | Merge pull request #1 from CristianBernardes/develop |
+| `2b46abe` | 2026-10-31 | docs: inclui PayPal no FUNDING.yml |
+| `c631760` | 2026-10-31 | Merge remote-tracking branch 'origin/master' |
+| `197e260` | 2026-10-31 | docs: adiciona vídeo de demonstração no topo dos READMEs |
+| `a6396ab` | 2026-10-31 | Merge develop into master |
+| `3c4c315` | 2026-10-31 | docs: tenta embed iframe do vídeo nos READMEs |
+| `a61ed58` | 2026-10-31 | Merge develop into master |
+| `bed16c5` | 2026-10-31 | docs: remove iframe do vídeo (não renderiza no GitHub) |
+| `18cd72b` | 2026-10-31 | Merge develop into master |
+| `f909388` | 2026-10-31 | docs: adiciona link do YouTube no formato simples |
+| `bfd811c` | 2026-10-31 | Merge develop into master |
+| `8f341c9` | 2026-10-31 | docs: vídeo de demonstração em MP4 (H.264) embutido nos READMEs |
+| `dc430a5` | 2026-10-31 | Merge develop into master |
+| `9db4282` | 2026-10-31 | docs: remove vídeo embutido (não tocava); mantém link do YouTube |
+| `8cc4b20` | 2026-10-31 | Merge develop into master |
+| `b5499ef` | 2026-10-31 | docs: remove link simples do YouTube dos READMEs |
+| `a2c5228` | 2026-10-31 | Merge develop into master |
+| `424eccd` | 2026-10-31 | docs: usa Agent_Office_2.png como chamada para o vídeo |
+| `f62aa0f` | 2026-10-31 | Merge develop into master |
+| `da154f5` | 2026-10-31 | docs: centraliza todas as imagens dos READMEs |
+| `345f601` | 2026-10-31 | Merge develop into master |
+| `b25ddaf` | 2026-10-31 | docs: remove pendências inexistentes dos READMEs (frontend e gateway já implementados) |
+| `74b541b` | 2026-10-31 | Merge develop into master |
+| `ed874cb` | 2026-10-31 | docs: verificação final e estado atual |
+| `c3ec815` | 2026-10-31 | Merge develop into master |
+| `7ca1918` | 2026-10-31 | build: alvos de lint, teste e build de Go e frontend no Makefile |
+| `3360ee2` | 2026-10-31 | Merge develop into master |
+| `0b6e9e9` | 2026-10-31 | docs(scratchpad): rodada 119, banco refeito e seed |
+| `fc919b6` | 2026-10-31 | Merge develop into master |
+| `b68add4` | 2026-10-31 | style(frontend): formata o frontend com prettier |
+| `957f22a` | 2026-10-31 | Merge develop into master |
+| `ca235fb` | 2026-10-31 | Atualização do Link do Vídeo |
+| `450ec86` | 2026-10-31 | Merge pull request #2 from CristianBernardes/develop |
+| `43c41b4` | 2026-10-31 | Agent host session 6f73206e-cd7b-4bcd-8b1a-ca6b309e8139 - baseline checkpoint |
+| `ac677ba` | 2026-10-31 | Agent host session 6f73206e-cd7b-4bcd-8b1a-ca6b309e8139 - turn 1 start |
+| `d646c0f` | 2026-10-31 | Agent host session 6f73206e-cd7b-4bcd-8b1a-ca6b309e8139 - turn 1 |
+| `b2aab6c` | 2026-10-31 | Agent host session 7f667ded-8d8c-4c07-9b7b-89f20f56a451 - baseline checkpoint |
+| `4e40cc7` | 2026-10-31 | Agent host session 564f1508-38ae-4a6c-9ca5-b7747fe242af - baseline checkpoint |
+| `38b6ca1` | 2026-10-31 | Agent host session 9539eef0-0a35-4bc3-be7a-3a535095978e - baseline checkpoint |
+| `3dddb6f` | 2026-10-31 | Agent host session 0d5dbc41-b276-4ee6-be66-223a2b987321 - baseline checkpoint |
+| `c4d16b3` | 2026-10-31 | Agent host session 042c4cfd-2603-419d-a4e6-175494067c31 - baseline checkpoint |
+| `43e047d` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - baseline checkpoint |
+| `2e3e769` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 1 start |
+| `1637add` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 1 |
+| `c839cd3` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 2 start |
+| `bd5072c` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 2 |
+| `947f741` | 2026-11-01 | feat: poderes do dono, roteamento por área, diálogo PO-cliente e demissão aprovada (ADR-054/055/056) |
+| `303bc22` | 2026-11-01 | docs: atualiza artefatos de pesquisa gerados pelos agentes |
+| `0509844` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 3 start |
+| `f3bb866` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 3 |
+| `cd5cf42` | 2026-11-01 | docs(scratchpad): rodada 123, merge da develop na master |
+| `7d9d258` | 2026-11-01 | Merge develop into master |
+| `e97563d` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 4 start |
+| `23f5c6b` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 4 |
+| `742a62d` | 2026-11-01 | docs: READMEs e SCRATCHPAD com responsabilidades por cargo, poderes do dono e demissão aprovada |
+| `9ebc4d6` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 5 start |
+| `b7a9934` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 5 |
+| `e3945c8` | 2026-11-01 | chore: remove CI/CD (workflow, selo e ADR-040/041 revogados) |
+| `7b181d3` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 6 start |
+| `947f023` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 6 |
+| `d068a8a` | 2026-11-01 | docs(scratchpad): rodada 126, merge da develop na master |
+| `e749501` | 2026-11-01 | Merge develop into master |
+| `bd58a33` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 7 start |
+| `b173f8a` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 7 |
+| `69e5a24` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 8 start |
+| `80524f1` | 2026-11-01 | Agent host session 57dc4d89-2711-4b04-8889-e2723ae68fd6 - turn 8 |
+| `8b2e029` | 2026-11-01 | fix(llm): bloqueia vazamento do raciocínio do LLM em outro idioma (ADR-057) |
+| `99da28a` | 2026-11-01 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - baseline checkpoint |
+| `b1f565a` | 2026-11-01 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 1 start |
+| `64333ca` | 2026-11-01 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 1 |
+| `1838b94` | 2026-11-01 | feat: permite excluir tarefas do board |
+| `a4c87c5` | 2026-11-01 | Merge branch 'develop' |
+| `b6041ee` | 2026-11-01 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 2 start |
+| `28fc600` | 2026-11-01 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 2 |
+| `f912538` | 2026-11-01 | docs: README e SCRATCHPAD com exclusão de tarefas (rodada 128) |
+| `892f787` | 2026-11-01 | Merge branch 'develop' |
+| `7687ebe` | 2026-11-01 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 3 start |
+| `bc13ef7` | 2026-11-01 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 3 |
+| `2610b18` | 2026-11-02 | Merge pull request #3 from CristianBernardes/develop |
+| `e806442` | 2026-11-02 | feat: permite selecionar responsavel ja na criacao da tarefa |
+| `c08ed10` | 2026-11-02 | Atualização do README.md |
+| `1c757eb` | 2026-11-02 | Merge branch 'develop' |
+| `37f5f03` | 2026-11-02 | feat: permite bloquear criação de tarefas por agentes |
+| `9613a99` | 2026-11-02 | Merge pull request #4 from CristianBernardes/develop |
+| `102f4c6` | 2026-11-02 | fix(frontend): volta a preencher o select de modelos com GET /models |
+| `5657133` | 2026-11-02 | fix(frontend): volta a preencher o select de modelos com GET /models |
+| `fd64ce2` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 4 start |
+| `1027374` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 4 |
+| `07065b8` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 5 start |
+| `531e542` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 5 |
+| `6e5d1bf` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 6 start |
+| `67316e2` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 6 |
+| `f550275` | 2026-11-02 | fix(frontend): volta a preencher o select de modelos com GET /models |
+| `37d5a16` | 2026-11-02 | Merge remote-tracking branch 'origin/develop' into develop |
+| `9892c2a` | 2026-11-02 | Merge remote-tracking branch 'origin/develop' into develop |
+| `2bcdbf7` | 2026-11-02 | fix(frontend): volta a preencher o select de modelos com GET /models |
+| `6a4ac8e` | 2026-11-02 | Merge remote-tracking branch 'origin/master' |
+| `ec4b4e1` | 2026-11-02 | Merge remote-tracking branch 'origin/master' |
+| `69f98b2` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 7 start |
+| `66a91d2` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 7 |
+| `4b68e2b` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 8 start |
+| `92c7a79` | 2026-11-02 | Agent host session bd7a51ba-fe34-49e4-abdf-40293b255483 - turn 8 |
+| `36e37da` | 2026-11-02 | Merge pull request #5 from CristianBernardes/develop |
+| `4ea12f8` | 2026-11-02 | docs: adiciona arquivos de community standards |
+| `55cd6b7` | 2026-11-02 | Merge pull request #6 from CristianBernardes/develop |
+| `f3759bd` | 2026-11-02 | docs: versões em inglês dos community standards com links cruzados |
+| `c9a2c48` | 2026-11-02 | Merge pull request #7 from CristianBernardes/develop |
+| `f8b12c8` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - baseline checkpoint |
+| `977bdbd` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 1 start |
+| `1e57f85` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 1 |
+| `69d3194` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 2 start |
+| `488b099` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 2 |
+| `7296db7` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 3 start |
+| `ae2eb3d` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 3 |
+| `dc4eb8e` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 4 start |
+| `aaf2f57` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 4 |
+| `33ec62e` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 5 start |
+| `6500f2d` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 5 |
+| `67fb414` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 6 start |
+| `aff46e3` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 6 |
+| `f3b89b7` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 7 start |
+| `8a6a12a` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 7 |
+| `e262e10` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 8 start |
+| `ae671bd` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 8 |
+| `1c14b8a` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 9 start |
+| `7fdf9ea` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 9 |
+| `2bdb763` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 10 start |
+| `f477bbc` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 10 |
+| `6372256` | 2026-11-02 | feat: colocar dependências de desenvolvimento em contêiner para simplificar a configuração |
+| `bb5bcc3` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 11 start |
+| `7b553dd` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 11 |
+| `b6e8d28` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 12 start |
+| `b06ef4c` | 2026-11-03 | Agent host session 92e9ba09-5af3-4113-839f-2c7e27205cd5 - turn 12 |
+| `e1dd829` | 2026-11-03 | Merge pull request #8 from CristianBernardes/develop |
+| `ad7e7be` | 2026-11-03 | Agent host session b25cd88c-3d3d-4c45-b12c-83092626b4d1 - baseline checkpoint |
+| `9d02ccc` | 2026-11-03 | Agent host session b25cd88c-3d3d-4c45-b12c-83092626b4d1 - turn 1 start |
+| `15a518e` | 2026-11-03 | Agent host session b25cd88c-3d3d-4c45-b12c-83092626b4d1 - turn 1 |
+| `c4e9b27` | 2026-11-03 | feat: respeita configuração de bloqueio de criação de tarefas por agentes |
+| `c827cd7` | 2026-11-03 | Merge pull request #9 from CristianBernardes/develop |
+| `9d94edc` | 2026-11-03 | Agent host session b25cd88c-3d3d-4c45-b12c-83092626b4d1 - turn 2 start |
+| `95d99a1` | 2026-11-03 | Agent host session b25cd88c-3d3d-4c45-b12c-83092626b4d1 - turn 2 |
+| `dc99ffc` | 2026-11-03 | feat: Atualização do .env.example |
+| `e3799e4` | 2026-11-03 | Merge pull request #10 from CristianBernardes/develop |
+| `891f3f2` | 2026-11-03 | Agent host session 88479d08-5c94-49a5-afa2-e5cceb005b2c - baseline checkpoint |
