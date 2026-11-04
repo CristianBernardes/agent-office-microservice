@@ -55,7 +55,7 @@ class AgentThinkUseCase:
         system_prompt = self._prompt_provider.get_system_prompt(
             agent.role, agent.name, language or self._language
         )
-        llm_adapter = self._llm_adapter_resolver.resolve(agent.role)
+        llm_adapter = self._llm_adapter_resolver.resolve(agent.role, agent.llm_model)
         response = await llm_adapter.think(system_prompt=system_prompt, context=context)
 
         await self._publish_thought(agent, response)

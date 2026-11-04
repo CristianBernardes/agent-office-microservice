@@ -76,7 +76,7 @@ class ResearchTopicUseCase:
         if agent is None:
             raise AgentNotFoundError("agent.not_found", agent_id=data.agent_id)
         results = await self._safe_search(data)
-        response = await self._llm.resolve(agent.role).think(
+        response = await self._llm.resolve(agent.role, agent.llm_model).think(
             self._labels["system"], self._context(data.topic, results)
         )
         content = (response.thought or response.raw_response).rstrip() + self._footer(results)

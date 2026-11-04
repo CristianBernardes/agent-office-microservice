@@ -32,7 +32,7 @@ class _Resolver(ILlmAdapterResolver):
     def __init__(self) -> None:
         self.llm = MockLlmAdapter()
 
-    def resolve(self, role: Role) -> ILlmAdapter:
+    def resolve(self, role: Role, model: str = "") -> ILlmAdapter:
         return self.llm
 
 

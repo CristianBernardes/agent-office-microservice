@@ -52,6 +52,13 @@ class Settings(BaseSettings):
     ollama_model: str = "nemotron-3.5-bolt:latest"
     ollama_embedding_model: str = "nomic-embed-text:latest"
 
+    # Anthropic (Claude) — provedor em nuvem, opcional, por papel (ver ADR-058).
+    # Ausente por padrão: só é exigida quando um papel tem um modelo "claude-*"
+    # configurado (ver `AGENT_*_MODEL` abaixo).
+    anthropic_api_key: str = ""
+    anthropic_base_url: str = "https://api.anthropic.com"
+    anthropic_request_timeout_seconds: float = Field(default=120, gt=0)
+
     # Idioma do escritório (prompts dos agentes e fallback de erros): pt | en (ADR-012)
     office_language: str = "en"
 

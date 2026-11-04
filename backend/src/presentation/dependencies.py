@@ -73,7 +73,9 @@ from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter
 from src.domain.localization.language import OfficeLanguage
 from src.infrastructure.config.settings import Settings, get_settings
+from src.infrastructure.llm.anthropic_adapter import AnthropicAdapter
 from src.infrastructure.llm.ollama_adapter import OllamaAdapter
+from src.infrastructure.llm.provider_resolution import is_anthropic_model
 from src.infrastructure.llm.role_based_llm_adapter_resolver import RoleBasedLlmAdapterResolver
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
 from src.infrastructure.messaging.mqtt_message_bus import MqttMessageBus
@@ -345,15 +347,25 @@ def get_message_bus() -> IMessageBus:
     return InMemoryMessageBus()
 
 
-# Bloco: resolvedor de adaptador de LLM por papel (singleton por processo).
-# `OllamaAdapter` é o provedor padrão deste projeto (ver ADR-005 e ADR-009); o
-# modelo de cada papel vem de `.env` (Fase 5).
+# Bloco: resolvedor de adaptador de LLM por papel, com override por agente
+# (singleton por processo). `OllamaAdapter` é o provedor padrão deste projeto
+# (ver ADR-005 e ADR-009). Modelos "claude-*" são roteados para
+# `AnthropicAdapter` (ver ADR-058). O modelo escolhido na contratação de cada
+# agente (`agent.llm_model`) tem prioridade sobre o modelo padrão do papel
+# vindo de `.env` (ver ADR-059).
 @lru_cache
 def get_llm_adapter_resolver() -> ILlmAdapterResolver:
     """Retorna a instância única do resolvedor de adaptadores de LLM por papel."""
     settings = get_application_settings()
 
-    def build_ollama_adapter(model: str) -> ILlmAdapter:
+    def build_llm_adapter(model: str) -> ILlmAdapter:
+        if is_anthropic_model(model):
+            return AnthropicAdapter(
+                api_key=settings.anthropic_api_key,
+                model=model,
+                base_url=settings.anthropic_base_url,
+                request_timeout_seconds=settings.anthropic_request_timeout_seconds,
+            )
         return OllamaAdapter(
             base_url=settings.ollama_base_url,
             model=model,
@@ -362,7 +374,7 @@ def get_llm_adapter_resolver() -> ILlmAdapterResolver:
         )
 
     return RoleBasedLlmAdapterResolver(
-        adapter_factory=build_ollama_adapter,
+        adapter_factory=build_llm_adapter,
         default_model=settings.ollama_model,
         role_models=settings.role_models(),
     )

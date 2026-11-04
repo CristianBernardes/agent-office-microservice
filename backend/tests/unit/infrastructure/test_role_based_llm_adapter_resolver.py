@@ -41,6 +41,17 @@ class TestRoleBasedLlmAdapterResolver:
         assert resolver.resolve(Role.TECH_LEAD) is resolver.resolve(Role.QA_ENGINEER)
         assert created == ["big-model"]
 
+    def test_agent_model_takes_priority_over_role_model(self) -> None:
+        """O modelo escolhido na contratação do agente sobrepõe o padrão do papel (ADR-059)."""
+        created: list[str] = []
+        self._build(created).resolve(Role.TECH_LEAD, "claude-sonnet-4-5-20250929")
+        assert created == ["claude-sonnet-4-5-20250929"]
+
+    def test_empty_agent_model_falls_back_to_role_model(self) -> None:
+        created: list[str] = []
+        self._build(created).resolve(Role.TECH_LEAD, "")
+        assert created == ["big-model"]
+
 
 class TestSettingsRoleModels:
     def test_only_non_empty_role_models_are_returned(self) -> None:
