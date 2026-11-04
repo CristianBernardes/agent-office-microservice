@@ -135,6 +135,7 @@ describe("createApiClient", () => {
     const api = createApiClient("http://api", () => "en", fetchMock);
     await api.fireAgent("a1");
     await api.sendMessage("s1", "oi");
+    await api.sendHrMessage("demita o Davi", "s2");
     await api.listPendingDismissals();
     await api.decideDismissal("p1", true);
     await api.decideDismissal("p2", false);
@@ -142,6 +143,7 @@ describe("createApiClient", () => {
     expect(urls).toEqual([
       "http://api/agents/a1/fire",
       "http://api/messages",
+      "http://api/hr/chat",
       "http://api/dismissals?pending_only=true",
       "http://api/dismissals/p1/approve",
       "http://api/dismissals/p2/reject",

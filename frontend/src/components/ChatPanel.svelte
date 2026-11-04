@@ -6,18 +6,26 @@
     messages,
     agents,
     canSend = false,
+    title,
+    placeholder,
+    disabledHint,
     onsend,
   }: {
     messages: ChatMessage[]
     agents: Agent[]
     canSend?: boolean
+    title?: string
+    placeholder?: string
+    disabledHint?: string
     onsend?: (content: string) => Promise<void>
   } = $props()
 
   let text = $state('')
   let failed = $state(false)
+  let sending = $state(false)
 
-  const nameOf = (id: string | null) => agents.find((a) => a.agent_id === id)?.name ?? i18n.t.system
+  const nameOf = (message: ChatMessage, id: string | null) =>
+    agents.find((a) => a.agent_id === id)?.name ?? (id === null && message.kind === 'chat' ? i18n.t.you : i18n.t.system)
 
   // Bloco: o cliente (usuário) responde ao Product Owner pelo chat; a resposta vira contexto do time.
   async function send(event: SubmitEvent) {
@@ -25,17 +33,20 @@
     const value = text.trim()
     if (!value || !onsend) return
     failed = false
+    sending = true
     try {
       await onsend(value)
       text = ''
     } catch {
       failed = true
+    } finally {
+      sending = false
     }
   }
 </script>
 
-<section class="panel" aria-label={i18n.t.chat}>
-  <h2>{i18n.t.chat}</h2>
+<section class="panel" aria-label={title ?? i18n.t.chat}>
+  <h2>{title ?? i18n.t.chat}</h2>
   {#if messages.length === 0}
     <p class="empty">{i18n.t.noMessages}</p>
   {:else}
@@ -43,8 +54,8 @@
       {#each messages as message (message.message_id)}
         <li class="kind-{message.kind}">
           <header>
-            <strong>{nameOf(message.sender_id)}</strong>
-            {#if message.recipient_id}<span class="to">→ {nameOf(message.recipient_id)}</span>{/if}
+            <strong>{nameOf(message, message.sender_id)}</strong>
+            {#if message.recipient_id}<span class="to">→ {nameOf(message, message.recipient_id)}</span>{/if}
             <span class="badge">{i18n.t.messageKind[message.kind]}</span>
           </header>
           <p>{message.content}</p>
@@ -56,11 +67,11 @@
     <form onsubmit={send}>
       <input
         bind:value={text}
-        placeholder={canSend ? i18n.t.chatPlaceholder : i18n.t.chatNeedsGoal}
-        aria-label={i18n.t.chatPlaceholder}
-        disabled={!canSend}
+        placeholder={canSend ? (placeholder ?? i18n.t.chatPlaceholder) : (disabledHint ?? i18n.t.chatNeedsGoal)}
+        aria-label={placeholder ?? i18n.t.chatPlaceholder}
+        disabled={!canSend || sending}
       />
-      <button type="submit" disabled={!canSend || !text.trim()}>{i18n.t.chatSend}</button>
+      <button type="submit" disabled={!canSend || sending || !text.trim()}>{i18n.t.chatSend}</button>
     </form>
     {#if failed}<p role="alert">{i18n.t.loadError}</p>{/if}
   {/if}

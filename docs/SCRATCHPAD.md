@@ -1084,7 +1084,29 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   Claude listados no `HireForm`). `ruff`/`mypy` limpos nos arquivos alterados;
   `svelte-check`/`tsc` sem erros.
 
-## Estado atual e ponto de retomada (após a Rodada 138)
+### Rodada 139 — Chat direto do dono com o RH (ADR-060)
+
+- **Pedido do dono do produto:** um quadro de chat com o RH, como o do PO, para discutir o
+  desempenho do time e pedir demissões (a ferramenta `propose_dismissal` existia, mas nunca era
+  usada pelo LLM do RH).
+- **Backend:** `HrChatUseCase` + `POST /hr/chat` (`hr_chat_router.py`): sessão própria
+  (`scenario="hr"`), prompt com o elenco (nome | cargo | `agent_id`) e instrução explícita de
+  chamar `propose_dismissal`; recusas da ferramenta voltam como mensagem `system` localizada;
+  409 sem RH ativo, 404 para sessão inexistente/não-RH. Prompts do RH (pt/en) reforçados.
+  A aprovação final continua no `DismissalModal` (ADR-056).
+- **Frontend:** segundo `ChatPanel` ("Conversa com o RH") com título/placeholder próprios; sessão
+  guardada no `localStorage`; mensagens do dono agora aparecem como "Você" (antes "Sistema");
+  botão bloqueado enquanto o RH responde.
+- **Validação:** backend 453 unit, ruff/mypy limpos; frontend `svelte-check` 0 erros, 83 testes.
+- **Correção (mesma rodada):** a modal não aparecia porque o RH respondia em texto sem emitir
+  `tool_call`. Pedido do dono: a ordem de demissão no chat é detectada automaticamente (sem JSON),
+  mas só cria a proposta pendente; quem demite é o dono na modal (ADR-056). `dismissal_intent.detect_dismissal_targets` (determinístico, pt/en) + `HrChatUseCase`
+  propõe; o LLM não é chamado nesse caso. Perguntas/condicionais não
+  demitem. 455 unit.
+- **Limitações:** sem streaming; detecção por palavras-chave; respostas de conversa não
+  validadas contra um LLM real.
+
+## Estado atual e ponto de retomada (após a Rodada 139)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -1211,6 +1233,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 136 | `c4e9b27` | `WorkLoopUseCase` passa a respeitar a configuração `agents_can_create_tasks` do quadro: a divisão de tarefas (que poderia criar novas) é evitada quando a criação está bloqueada | ajuste de comportamento, sem teste novo dedicado | `backend/src/application/autonomy/work_loop_use_case.py`, `backend/src/presentation/dependencies.py` |
 | 137 | `dc99ffc` | Atualização de `backend/.env.example` com variáveis adicionadas nas rodadas recentes | documentação de configuração | `backend/.env.example` |
 | 138 | `84c5bf9` | Anthropic (Claude) como provedor de LLM por agente (ADR-058); correção do modelo do agente ignorado na resolução do LLM (ADR-059); `GET /models` lista Claude no `HireForm` | 442 unit (backend); 82 (frontend); validação end-to-end real contra a API da Anthropic | `backend/src/infrastructure/llm/anthropic_*.py`, `backend/src/infrastructure/llm/provider_resolution.py`, `backend/src/infrastructure/llm/role_based_llm_adapter_resolver.py`, `backend/src/domain/interfaces/llm_adapter_resolver.py`, `backend/src/application/agents/agent_think_use_case.py`, `backend/src/application/research/research_use_case.py`, `backend/src/presentation/api/models_router.py`, `backend/src/presentation/dependencies.py`, `frontend/src/lib/messages.ts`, `docs/adr/058*`, `docs/adr/059*` |
+| 139 | (este commit) | Chat direto do dono com o RH (ADR-060): `POST /hr/chat`, segundo `ChatPanel`, prompts do RH reforçados | 453 unit (backend); 83 (frontend) | `backend/src/application/chat/hr_chat_use_case.py`, `backend/src/presentation/api/hr_chat_router.py`, `frontend/src/App.svelte`, `frontend/src/components/ChatPanel.svelte`, `docs/adr/060*` |
 
 ### O que funciona
 

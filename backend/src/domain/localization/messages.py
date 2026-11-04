@@ -47,6 +47,16 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "Session with ID '{session_id}' was not found.",
         Language.PT: "Sessão com ID '{session_id}' não foi encontrada.",
     },
+    "hr_chat.unavailable": {
+        Language.EN: "There is no active HR manager to talk to — hire one first.",
+        Language.PT: "Não há um gerente de RH ativo para conversar — contrate um primeiro.",
+    },
+    "hr_chat.proposed": {
+        Language.EN: "Understood. I filed the dismissal proposal for {name} — confirm it in the "
+        "approval window.",
+        Language.PT: "Entendido. Registrei a proposta de demissão de {name} — confirme na janela "
+        "de aprovação.",
+    },
     "artifact.cannot_request_review": {
         Language.EN: "Artifact '{title}' is '{status}' and cannot be sent for review — "
         "only 'draft' artifacts can be reviewed.",

@@ -117,6 +117,11 @@ export const PRIORITIES: readonly Priority[] = [
   "low",
 ];
 
+export interface HrChatReply {
+  session_id: string;
+  reply: ChatMessage;
+}
+
 export interface DismissalProposal {
   proposal_id: string;
   agent_id: string;

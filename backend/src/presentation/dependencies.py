@@ -24,6 +24,7 @@ from src.application.autonomy.client_dialogue_use_case import ClientDialogueUseC
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.autonomy.work_loop_use_case import WorkLoopUseCase
 from src.application.chat.chat_use_cases import SendMessageUseCase, SubmitGoalUseCase
+from src.application.chat.hr_chat_use_case import HrChatUseCase
 from src.application.dismissals.dismissal_use_cases import (
     DecideDismissalUseCase,
     ProposeDismissalUseCase,
@@ -463,6 +464,17 @@ def get_send_message_use_case() -> SendMessageUseCase:
         chat_repository=get_chat_repository(),
         agent_repository=get_agent_repository(),
         message_bus=get_message_bus(),
+    )
+
+
+def get_hr_chat_use_case() -> HrChatUseCase:
+    return HrChatUseCase(
+        agent_repository=get_agent_repository(),
+        chat_repository=get_chat_repository(),
+        dispatch_goal=get_dispatch_goal_use_case(),
+        send_message=get_send_message_use_case(),
+        propose_dismissal=get_propose_dismissal_use_case(),
+        language=get_settings().language(),
     )
 
 

@@ -6,6 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from src.application.chat.hr_chat_use_case import HrChatResult
 from src.domain.entities.chat import ChatMessage, Goal, MessageKind
 
 
@@ -58,4 +59,20 @@ class MessageResponse(BaseModel):
             task_id=message.task_id.value if message.task_id else None,
             kind=message.kind.value,
             content=message.content,
+        )
+
+
+class HrChatRequest(BaseModel):
+    content: str = Field(..., min_length=1, max_length=8000)
+    session_id: UUID | None = None
+
+
+class HrChatResponse(BaseModel):
+    session_id: UUID
+    reply: MessageResponse
+
+    @classmethod
+    def from_result(cls, result: HrChatResult) -> HrChatResponse:
+        return cls(
+            session_id=result.session_id.value, reply=MessageResponse.from_entity(result.reply)
         )

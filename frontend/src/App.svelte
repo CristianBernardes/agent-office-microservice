@@ -19,7 +19,7 @@
   import { mergeLogs } from './lib/logs'
   import { OfficeStore } from './lib/office.svelte'
   import { connectRealtime } from './lib/realtime'
-  import type { Agent, DismissalProposal, HireAgentInput, Priority, Task, TaskStatus } from './lib/types'
+  import type { Agent, ChatMessage, DismissalProposal, HireAgentInput, Priority, Task, TaskStatus } from './lib/types'
 
   const config = loadConfig(import.meta.env)
   i18n.init(config.defaultLanguage, localStorage)
@@ -117,6 +117,32 @@
     await store.load(api)
   }
 
+  // Bloco: chat direto com o RH; a sessão fica no navegador e o histórico vem da API de mensagens.
+  const HR_SESSION_KEY = 'agent-office.hr-session'
+  let hrSessionId = $state<string | null>(localStorage.getItem(HR_SESSION_KEY))
+  let hrMessages = $state<ChatMessage[]>([])
+  const hasHr = $derived(store.agents.some((a) => a.role === 'hr_manager' && a.status !== 'offline'))
+
+  async function loadHrMessages() {
+    if (!hrSessionId) return
+    try {
+      hrMessages = await api.listMessages(hrSessionId)
+    } catch {
+      // Sessão inexistente (ex.: banco reiniciado): recomeça a conversa do zero.
+      hrSessionId = null
+      hrMessages = []
+      localStorage.removeItem(HR_SESSION_KEY)
+    }
+  }
+
+  async function sendHrMessage(content: string) {
+    const result = await api.sendHrMessage(content, hrSessionId)
+    hrSessionId = result.session_id
+    localStorage.setItem(HR_SESSION_KEY, result.session_id)
+    await loadHrMessages()
+    await store.load(api)
+  }
+
   async function sendMessage(content: string) {
     if (!store.sessionId) throw new Error('no session')
     await api.sendMessage(store.sessionId, content)
@@ -125,6 +151,7 @@
 
   onMount(() => {
     store.load(api).catch(() => {})
+    loadHrMessages().catch(() => {})
     api
       .listModels()
       .then((list) => (models = list))
@@ -198,6 +225,15 @@
       agents={store.agents}
       canSend={store.sessionId !== null}
       onsend={sendMessage}
+    />
+    <ChatPanel
+      messages={hrMessages}
+      agents={store.agents}
+      canSend={hasHr}
+      title={i18n.t.hrChat}
+      placeholder={i18n.t.hrChatPlaceholder}
+      disabledHint={i18n.t.hrChatNeedsHr}
+      onsend={sendHrMessage}
     />
     <LogPanel {lines} agents={store.agents} />
   </div>
