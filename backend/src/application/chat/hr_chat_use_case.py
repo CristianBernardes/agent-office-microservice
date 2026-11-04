@@ -1,8 +1,8 @@
 """Caso de uso: o dono do produto conversa diretamente com o RH (ADR-060).
 
-A conversa vive numa sessão própria (``scenario="hr"``), separada dos objetivos. O RH recebe o
-elenco com os identificadores e pode agir pela ferramenta ``propose_dismissal``; a decisão final
-continua sendo do dono, pelo modal de aprovação (ADR-056).
+A conversa vive numa sessão própria (``scenario="hr"``), separada dos objetivos. Quando o dono
+ordena uma demissão, o RH a executa na hora (propõe e aprova em nome do dono, ADR-056); nas demais
+mensagens o RH responde pelo LLM.
 """
 
 from __future__ import annotations
@@ -10,11 +10,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from src.application.agents.dispatch_goal_use_case import DispatchGoalUseCase
-from src.application.agents.fire_agent_use_case import AgentNotFoundError
 from src.application.chat.chat_use_cases import (
     SendMessageInput,
     SendMessageUseCase,
     SessionNotFoundError,
+)
+from src.application.chat.dismissal_intent import detect_dismissal_targets
+from src.application.dismissals.dismissal_use_cases import (
+    DecideDismissalUseCase,
+    ProposeDismissalInput,
+    ProposeDismissalUseCase,
 )
 from src.domain.entities.agent import Agent, AgentStatus, Role
 from src.domain.entities.chat import ChatMessage, MessageKind, Session
@@ -30,33 +35,19 @@ _HISTORY_LIMIT = 20
 
 _PROMPTS = {
     Language.PT: "O dono do produto está conversando diretamente com você, RH.\n"
-    "Elenco atual (nome | cargo | agent_id):\n{roster}\n\n"
+    "Elenco atual (nome | cargo):\n{roster}\n\n"
     "Conversa até agora:\n{history}\n\n"
     "Mensagem do dono: {message}\n\n"
-    "Responda ao dono com objetividade e SOMENTE com um objeto JSON, sem texto fora dele:\n"
-    '{{"thought": "<sua resposta ao dono>", "action": "idle", "tool_call": null}}\n'
-    "Se o dono pedir ou autorizar a demissão de alguém (inclusive confirmando um pedido "
-    "anterior da conversa), preencha tool_call com\n"
-    '{{"tool": "propose_dismissal", "args": {{"agent_id": "<id exato da lista>", '
-    '"reason": "<motivo dado pelo dono>"}}}}\n'
-    "e avise em thought que a proposta foi enviada para a aprovação dele. Nunca diga que "
-    "fez algo (conversou com alguém, chamou ferramenta) sem que isso conste em tool_call; "
-    "você não tem como conversar com outros agentes por aqui. Ao avaliar desempenho, use só o "
-    "que você sabe do time e seja franco.",
+    "Responda ao dono com objetividade. Use só o que você sabe do time e seja franco. Nunca "
+    "diga que fez algo (como conversar com outro agente) que você não fez; demissões ordenadas "
+    "pelo dono são executadas pelo sistema, não por você aqui.",
     Language.EN: "The product owner is talking directly to you, HR.\n"
-    "Current roster (name | role | agent_id):\n{roster}\n\n"
+    "Current roster (name | role):\n{roster}\n\n"
     "Conversation so far:\n{history}\n\n"
     "Owner message: {message}\n\n"
-    "Answer the owner concisely and ONLY with a JSON object, no text outside it:\n"
-    '{{"thought": "<your answer to the owner>", "action": "idle", "tool_call": null}}\n'
-    "If the owner asks for or authorizes someone's dismissal (including confirming an earlier "
-    "request in the conversation), fill tool_call with\n"
-    '{{"tool": "propose_dismissal", "args": {{"agent_id": "<exact id from the list>", '
-    '"reason": "<reason given by the owner>"}}}}\n'
-    "and say in thought that the proposal was sent for their approval. Never claim to have done "
-    "something (talked to someone, called a tool) unless it is in tool_call; you cannot talk to "
-    "other agents from here. When assessing performance, use only what you know of the team "
-    "and be candid.",
+    "Answer the owner concisely. Use only what you know of the team and be candid. Never claim "
+    "to have done something (like talking to another agent) that you did not do; dismissals "
+    "ordered by the owner are carried out by the system, not by you here.",
 }
 
 _OWNER_LABEL = {Language.PT: "Dono", Language.EN: "Owner"}
@@ -87,12 +78,16 @@ class HrChatUseCase:
         chat_repository: IChatRepository,
         dispatch_goal: DispatchGoalUseCase,
         send_message: SendMessageUseCase,
+        propose_dismissal: ProposeDismissalUseCase,
+        decide_dismissal: DecideDismissalUseCase,
         language: Language,
     ) -> None:
         self._agents = agent_repository
         self._chat = chat_repository
         self._dispatch = dispatch_goal
         self._send = send_message
+        self._propose = propose_dismissal
+        self._decide = decide_dismissal
         self._language = language
 
     async def execute(self, data: HrChatInput) -> HrChatResult:
@@ -101,29 +96,49 @@ class HrChatUseCase:
         hr = self._hr_manager(agents)
         session_id = await self._resolve_session(data.session_id)
         names = {a.agent_id: a.name for a in agents}
-        history = "\n".join(
-            f"- {names.get(m.sender_id, 'RH') if m.sender_id else _OWNER_LABEL[lang]}: {m.content}"
-            for m in await self._chat.list_messages(session_id, _HISTORY_LIMIT)
-        )
+        messages = await self._chat.list_messages(session_id, _HISTORY_LIMIT)
         await self._send.execute(
             SendMessageInput(session_id, data.content, recipient_id=hr.agent_id)
         )
-        prompt = _PROMPTS[lang].format(
-            roster=self._roster(agents), history=history, message=data.content
+        active = [a for a in agents if a.status != AgentStatus.OFFLINE]
+        targets = detect_dismissal_targets(
+            data.content, [m.content for m in messages], [a for a in active if a is not hr]
         )
         kind = MessageKind.CHAT
-        try:
+        if targets:
+            content, kind = await self._dismiss(hr, targets, data.content, lang)
+        else:
+            history = "\n".join(
+                f"- {names.get(m.sender_id, 'RH') if m.sender_id else _OWNER_LABEL[lang]}: "
+                f"{m.content}"
+                for m in messages
+            )
+            prompt = _PROMPTS[lang].format(
+                roster=self._roster(agents), history=history, message=data.content
+            )
             content = (await self._dispatch.execute(hr.agent_id, prompt, lang)).thought
-        except (DomainError, AgentNotFoundError) as error:
-            # A ferramenta recusou a ação (ex.: já pendente): o dono precisa ver o motivo.
-            content, kind = error.localized(lang), MessageKind.SYSTEM
-        except (KeyError, ValueError):
-            # Argumentos inválidos na chamada da ferramenta (ex.: id fora da lista).
-            content, kind = translate("hr_chat.invalid_tool_call", lang), MessageKind.SYSTEM
         reply = await self._send.execute(
             SendMessageInput(session_id, content, sender_id=hr.agent_id, kind=kind)
         )
         return HrChatResult(session_id, reply)
+
+    # Bloco: ordem do dono é decisão final (ADR-056 aceita a decisão do dono): propõe e já aprova.
+    async def _dismiss(
+        self, hr: Agent, targets: list[Agent], reason: str, lang: Language
+    ) -> tuple[str, MessageKind]:
+        lines: list[str] = []
+        failed = False
+        for target in targets:
+            try:
+                proposal = await self._propose.execute(
+                    ProposeDismissalInput(hr.agent_id, target.agent_id, reason)
+                )
+                await self._decide.execute(proposal.proposal_id, True)
+                lines.append(translate("hr_chat.dismissed", lang, name=target.name))
+            except DomainError as error:
+                failed = True
+                lines.append(error.localized(lang))
+        return "\n".join(lines), MessageKind.SYSTEM if failed else MessageKind.DECISION
 
     async def _resolve_session(self, session_id: SessionId | None) -> SessionId:
         if session_id is None:
@@ -145,7 +160,5 @@ class HrChatUseCase:
     @staticmethod
     def _roster(agents: list[Agent]) -> str:
         return "\n".join(
-            f"- {a.name} | {a.role.value} | {a.agent_id}"
-            for a in agents
-            if a.status != AgentStatus.OFFLINE
+            f"- {a.name} | {a.role.value}" for a in agents if a.status != AgentStatus.OFFLINE
         )

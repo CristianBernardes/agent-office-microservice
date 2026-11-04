@@ -17,16 +17,18 @@ discutir o desempenho do time com o RH e poder pedir demissões diretamente.
   (`Session.scenario = "hr"`, criada se `session_id` não vier), aciona o RH via
   `DispatchGoalUseCase` e grava a resposta na mesma sessão. O histórico é lido pela rota já
   existente `GET /sessions/{id}/messages`.
-- O prompt entregue ao RH inclui o elenco ativo (nome | cargo | `agent_id`) e a instrução de usar
-  `propose_dismissal` quando o dono pedir ou autorizar uma demissão. Assim o RH tem os
-  identificadores necessários e um pedido explícito, em vez de depender de iniciativa própria.
-- A decisão final continua do dono: a proposta aparece no `DismissalModal` (ADR-056) para
-  aprovar/rejeitar. Recusas da ferramenta (já pendente, já offline, sem motivo) voltam ao chat como
-  mensagem `system` localizada.
+- Ordem de demissão é executada na hora, sem depender do LLM: `detect_dismissal_targets`
+  identifica verbo de demissão + nome do agente (ou o último citado na conversa, em "demita ele");
+  perguntas e frases condicionais ("caso ele não se alinhe…") não são ordens. O RH então propõe
+  e aprova em nome do dono (decisão do dono é final), o agente fica offline e o chat confirma.
+  Nesse caso o LLM não é chamado. As demais mensagens vão ao LLM do RH, com o elenco e o
+  histórico rotulado (Dono/RH) no prompt, proibido de afirmar ações que não fez.
+- Tentar usar a ferramenta `propose_dismissal` via LLM foi descartado: o modelo respondia em
+  texto sem emitir `tool_call` e a demissão nunca acontecia.
 - Sem RH ativo a rota responde 409; sessão inexistente (ou que não seja de RH) responde 404.
 - Frontend: segundo `ChatPanel` ("Conversa com o RH"); o id da sessão fica no `localStorage`.
 
 ## Consequências
 
-- O RH só age quando o LLM escolhe chamar a ferramenta; a qualidade depende do modelo do RH.
+- A detecção é por palavras-chave pt/en; frases ambíguas caem no LLM, sem demitir.
 - Não há streaming: a resposta chega ao fim da chamada do LLM.
