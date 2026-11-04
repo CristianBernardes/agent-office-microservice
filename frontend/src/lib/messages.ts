@@ -80,6 +80,10 @@ export interface Messages {
   chatPlaceholder: string;
   chatSend: string;
   chatNeedsGoal: string;
+  hrChat: string;
+  hrChatPlaceholder: string;
+  hrChatNeedsHr: string;
+  you: string;
   dismissalTitle: string;
   dismissalMessage: string;
   dismissalReason: string;
@@ -192,6 +196,11 @@ export const pt: Messages = {
   chatPlaceholder: "Responda ao time (o Product Owner conversa com você aqui)…",
   chatSend: "Enviar",
   chatNeedsGoal: "Envie um objetivo para abrir a conversa com o time.",
+  hrChat: "Conversa com o RH",
+  hrChatPlaceholder:
+    "Fale com o RH sobre o desempenho do time ou peça uma demissão…",
+  hrChatNeedsHr: "Contrate um gerente de RH para conversar com ele.",
+  you: "Você",
   dismissalTitle: "Proposta de demissão",
   dismissalMessage:
     "{hr} propõe demitir {name} ({role}). A decisão final é sua.",
@@ -335,6 +344,11 @@ export const en: Messages = {
   chatPlaceholder: "Reply to the team (the Product Owner talks to you here)…",
   chatSend: "Send",
   chatNeedsGoal: "Send a goal to open the conversation with the team.",
+  hrChat: "Chat with HR",
+  hrChatPlaceholder:
+    "Talk to HR about the team's performance or ask for a dismissal…",
+  hrChatNeedsHr: "Hire an HR manager to talk to them.",
+  you: "You",
   dismissalTitle: "Dismissal proposal",
   dismissalMessage:
     "{hr} proposes dismissing {name} ({role}). The final decision is yours.",

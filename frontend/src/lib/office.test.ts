@@ -45,6 +45,7 @@ function fakeApi(overrides: Partial<ApiClient> = {}): ApiClient {
     listPendingDismissals: vi.fn().mockResolvedValue([]),
     decideDismissal: vi.fn(),
     sendMessage: vi.fn(),
+    sendHrMessage: vi.fn(),
     ...overrides,
   };
 }

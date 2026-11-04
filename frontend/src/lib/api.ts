@@ -6,6 +6,7 @@ import type {
   DismissalProposal,
   Goal,
   HireAgentInput,
+  HrChatReply,
   Language,
   MoveTaskInput,
   Priority,
@@ -65,6 +66,10 @@ export interface ApiClient {
     approved: boolean,
   ): Promise<DismissalProposal>;
   sendMessage(sessionId: string, content: string): Promise<ChatMessage>;
+  sendHrMessage(
+    content: string,
+    sessionId: string | null,
+  ): Promise<HrChatReply>;
   createTask(input: CreateTaskInput): Promise<Task>;
   hireAgent(input: HireAgentInput): Promise<Agent>;
   listModels(): Promise<string[]>;
@@ -147,6 +152,8 @@ export function createApiClient(
         {},
       ),
     fireAgent: (agentId) => post<Agent>(`/agents/${agentId}/fire`, {}),
+    sendHrMessage: (content, sessionId) =>
+      post<HrChatReply>("/hr/chat", { content, session_id: sessionId }),
     sendMessage: (sessionId, content) =>
       post<ChatMessage>("/messages", { session_id: sessionId, content }),
   };

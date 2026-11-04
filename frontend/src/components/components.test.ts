@@ -152,6 +152,32 @@ describe("componentes", () => {
     expect(screen.getByText("Ana")).toBeTruthy();
   });
 
+  it("ChatPanel aceita título próprio, rotula o dono e envia ao RH", async () => {
+    const message = {
+      message_id: "m1",
+      sender_id: null,
+      recipient_id: "a1",
+      kind: "chat",
+      content: "Como está o Davi?",
+    } as unknown as ChatMessage;
+    const onsend = vi.fn().mockResolvedValue(undefined);
+    render(ChatPanel, {
+      messages: [message],
+      agents: [agent],
+      canSend: true,
+      title: "Chat com o RH",
+      placeholder: "Fale com o RH",
+      onsend,
+    });
+    expect(screen.getByText("Chat com o RH")).toBeTruthy();
+    expect(screen.getByText("Você")).toBeTruthy();
+    await fireEvent.input(screen.getByPlaceholderText("Fale com o RH"), {
+      target: { value: "Demita o Davi" },
+    });
+    await fireEvent.click(screen.getByRole("button"));
+    await waitFor(() => expect(onsend).toHaveBeenCalledWith("Demita o Davi"));
+  });
+
   it("DonationModal usa Pix em pt e PayPal em en", async () => {
     const view = render(DonationModal, {
       paypalUrl: "https://paypal.me/x",
