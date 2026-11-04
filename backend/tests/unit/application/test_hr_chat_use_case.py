@@ -97,7 +97,7 @@ async def test_reuses_the_session_and_sends_history() -> None:
     second = await use_case.execute(HrChatInput("And Davi?", session_id=first.session_id))
 
     assert second.session_id == first.session_id
-    assert "- How is the team?" in dispatch.contexts[1]
+    assert "- Owner: How is the team?" in dispatch.contexts[1]
 
 
 async def test_tool_refusal_becomes_a_system_message() -> None:
@@ -105,6 +105,23 @@ async def test_tool_refusal_becomes_a_system_message() -> None:
     result = await use_case.execute(HrChatInput("Fire Davi"))
     assert result.reply.kind == MessageKind.SYSTEM
     assert "needs a reason" in result.reply.content
+
+
+async def test_invalid_tool_arguments_become_a_system_message() -> None:
+    use_case, _, _ = await _build(_Dispatch(KeyError("agent_id")))
+    result = await use_case.execute(HrChatInput("Fire Davi"))
+    assert result.reply.kind == MessageKind.SYSTEM
+    assert "invalid data" in result.reply.content
+
+
+async def test_history_labels_who_spoke_and_prompt_demands_tool_call_json() -> None:
+    dispatch = _Dispatch()
+    use_case, _, _ = await _build(dispatch)
+    first = await use_case.execute(HrChatInput("Fire Davi"))
+    await use_case.execute(HrChatInput("Yes, do it", session_id=first.session_id))
+    assert "- Owner: Fire Davi" in dispatch.contexts[1]
+    assert "- Rita: Vou propor." in dispatch.contexts[1]
+    assert "propose_dismissal" in dispatch.contexts[1]
 
 
 async def test_requires_an_active_hr_manager() -> None:

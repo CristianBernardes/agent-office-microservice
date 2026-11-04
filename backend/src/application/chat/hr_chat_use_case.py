@@ -22,6 +22,7 @@ from src.domain.exceptions.domain_exceptions import DomainError
 from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.localization.language import Language
+from src.domain.localization.messages import translate
 from src.domain.value_objects.identifiers import SessionId
 
 HR_SCENARIO = "hr"
@@ -32,19 +33,33 @@ _PROMPTS = {
     "Elenco atual (nome | cargo | agent_id):\n{roster}\n\n"
     "Conversa até agora:\n{history}\n\n"
     "Mensagem do dono: {message}\n\n"
-    "Responda ao dono com objetividade. Se ele pedir ou autorizar a demissão de alguém, "
-    "use a ferramenta propose_dismissal com o agent_id exato da lista e o motivo dito por ele; "
-    "o dono confirmará em seguida. Se o pedido for sobre desempenho, avalie com base no que "
-    "você sabe do time e seja franco.",
+    "Responda ao dono com objetividade e SOMENTE com um objeto JSON, sem texto fora dele:\n"
+    '{{"thought": "<sua resposta ao dono>", "action": "idle", "tool_call": null}}\n'
+    "Se o dono pedir ou autorizar a demissão de alguém (inclusive confirmando um pedido "
+    "anterior da conversa), preencha tool_call com\n"
+    '{{"tool": "propose_dismissal", "args": {{"agent_id": "<id exato da lista>", '
+    '"reason": "<motivo dado pelo dono>"}}}}\n'
+    "e avise em thought que a proposta foi enviada para a aprovação dele. Nunca diga que "
+    "fez algo (conversou com alguém, chamou ferramenta) sem que isso conste em tool_call; "
+    "você não tem como conversar com outros agentes por aqui. Ao avaliar desempenho, use só o "
+    "que você sabe do time e seja franco.",
     Language.EN: "The product owner is talking directly to you, HR.\n"
     "Current roster (name | role | agent_id):\n{roster}\n\n"
     "Conversation so far:\n{history}\n\n"
     "Owner message: {message}\n\n"
-    "Answer the owner concisely. If they ask for or authorize someone's dismissal, use the "
-    "propose_dismissal tool with the exact agent_id from the list and the reason they gave; "
-    "the owner will confirm right after. If the request is about performance, assess it from "
-    "what you know of the team and be candid.",
+    "Answer the owner concisely and ONLY with a JSON object, no text outside it:\n"
+    '{{"thought": "<your answer to the owner>", "action": "idle", "tool_call": null}}\n'
+    "If the owner asks for or authorizes someone's dismissal (including confirming an earlier "
+    "request in the conversation), fill tool_call with\n"
+    '{{"tool": "propose_dismissal", "args": {{"agent_id": "<exact id from the list>", '
+    '"reason": "<reason given by the owner>"}}}}\n'
+    "and say in thought that the proposal was sent for their approval. Never claim to have done "
+    "something (talked to someone, called a tool) unless it is in tool_call; you cannot talk to "
+    "other agents from here. When assessing performance, use only what you know of the team "
+    "and be candid.",
 }
+
+_OWNER_LABEL = {Language.PT: "Dono", Language.EN: "Owner"}
 
 
 class HrUnavailableError(DomainError):
@@ -85,8 +100,10 @@ class HrChatUseCase:
         agents = await self._agents.list_all()
         hr = self._hr_manager(agents)
         session_id = await self._resolve_session(data.session_id)
+        names = {a.agent_id: a.name for a in agents}
         history = "\n".join(
-            f"- {m.content}" for m in await self._chat.list_messages(session_id, _HISTORY_LIMIT)
+            f"- {names.get(m.sender_id, 'RH') if m.sender_id else _OWNER_LABEL[lang]}: {m.content}"
+            for m in await self._chat.list_messages(session_id, _HISTORY_LIMIT)
         )
         await self._send.execute(
             SendMessageInput(session_id, data.content, recipient_id=hr.agent_id)
@@ -100,6 +117,9 @@ class HrChatUseCase:
         except (DomainError, AgentNotFoundError) as error:
             # A ferramenta recusou a ação (ex.: já pendente): o dono precisa ver o motivo.
             content, kind = error.localized(lang), MessageKind.SYSTEM
+        except (KeyError, ValueError):
+            # Argumentos inválidos na chamada da ferramenta (ex.: id fora da lista).
+            content, kind = translate("hr_chat.invalid_tool_call", lang), MessageKind.SYSTEM
         reply = await self._send.execute(
             SendMessageInput(session_id, content, sender_id=hr.agent_id, kind=kind)
         )

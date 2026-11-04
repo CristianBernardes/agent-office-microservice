@@ -51,6 +51,10 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "There is no active HR manager to talk to — hire one first.",
         Language.PT: "Não há um gerente de RH ativo para conversar — contrate um primeiro.",
     },
+    "hr_chat.invalid_tool_call": {
+        Language.EN: "HR tried to propose a dismissal with invalid data. Please ask again.",
+        Language.PT: "O RH tentou propor a demissão com dados inválidos. Peça novamente.",
+    },
     "artifact.cannot_request_review": {
         Language.EN: "Artifact '{title}' is '{status}' and cannot be sent for review — "
         "only 'draft' artifacts can be reviewed.",

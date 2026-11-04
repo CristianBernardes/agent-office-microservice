@@ -1098,6 +1098,12 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   guardada no `localStorage`; mensagens do dono agora aparecem como "Você" (antes "Sistema");
   botão bloqueado enquanto o RH responde.
 - **Validação:** backend 453 unit, ruff/mypy limpos; frontend `svelte-check` 0 erros, 83 testes.
+- **Correção (mesma rodada):** a modal não aparecia porque o prompt não exigia o formato JSON
+  do agente; o RH respondia em texto ("chamando a ferramenta…") e nenhum `tool_call` era emitido
+  (o adaptador trata texto puro como pensamento, ADR-036). O prompt do chat com o RH agora exige
+  JSON com `tool_call` de `propose_dismissal`, rotula o histórico (Dono/nome do RH), proíbe
+  afirmar ações não feitas (o RH dizia ter "conversado com o Nuno") e argumentos inválidos viram
+  mensagem `system`. 455 unit. Ainda não validado contra um LLM real.
 - **Limitações:** sem streaming; o RH só propõe se o LLM chamar a ferramenta (o prompt agora
   pede isso explicitamente); não validado contra um LLM real nesta rodada.
 
