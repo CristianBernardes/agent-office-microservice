@@ -1,8 +1,8 @@
 """Caso de uso: o dono do produto conversa diretamente com o RH (ADR-060).
 
 A conversa vive numa sessão própria (``scenario="hr"``), separada dos objetivos. Quando o dono
-ordena uma demissão, o RH a executa na hora (propõe e aprova em nome do dono, ADR-056); nas demais
-mensagens o RH responde pelo LLM.
+ordena uma demissão, o RH registra a proposta na hora; a demissão só acontece quando o dono a
+aprova na modal (ADR-056). Nas demais mensagens o RH responde pelo LLM.
 """
 
 from __future__ import annotations
@@ -17,7 +17,6 @@ from src.application.chat.chat_use_cases import (
 )
 from src.application.chat.dismissal_intent import detect_dismissal_targets
 from src.application.dismissals.dismissal_use_cases import (
-    DecideDismissalUseCase,
     ProposeDismissalInput,
     ProposeDismissalUseCase,
 )
@@ -79,7 +78,6 @@ class HrChatUseCase:
         dispatch_goal: DispatchGoalUseCase,
         send_message: SendMessageUseCase,
         propose_dismissal: ProposeDismissalUseCase,
-        decide_dismissal: DecideDismissalUseCase,
         language: Language,
     ) -> None:
         self._agents = agent_repository
@@ -87,7 +85,6 @@ class HrChatUseCase:
         self._dispatch = dispatch_goal
         self._send = send_message
         self._propose = propose_dismissal
-        self._decide = decide_dismissal
         self._language = language
 
     async def execute(self, data: HrChatInput) -> HrChatResult:
@@ -122,7 +119,7 @@ class HrChatUseCase:
         )
         return HrChatResult(session_id, reply)
 
-    # Bloco: ordem do dono é decisão final (ADR-056 aceita a decisão do dono): propõe e já aprova.
+    # Bloco: ordem do dono vira proposta; quem demite é o dono, na modal de aprovação (ADR-056).
     async def _dismiss(
         self, hr: Agent, targets: list[Agent], reason: str, lang: Language
     ) -> tuple[str, MessageKind]:
@@ -130,15 +127,14 @@ class HrChatUseCase:
         failed = False
         for target in targets:
             try:
-                proposal = await self._propose.execute(
+                await self._propose.execute(
                     ProposeDismissalInput(hr.agent_id, target.agent_id, reason)
                 )
-                await self._decide.execute(proposal.proposal_id, True)
-                lines.append(translate("hr_chat.dismissed", lang, name=target.name))
+                lines.append(translate("hr_chat.proposed", lang, name=target.name))
             except DomainError as error:
                 failed = True
                 lines.append(error.localized(lang))
-        return "\n".join(lines), MessageKind.SYSTEM if failed else MessageKind.DECISION
+        return "\n".join(lines), MessageKind.SYSTEM if failed else MessageKind.CHAT
 
     async def _resolve_session(self, session_id: SessionId | None) -> SessionId:
         if session_id is None:

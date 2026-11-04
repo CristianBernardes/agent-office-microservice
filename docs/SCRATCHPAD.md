@@ -1099,9 +1099,9 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   botão bloqueado enquanto o RH responde.
 - **Validação:** backend 453 unit, ruff/mypy limpos; frontend `svelte-check` 0 erros, 83 testes.
 - **Correção (mesma rodada):** a modal não aparecia porque o RH respondia em texto sem emitir
-  `tool_call`. Pedido do dono: demissão ordenada no chat é executada automaticamente, sem JSON
-  nem modal. `dismissal_intent.detect_dismissal_targets` (determinístico, pt/en) + `HrChatUseCase`
-  propõe e aprova em nome do dono; o LLM não é chamado nesse caso. Perguntas/condicionais não
+  `tool_call`. Pedido do dono: a ordem de demissão no chat é detectada automaticamente (sem JSON),
+  mas só cria a proposta pendente; quem demite é o dono na modal (ADR-056). `dismissal_intent.detect_dismissal_targets` (determinístico, pt/en) + `HrChatUseCase`
+  propõe; o LLM não é chamado nesse caso. Perguntas/condicionais não
   demitem. 455 unit.
 - **Limitações:** sem streaming; detecção por palavras-chave; respostas de conversa não
   validadas contra um LLM real.

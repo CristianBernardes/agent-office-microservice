@@ -474,7 +474,6 @@ def get_hr_chat_use_case() -> HrChatUseCase:
         dispatch_goal=get_dispatch_goal_use_case(),
         send_message=get_send_message_use_case(),
         propose_dismissal=get_propose_dismissal_use_case(),
-        decide_dismissal=get_decide_dismissal_use_case(),
         language=get_settings().language(),
     )
 

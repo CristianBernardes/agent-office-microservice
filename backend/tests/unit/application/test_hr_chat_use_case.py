@@ -8,12 +8,8 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from src.application.agents.fire_agent_use_case import FireAgentUseCase
 from src.application.chat.hr_chat_use_case import HrChatInput, HrChatUseCase, HrUnavailableError
-from src.application.dismissals.dismissal_use_cases import (
-    DecideDismissalUseCase,
-    ProposeDismissalUseCase,
-)
+from src.application.dismissals.dismissal_use_cases import ProposeDismissalUseCase
 from src.domain.entities.agent import Agent, AgentStatus, Personality, Role
 from src.domain.entities.chat import ChatMessage, MessageKind, Session
 from src.domain.localization.language import Language
@@ -27,7 +23,6 @@ from src.infrastructure.persistence.in_memory_dismissal_repository import (
 from src.presentation.dependencies import (
     get_agent_repository,
     get_chat_repository,
-    get_decide_dismissal_use_case,
     get_hr_chat_use_case,
     get_propose_dismissal_use_case,
 )
@@ -87,7 +82,6 @@ async def _build(
         dispatch,  # type: ignore[arg-type]
         _Send(chat),  # type: ignore[arg-type]
         ProposeDismissalUseCase(agents, dismissals, bus),
-        DecideDismissalUseCase(dismissals, FireAgentUseCase(agents), bus),
         Language.EN,
     )
     return use_case, chat, agents, dev
@@ -120,27 +114,29 @@ async def test_history_labels_who_spoke() -> None:
     assert "- Rita: Vou propor." in dispatch.contexts[1]
 
 
-async def test_owner_order_dismisses_immediately_without_calling_the_llm() -> None:
+async def test_owner_order_files_a_pending_proposal_without_calling_the_llm() -> None:
     dispatch = _Dispatch()
     use_case, _, agents, dev = await _build(dispatch)
 
     result = await use_case.execute(HrChatInput("Fire Davi, he keeps missing deadlines"))
 
     assert dispatch.contexts == []
-    assert result.reply.kind == MessageKind.DECISION
-    assert "Davi has been dismissed" in result.reply.content
+    assert "proposal for Davi" in result.reply.content
+    pending = await use_case._propose._dismissals.list_all()  # noqa: SLF001
+    assert [p.agent_id for p in pending] == [dev.agent_id]
+    assert pending[0].reason == "Fire Davi, he keeps missing deadlines"
     stored = await agents.find_by_id(dev.agent_id)
-    assert stored is not None and stored.status == AgentStatus.OFFLINE
+    assert stored is not None and stored.status != AgentStatus.OFFLINE
 
 
 async def test_order_without_a_name_uses_the_last_agent_mentioned() -> None:
-    use_case, _, agents, dev = await _build(_Dispatch())
+    use_case, _, _, dev = await _build(_Dispatch())
     first = await use_case.execute(HrChatInput("Davi is slow lately"))
 
     await use_case.execute(HrChatInput("I want to fire him!", session_id=first.session_id))
 
-    stored = await agents.find_by_id(dev.agent_id)
-    assert stored is not None and stored.status == AgentStatus.OFFLINE
+    pending = await use_case._propose._dismissals.list_all()  # noqa: SLF001
+    assert [p.agent_id for p in pending] == [dev.agent_id]
 
 
 async def test_conditional_or_question_is_not_an_order() -> None:
@@ -155,15 +151,14 @@ async def test_conditional_or_question_is_not_an_order() -> None:
     assert stored is not None and stored.status != AgentStatus.OFFLINE
 
 
-async def test_already_dismissed_agent_is_not_dismissed_again() -> None:
-    dispatch = _Dispatch()
-    use_case, _, _, _ = await _build(dispatch)
+async def test_repeated_order_reports_the_pending_proposal_as_system_message() -> None:
+    use_case, _, _, _ = await _build(_Dispatch())
     await use_case.execute(HrChatInput("Fire Davi"))
 
     result = await use_case.execute(HrChatInput("Fire Davi"))
 
-    assert result.reply.kind == MessageKind.CHAT
-    assert len(dispatch.contexts) == 1
+    assert result.reply.kind == MessageKind.SYSTEM
+    assert "pending" in result.reply.content
 
 
 async def test_requires_an_active_hr_manager() -> None:
@@ -207,7 +202,6 @@ class TestHrChatRoute:
             _Dispatch(),  # type: ignore[arg-type]
             _Send(get_chat_repository()),  # type: ignore[arg-type]
             get_propose_dismissal_use_case(),
-            get_decide_dismissal_use_case(),
             Language.EN,
         )
         try:

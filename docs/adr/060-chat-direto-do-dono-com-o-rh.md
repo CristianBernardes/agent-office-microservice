@@ -20,7 +20,8 @@ discutir o desempenho do time com o RH e poder pedir demissões diretamente.
 - Ordem de demissão é executada na hora, sem depender do LLM: `detect_dismissal_targets`
   identifica verbo de demissão + nome do agente (ou o último citado na conversa, em "demita ele");
   perguntas e frases condicionais ("caso ele não se alinhe…") não são ordens. O RH então propõe
-  e aprova em nome do dono (decisão do dono é final), o agente fica offline e o chat confirma.
+  cria a proposta pendente; a demissão só ocorre quando o dono aprova no `DismissalModal`
+  (ADR-056), que abre assim que o chat recarrega as propostas pendentes.
   Nesse caso o LLM não é chamado. As demais mensagens vão ao LLM do RH, com o elenco e o
   histórico rotulado (Dono/RH) no prompt, proibido de afirmar ações que não fez.
 - Tentar usar a ferramenta `propose_dismissal` via LLM foi descartado: o modelo respondia em

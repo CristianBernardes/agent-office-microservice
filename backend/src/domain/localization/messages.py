@@ -51,9 +51,11 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "There is no active HR manager to talk to — hire one first.",
         Language.PT: "Não há um gerente de RH ativo para conversar — contrate um primeiro.",
     },
-    "hr_chat.dismissed": {
-        Language.EN: "Understood. As you ordered, {name} has been dismissed.",
-        Language.PT: "Entendido. Conforme sua ordem, {name} foi demitido(a).",
+    "hr_chat.proposed": {
+        Language.EN: "Understood. I filed the dismissal proposal for {name} — confirm it in the "
+        "approval window.",
+        Language.PT: "Entendido. Registrei a proposta de demissão de {name} — confirme na janela "
+        "de aprovação.",
     },
     "artifact.cannot_request_review": {
         Language.EN: "Artifact '{title}' is '{status}' and cannot be sent for review — "
