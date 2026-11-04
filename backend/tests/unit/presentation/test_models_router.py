@@ -62,9 +62,7 @@ class TestAnthropicModelsInList:
     ) -> None:
         def handler(request: httpx.Request) -> httpx.Response:
             if "anthropic.com" in str(request.url):
-                return httpx.Response(
-                    200, json={"data": [{"id": "claude-sonnet-4-5-20250929"}]}
-                )
+                return httpx.Response(200, json={"data": [{"id": "claude-sonnet-4-5-20250929"}]})
             return httpx.Response(200, json={"models": [{"name": "a:latest"}]})
 
         _patch_transport(monkeypatch, httpx.MockTransport(handler))

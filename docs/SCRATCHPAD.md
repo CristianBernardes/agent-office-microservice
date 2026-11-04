@@ -1035,7 +1035,56 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   rodadas recentes (ex.: configuração de bloqueio de tarefas). Apenas documentação de
   configuração; `.env` reais não versionados não são alterados por este commit.
 
-## Estado atual e ponto de retomada (após a Rodada 137)
+### Rodada 138 — Anthropic (Claude) como provedor de LLM por agente (ADR-058/059)
+
+- **Pedido do dono do produto:** integrar IAs de ponta em nuvem (ex.: Claude) ao sistema, com a
+  escolha de modelo aparecendo no frontend (formulário de contratação) e tendo efeito real no
+  agente contratado, desde que a credencial (`ANTHROPIC_API_KEY`) esteja configurada no `.env`.
+- **`AnthropicAdapter`** (`backend/src/infrastructure/llm/anthropic_adapter.py`): nova
+  implementação de `ILlmAdapter` via API *Messages* da Anthropic (HTTP puro com `httpx`, sem SDK
+  proprietário — mesmo padrão de integração leve do `OllamaAdapter`/`TavilySearchAdapter`).
+  Qualquer modelo com prefixo `claude-` é roteado automaticamente para esse adaptador
+  (`provider_resolution.py::is_anthropic_model`); todo o restante continua no `OllamaAdapter`.
+  Chave de API opcional em `Settings`, sem valor padrão — só exigida (erro explícito) na primeira
+  chamada `think()` de um papel que efetivamente use Claude, nunca na inicialização do serviço.
+  A Anthropic não tem API de embeddings; `AnthropicAdapter.embed()` levanta
+  `NotImplementedError` deliberadamente (ADR-058).
+- **`GET /models` passa a listar também os modelos Claude** (`models_router.py`): combina os
+  modelos do Ollama com `GET /v1/models` da Anthropic quando `ANTHROPIC_API_KEY` está
+  configurada — sem a chave, nenhuma chamada à Anthropic é feita e nenhum modelo Claude aparece
+  na lista nem no dropdown do `HireForm` (frontend). Rótulo do campo no frontend atualizado de
+  "Modelo (Ollama)" para "Modelo (LLM)" em pt/en, já que a lista agora pode misturar provedores.
+- **Correção de bug: modelo do agente era ignorado na resolução do LLM.** Ao investigar se a
+  escolha de modelo feita na contratação realmente tinha efeito, foi identificado que
+  `AgentThinkUseCase`, `ResearchTopicUseCase` e a memória semântica sempre resolviam o adaptador
+  **pelo papel** (`ILlmAdapterResolver.resolve(agent.role)`), ignorando por completo o
+  `agent.llm_model` individual escolhido na contratação — o campo era salvo e devolvido pela API,
+  mas nunca influenciava qual LLM o agente de fato usava. `ILlmAdapterResolver.resolve()` passou
+  a aceitar um segundo parâmetro opcional (`model: str = ""`); `RoleBasedLlmAdapterResolver`
+  prioriza agora **modelo do agente > modelo do papel (`.env`) > modelo padrão global**.
+  `AgentThinkUseCase` e `ResearchTopicUseCase` repassam `agent.llm_model`; a memória semântica
+  (`memory_use_cases.py`) continua resolvendo só pelo papel, deliberadamente, já que a Anthropic
+  não tem embeddings e um agente com Claude não pode perder a capacidade de memória (ADR-059).
+- **Correção de teste frágil:** `test_research_router.py` sobrescrevia `get_llm_adapter_resolver`
+  via `app.dependency_overrides`, mas essa função é chamada diretamente (não via `Depends(...)`
+  encadeado) dentro de `get_research_use_case()` — o override nunca interceptava de fato, e o
+  teste só passava por coincidência quando o Ollama local da máquina tinha o modelo certo
+  instalado. Corrigido para sobrescrever `get_research_use_case` diretamente (a dependência que a
+  rota de fato declara via `Depends(...)`).
+- **Validação end-to-end real:** subido um backend de teste isolado (memória, porta própria),
+  contratado um agente PO com `claude-haiku-4-5-20251001` e feito `think()` de verdade contra a
+  API da Anthropic (resposta real em português, confirmando a integração). Prova decisiva:
+  reiniciando o mesmo backend com `ANTHROPIC_API_KEY=""`, a mesma chamada falhou com
+  `RuntimeError: ANTHROPIC_API_KEY não configurada...` — confirmando que a chamada é real e
+  depende genuinamente da credencial, não é simulada nem hardcoded.
+- Novos ADRs: `docs/adr/058-anthropic-claude-como-provedor-de-llm-em-nuvem.md` e
+  `docs/adr/059-modelo-do-agente-sobrepoe-modelo-do-papel.md`.
+- Testes: 442 unit no backend (antes 440 — novos cenários de `/models` com/sem chave Anthropic e
+  prioridade do modelo do agente no resolver), 82 no frontend (novo cenário cobrindo modelos
+  Claude listados no `HireForm`). `ruff`/`mypy` limpos nos arquivos alterados;
+  `svelte-check`/`tsc` sem erros.
+
+## Estado atual e ponto de retomada (após a Rodada 138)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -1161,14 +1210,20 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 135 | `4ea12f8`/`f3759bd` | Community standards: `CODE_OF_CONDUCT`, `CONTRIBUTING`, `SECURITY`, templates de issue/PR (pt/en com links cruzados) | documentação apenas | `.github/CODE_OF_CONDUCT*.md`, `.github/CONTRIBUTING*.md`, `.github/SECURITY*.md`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
 | 136 | `c4e9b27` | `WorkLoopUseCase` passa a respeitar a configuração `agents_can_create_tasks` do quadro: a divisão de tarefas (que poderia criar novas) é evitada quando a criação está bloqueada | ajuste de comportamento, sem teste novo dedicado | `backend/src/application/autonomy/work_loop_use_case.py`, `backend/src/presentation/dependencies.py` |
 | 137 | `dc99ffc` | Atualização de `backend/.env.example` com variáveis adicionadas nas rodadas recentes | documentação de configuração | `backend/.env.example` |
+| 138 | `84c5bf9` | Anthropic (Claude) como provedor de LLM por agente (ADR-058); correção do modelo do agente ignorado na resolução do LLM (ADR-059); `GET /models` lista Claude no `HireForm` | 442 unit (backend); 82 (frontend); validação end-to-end real contra a API da Anthropic | `backend/src/infrastructure/llm/anthropic_*.py`, `backend/src/infrastructure/llm/provider_resolution.py`, `backend/src/infrastructure/llm/role_based_llm_adapter_resolver.py`, `backend/src/domain/interfaces/llm_adapter_resolver.py`, `backend/src/application/agents/agent_think_use_case.py`, `backend/src/application/research/research_use_case.py`, `backend/src/presentation/api/models_router.py`, `backend/src/presentation/dependencies.py`, `frontend/src/lib/messages.ts`, `docs/adr/058*`, `docs/adr/059*` |
 
 ### O que funciona
 
-290 testes unitários + 13 de integração (`docker compose up -d postgres mosquitto`, `pytest -m integration`);
-ruff e mypy limpos. Frontend: 81 testes (vitest) e svelte-check sem erros. API: agents, tasks, goals, messages, memories, relationships, meetings, layout,
-activity, research; agentes têm a ferramenta research. i18n pt/en em erros, prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`.
-Autonomia opt-in (`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). ADRs 001–038, RFCs 001–004. Backend e
-frontend sobem via `docker compose up` sem exigir Poetry/Node.js instalados no host (Rodada 131) —
+442 testes unitários (backend) + 13 de integração (`docker compose up -d postgres mosquitto`,
+`pytest -m integration`); ruff e mypy limpos. Frontend: 82 testes (vitest) e svelte-check sem
+erros. API: agents, tasks, goals, messages, memories, relationships, meetings, layout, activity,
+research, models (lista Ollama + Claude); agentes têm a ferramenta research. i18n pt/en em erros,
+prompts e mensagens. Persistência `memory|postgres`, bus `memory|mqtt`. Autonomia opt-in
+(`AUTONOMY_ENABLED`, `MEETING_ROUNDS`). LLM por agente: Ollama como padrão (ADR-005/009) e
+Anthropic/Claude como provedor opcional em nuvem, selecionável por agente individual no formulário
+de contratação quando `ANTHROPIC_API_KEY` está configurada (ADR-058/059) — o modelo escolhido na
+contratação tem prioridade sobre o padrão do papel. ADRs 001–059, RFCs 001–004. Backend e frontend
+sobem via `docker compose up` sem exigir Poetry/Node.js instalados no host (Rodada 131) —
 migrations rodam dentro do container `backend` via `poetry run`; o frontend instala npm e builda via
 `entrypoint.sh` em toda subida do container.
 
@@ -1186,6 +1241,9 @@ migrations rodam dentro do container `backend` via `poetry run`; o frontend inst
   latência à inicialização, trade-off aceito explicitamente pelo dono do produto em troca de não
   precisar de Node.js no host; `node_modules` existe só dentro do container (sem bind mount do
   código do frontend no compose, também decidido pelo dono do produto).
+- Memória semântica (`remember`/`recall`) de um agente com modelo Claude continua usando o
+  embedding do Ollama do papel (`AGENT_<PAPEL>_MODEL`/`OLLAMA_MODEL`), nunca Claude — decisão
+  deliberada (ADR-059), já que a Anthropic não oferece API de embeddings.
 
 ### Backlog
 
@@ -1197,7 +1255,7 @@ migrations rodam dentro do container `backend` via `poetry run`; o frontend inst
 ADR antes do código; `make format` a cada mudança; SCRATCHPAD em **todo** commit; sem trailer do
 Copilot; commit e push sempre; responder em português; não parar para perguntar.
 
-## Apêndice — histórico completo do git (auditado na Rodada 92; atualizado na Rodada 137)
+## Apêndice — histórico completo do git (auditado na Rodada 92; atualizado na Rodada 138)
 
 Auditoria: todos os commits do `git log --all` listados abaixo, em ordem cronológica (alguns não
 tinham hash na tabela de rodadas). A partir da Rodada 92 passam a aparecer também commits de
@@ -1499,3 +1557,21 @@ produto por si só.
 | `dc99ffc` | 2026-11-03 | feat: Atualização do .env.example |
 | `e3799e4` | 2026-11-03 | Merge pull request #10 from CristianBernardes/develop |
 | `891f3f2` | 2026-11-03 | Agent host session 88479d08-5c94-49a5-afa2-e5cceb005b2c - baseline checkpoint |
+| `4611591` | 2026-11-03 | Agent host session 88479d08-5c94-49a5-afa2-e5cceb005b2c - turn 1 start |
+| `a6ff566` | 2026-11-03 | Agent host session 88479d08-5c94-49a5-afa2-e5cceb005b2c - turn 1 |
+| `6201b37` | 2026-11-03 | docs: Atualiza SCRATCHPAD com rodadas recentes e histórico de commits |
+| `2dd54f9` | 2026-11-03 | Merge pull request #11 from CristianBernardes/develop |
+| `d73799f` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - baseline checkpoint |
+| `384df56` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 1 start |
+| `67d1d79` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 1 |
+| `fae1a12` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 2 start |
+| `253ddce` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 2 |
+| `6396d04` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 3 start |
+| `913570a` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 3 |
+| `c2d713c` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 4 start |
+| `37f195f` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 4 |
+| `04d0936` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 5 start |
+| `4fd64b9` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 5 |
+| `b93b341` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 6 start |
+| `2576d64` | 2026-11-04 | Agent host session a98ed388-5d97-46d3-80fb-3ee34183ac6c - turn 6 |
+| `84c5bf9` | 2026-11-04 | feat: integra Anthropic (Claude) como provedor de LLM por agente |

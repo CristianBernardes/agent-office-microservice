@@ -72,3 +72,5 @@
 | [055](./055-dialogo-do-po-com-o-cliente.md) | Diálogo do PO com o cliente | Aceito |
 | [056](./056-demissao-com-aprovacao-do-dono.md) | Demissão proposta pelo RH com aprovação do dono | Aceito |
 | [057](./057-bloquear-raciocinio-do-llm-em-outro-idioma.md) | Bloquear o raciocínio do LLM em outro idioma no texto final | Aceito |
+| [058](./058-anthropic-claude-como-provedor-de-llm-em-nuvem.md) | Anthropic (Claude) como provedor de LLM em nuvem | Aceito |
+| [059](./059-modelo-do-agente-sobrepoe-modelo-do-papel.md) | Modelo escolhido na contratação sobrepõe o padrão do papel | Aceito |

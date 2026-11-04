@@ -45,7 +45,8 @@ rigorous architectural documentation (ADRs, RFCs, Design Docs).
 
 ![Hire an agent](images/hire_agent.png)
 
-*Hiring an agent: the listed models come from the locally installed Ollama (`GET /models`), nothing hardcoded.*
+*Hiring an agent: the listed models come from the locally installed Ollama and, when configured,
+the Anthropic account (`GET /models`), nothing hardcoded.*
 
 </div>
 
@@ -190,9 +191,10 @@ User command
  Agent enters "thinking" state (status published via MQTT)
         │
         ▼
- LLM (local Ollama, or any OpenAI-compatible API) receives the
- role's system prompt + context, and decides: a thought, an
- action and, optionally, a tool to run
+ LLM (local Ollama by default; Anthropic/Claude in the cloud if
+ chosen when that agent was hired) receives the role's system
+ prompt + context, and decides: a thought, an action and,
+ optionally, a tool to run
         │
         ▼
  Tool validated against the role's permissions and executed
@@ -418,6 +420,7 @@ Full contract: [RFC-004](docs/rfc/004-contrato-da-api-http.md) (in Portuguese).
 | Route | Purpose |
 |---|---|
 | `GET /health` | Service health |
+| `GET /models` | LLM models available for hiring: installed Ollama models and, when `ANTHROPIC_API_KEY` is set, the account's Claude models |
 | `/agents` (+ `/fire`, `/think`, `/memories`, `/relationships`) | Team, reasoning, memory and bonds |
 | `/dismissals` (+ `/approve`, `/reject`) | Dismissals proposed by HR, decided by the product owner |
 | `/relationships/interactions` | Records an interaction between two agents |
@@ -457,7 +460,7 @@ Every relevant architectural decision is documented before being implemented:
 | Gateway | Go (MQTT → Kafka, Redis dedupe) |
 | Messaging | Mosquitto (MQTT), Apache Kafka |
 | Data | PostgreSQL + pgvector, Redis |
-| AI | Ollama (outside Docker), per-role models via `.env` |
+| AI | Ollama (outside Docker, default) + Anthropic/Claude (optional, per agent, via `ANTHROPIC_API_KEY`) |
 | Observability | Prometheus, Grafana, Kafka UI, cAdvisor and exporters |
 | Infra | Docker Compose (volumes in `./.docker/`) |
 
@@ -551,6 +554,27 @@ ollama list   # installed models show up in the "Hire" button
   `AGENT_DEV_JUNIOR_MODEL`, `AGENT_QA_MODEL`, `AGENT_DATA_MODEL`, `AGENT_HR_MODEL`, `AGENT_CONSULTANT_MODEL`.
 - The default team has **11 agents**, but they speak one at a time; Ollama loads models on demand.
 - Embedding models (name containing `embed`) are not listed when hiring.
+
+### Cloud AI (Anthropic/Claude) — optional, per agent
+
+Besides local Ollama, any agent can use an Anthropic Claude model, chosen individually in the
+hiring/re-hiring form:
+
+1. Get a key at [console.anthropic.com](https://console.anthropic.com) and set
+   `ANTHROPIC_API_KEY` in `backend/.env` (`ANTHROPIC_BASE_URL` and
+   `ANTHROPIC_REQUEST_TIMEOUT_SECONDS` have sane defaults and rarely need changing).
+2. With the key set, `GET /models` also lists your account's Claude models — they show up
+   automatically in the model selector of the hiring form, alongside the Ollama models.
+3. Pick the Claude model **only for the agent you want to test** (e.g. the Product Owner) — no
+   need to touch any `AGENT_<ROLE>_MODEL` variable in `.env`; the model chosen at hiring time
+   takes priority over the role's default.
+4. Without `ANTHROPIC_API_KEY` set, no Claude model appears in the list and no call is ever made
+   to Anthropic — behavior stays 100% Ollama-based.
+
+An agent's semantic memory always keeps using the role's Ollama embedding model, even if the agent
+thinks with Claude — Anthropic does not offer an embeddings API (see
+[ADR-058](docs/adr/058-anthropic-claude-como-provedor-de-llm-em-nuvem.md) and
+[ADR-059](docs/adr/059-modelo-do-agente-sobrepoe-modelo-do-papel.md), in Portuguese).
 
 ### Minimum hardware (estimates)
 
