@@ -202,7 +202,7 @@ describe("componentes", () => {
     await fireEvent.input(screen.getByLabelText("Nome"), {
       target: { value: "Ana" },
     });
-    await fireEvent.change(screen.getByLabelText("Modelo (Ollama)"), {
+    await fireEvent.change(screen.getByLabelText("Modelo (LLM)"), {
       target: { value: "llama" },
     });
     await fireEvent.click(screen.getByRole("button", { name: "Contratar" }));
@@ -211,6 +211,18 @@ describe("componentes", () => {
       role: "dev_senior",
       llm_model: "llama",
     });
+  });
+
+  it("HireForm lista modelos Claude junto com os locais (ADR-058)", async () => {
+    render(HireForm, {
+      defaultModel: "qwen",
+      models: ["claude-sonnet-4-5-20250929", "qwen"],
+      onsubmit: vi.fn().mockResolvedValue(undefined),
+    });
+    const select = screen.getByLabelText("Modelo (LLM)") as HTMLSelectElement;
+    const optionValues = Array.from(select.options).map((o) => o.value);
+    expect(optionValues).toContain("claude-sonnet-4-5-20250929");
+    expect(optionValues).toContain("qwen");
   });
 
   it("HireForm contrata o time padrão", async () => {

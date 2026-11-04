@@ -30,7 +30,7 @@ class _KeywordEmbedder(MockLlmAdapter):
 
 
 class _Resolver(ILlmAdapterResolver):
-    def resolve(self, role: Role) -> MockLlmAdapter:
+    def resolve(self, role: Role, model: str = "") -> MockLlmAdapter:
         return _KeywordEmbedder()
 
 
