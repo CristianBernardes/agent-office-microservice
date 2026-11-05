@@ -5,7 +5,7 @@
 > [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md); em caso de divergência, prevalece a versão
 > assinada pelas partes (indique qual na cláusula 14).
 
-**Licenciante:** SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, CNPJ 36.601.376/0001-07, com sede na Rua Doutor Aray Xexeo Duarte, 495, Alto da Figueira, Varginha/MG, CEP 37.004-772, representada por Cristian Anderson Oliveira Bernardes ("Licenciante").
+**Licenciante:** SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, CNPJ 36.601.376/0001-07 (nome fantasia GENIOZ SOLUCOES EM TI), com sede na Rua Doutor Aray Xexeo Duarte, 495, Parque Alto da Figueira, Varginha/MG, CEP 37.004-772, representada por Cristian Anderson Oliveira Bernardes ("Licenciante").
 **Licenciada:** [razão social completa, CNPJ, endereço] ("Licenciada").
 **Data de início:** [data] ("Data de Início").
 
@@ -127,7 +127,7 @@ e. **Lei e foro:** aplica-se a lei **[brasileira / outra]**, e fica eleito o for
    estado/país]** [ou: os conflitos serão resolvidos por arbitragem conforme o regulamento de ...].
 f. **Notificações:** por escrito, para os contatos abaixo.
 
-**Contato do Licenciante:** cristian.aob@gmail.com — telefone (35) 3222-4881
+**Contato do Licenciante:** cristian.aob@gmail.com — telefone / WhatsApp (35) 99218-3238
 **Contato da Licenciada:** [e-mail / endereço]
 
 ## Assinaturas

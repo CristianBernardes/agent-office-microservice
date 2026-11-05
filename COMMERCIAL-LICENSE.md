@@ -5,7 +5,7 @@
 > [COMMERCIAL-LICENSE.pt-BR.md](./COMMERCIAL-LICENSE.pt-BR.md); if the two differ, the version
 > signed by the parties prevails (state which one in clause 14).
 
-**Licensor:** SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, CNPJ 36.601.376/0001-07, at Rua Doutor Aray Xexeo Duarte, 495, Alto da Figueira, Varginha/MG, CEP 37.004-772, represented by Cristian Anderson Oliveira Bernardes ("Licensor").
+**Licensor:** SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, CNPJ 36.601.376/0001-07 (trade name GENIOZ SOLUCOES EM TI), at Rua Doutor Aray Xexeo Duarte, 495, Parque Alto da Figueira, Varginha/MG, CEP 37.004-772, represented by Cristian Anderson Oliveira Bernardes ("Licensor").
 **Licensee:** [full legal name, tax ID, address] ("Licensee").
 **Effective date:** [date] ("Effective Date").
 
@@ -124,7 +124,7 @@ e. **Governing law and venue:** the laws of **[Brazil / other]** apply, and the 
    the rules of ...].
 f. **Notices:** in writing, to the contacts below.
 
-**Licensor contact:** cristian.aob@gmail.com — phone +55 (35) 3222-4881
+**Licensor contact:** cristian.aob@gmail.com — phone / WhatsApp +55 (35) 99218-3238
 **Licensee contact:** [e-mail / address]
 
 ## Signatures
