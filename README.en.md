@@ -715,4 +715,4 @@ README, or in the [Portuguese version](./README.md).
 
 ## 📄 License
 
-Open source under the [AGPL-3.0](./LICENSE) ([Portuguese summary](./LICENSE.pt-BR.md)), with a **paid commercial license** for those who cannot comply with the AGPL (for example, offering a modified version as a service without releasing the source): cristian.aob@gmail.com. Donations are **voluntary** and never required.
+Open source under the [AGPL-3.0](./LICENSE) ([Portuguese summary](./LICENSE.pt-BR.md)), with a **paid commercial license** for those who cannot comply with the AGPL (for example, offering a modified version as a service without releasing the source): cristian.aob@gmail.com. Agreement template: [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) ([Portuguese](./COMMERCIAL-LICENSE.pt-BR.md)). Donations are **voluntary** and never required.

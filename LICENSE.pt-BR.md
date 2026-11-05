@@ -13,6 +13,6 @@ O Agent Office é distribuído sob a **GNU AGPL-3.0**, com **licenciamento duplo
    completo das suas modificações sob a mesma licença.
 2. **Licença comercial (paga):** quem não puder ou não quiser cumprir a AGPL (por exemplo, para
    oferecer uma versão modificada como serviço sem abrir o código) precisa de uma licença comercial
-   do autor. Contato: cristian.aob@gmail.com
+   do autor. Contato: cristian.aob@gmail.com. Modelo de contrato: [COMMERCIAL-LICENSE.pt-BR.md](./COMMERCIAL-LICENSE.pt-BR.md).
 
 Contribuições de terceiros só serão aceitas mediante concordância com o licenciamento duplo.

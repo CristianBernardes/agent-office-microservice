@@ -712,4 +712,4 @@ deste README, ou na [versão em inglês](./README.en.md).
 
 ## 📄 Licença
 
-Código aberto sob a [AGPL-3.0](./LICENSE) ([resumo em português](./LICENSE.pt-BR.md)), com **licença comercial paga** para quem não puder cumprir a AGPL (por exemplo, oferecer uma versão modificada como serviço sem abrir o código): cristian.aob@gmail.com. As doações são **voluntárias** e nunca obrigatórias.
+Código aberto sob a [AGPL-3.0](./LICENSE) ([resumo em português](./LICENSE.pt-BR.md)), com **licença comercial paga** para quem não puder cumprir a AGPL (por exemplo, oferecer uma versão modificada como serviço sem abrir o código): cristian.aob@gmail.com. Modelo de contrato: [COMMERCIAL-LICENSE.pt-BR.md](./COMMERCIAL-LICENSE.pt-BR.md) ([inglês](./COMMERCIAL-LICENSE.md)). As doações são **voluntárias** e nunca obrigatórias.

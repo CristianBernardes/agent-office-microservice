@@ -1200,7 +1200,13 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - **Observações:** só vale para versões novas (cópias já baixadas continuam sob MIT); contribuições
   de terceiros exigem aceite do licenciamento duplo; o texto comercial deve passar por revisão jurídica.
 
-## Estado atual e ponto de retomada (após a Rodada 145)
+### Rodada 146 — modelo de contrato de licença comercial
+
+- `COMMERCIAL-LICENSE.md` (en) e `COMMERCIAL-LICENSE.pt-BR.md` (pt): contrato-base com lacunas
+  `[...]` (instalações, valor, prazo, suporte, foro etc.), referenciado nos READMEs e no
+  `LICENSE.pt-BR.md`. É um modelo, **precisa de revisão jurídica** antes de usar.
+
+## Estado atual e ponto de retomada (após a Rodada 146)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
