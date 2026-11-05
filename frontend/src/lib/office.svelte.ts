@@ -5,6 +5,7 @@ import type {
   Agent,
   ChatMessage,
   DismissalProposal,
+  HiringProposal,
   Task,
 } from "./types";
 
@@ -29,6 +30,7 @@ export class OfficeStore {
   selectedAgentId = $state<string | null>(null);
   sessionId = $state<string | null>(null);
   dismissals = $state<DismissalProposal[]>([]);
+  hirings = $state<HiringProposal[]>([]);
   connected = $state(false);
   error = $state(false);
   private logSeq = 0;
@@ -36,17 +38,20 @@ export class OfficeStore {
   // Bloco: carga/atualização via REST; as mensagens vêm da sessão do objetivo mais recente.
   async load(api: ApiClient): Promise<void> {
     try {
-      const [agents, tasks, activity, goals, dismissals] = await Promise.all([
-        api.listAgents(),
-        api.listTasks(),
-        api.listActivity(ACTIVITY_LIMIT),
-        api.listGoals(),
-        api.listPendingDismissals(),
-      ]);
+      const [agents, tasks, activity, goals, dismissals, hirings] =
+        await Promise.all([
+          api.listAgents(),
+          api.listTasks(),
+          api.listActivity(ACTIVITY_LIMIT),
+          api.listGoals(),
+          api.listPendingDismissals(),
+          api.listPendingHirings(),
+        ]);
       this.agents = agents;
       this.tasks = tasks;
       this.activity = activity;
       this.dismissals = dismissals;
+      this.hirings = hirings;
       this.sessionId =
         goals.length > 0 ? goals[goals.length - 1].session_id : null;
       this.messages =

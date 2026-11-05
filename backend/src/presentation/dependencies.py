@@ -29,6 +29,7 @@ from src.application.dismissals.dismissal_use_cases import (
     DecideDismissalUseCase,
     ProposeDismissalUseCase,
 )
+from src.application.hiring.hiring_use_cases import DecideHiringUseCase, ProposeHiringUseCase
 from src.application.layout.layout_use_cases import GetLayoutUseCase, SaveLayoutUseCase
 from src.application.meetings.meeting_use_cases import (
     FinishMeetingUseCase,
@@ -61,6 +62,7 @@ from src.domain.interfaces.agent_repository import IAgentRepository
 from src.domain.interfaces.artifact_repository import IArtifactRepository
 from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.dismissal_repository import IDismissalRepository
+from src.domain.interfaces.hiring_repository import IHiringRepository
 from src.domain.interfaces.layout_repository import ILayoutRepository
 from src.domain.interfaces.llm_adapter import ILlmAdapter
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
@@ -97,6 +99,7 @@ from src.infrastructure.persistence.in_memory_chat_repository import InMemoryCha
 from src.infrastructure.persistence.in_memory_dismissal_repository import (
     InMemoryDismissalRepository,
 )
+from src.infrastructure.persistence.in_memory_hiring_repository import InMemoryHiringRepository
 from src.infrastructure.persistence.in_memory_layout_repository import InMemoryLayoutRepository
 from src.infrastructure.persistence.in_memory_meeting_repository import (
     InMemoryMeetingRepository,
@@ -122,6 +125,7 @@ from src.infrastructure.persistence.postgres_chat_repository import PostgresChat
 from src.infrastructure.persistence.postgres_dismissal_repository import (
     PostgresDismissalRepository,
 )
+from src.infrastructure.persistence.postgres_hiring_repository import PostgresHiringRepository
 from src.infrastructure.persistence.postgres_layout_repository import PostgresLayoutRepository
 from src.infrastructure.persistence.postgres_meeting_repository import (
     PostgresMeetingRepository,
@@ -304,6 +308,30 @@ def get_propose_dismissal_use_case() -> ProposeDismissalUseCase:
     return ProposeDismissalUseCase(
         agent_repository=get_agent_repository(),
         dismissal_repository=get_dismissal_repository(),
+        message_bus=get_message_bus(),
+    )
+
+
+# Bloco: contratações propostas pelo RH e decididas pelo dono do produto.
+@lru_cache
+def get_hiring_repository() -> IHiringRepository:
+    if _use_postgres():
+        return PostgresHiringRepository(_require_pool())
+    return InMemoryHiringRepository()
+
+
+def get_propose_hiring_use_case() -> ProposeHiringUseCase:
+    return ProposeHiringUseCase(
+        agent_repository=get_agent_repository(),
+        hiring_repository=get_hiring_repository(),
+        message_bus=get_message_bus(),
+    )
+
+
+def get_decide_hiring_use_case() -> DecideHiringUseCase:
+    return DecideHiringUseCase(
+        hiring_repository=get_hiring_repository(),
+        hire_agent=get_hire_agent_use_case(),
         message_bus=get_message_bus(),
     )
 
@@ -550,8 +578,7 @@ def get_tool_registry() -> ToolRegistry:
         assign_task_use_case=get_assign_task_use_case(),
         complete_task_use_case=get_complete_task_use_case(),
         send_message_use_case=get_send_message_use_case(),
-        hire_agent_use_case=get_hire_agent_use_case(),
-        default_llm_model=get_settings().ollama_model,
+        propose_hiring_use_case=get_propose_hiring_use_case(),
         start_ceremony_use_case=get_start_ceremony_use_case(),
         research_use_case=get_research_use_case(),
         propose_dismissal_use_case=get_propose_dismissal_use_case(),
@@ -609,6 +636,7 @@ def get_work_loop_use_case() -> WorkLoopUseCase:
         chat_repository=get_chat_repository(),
         sprint_max_days=get_settings().sprint_max_days,
         board_settings=get_get_board_settings_use_case(),
+        propose_hiring=get_propose_hiring_use_case(),
     )
 
 
@@ -651,4 +679,5 @@ _CACHED_REPOSITORY_FACTORIES = (
     get_settings_repository,
     get_meeting_repository,
     get_dismissal_repository,
+    get_hiring_repository,
 )

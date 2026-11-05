@@ -1,4 +1,4 @@
-import type { Agent, Role } from "./types";
+import { BASE_ROLE, type Agent, type BaseRole, type Role } from "./types";
 
 export const MAP_WIDTH = 1586;
 export const MAP_HEIGHT = 992;
@@ -9,7 +9,7 @@ export interface Seat {
 }
 
 // Bloco: assento de cada papel no mapa escritorio_moderno.png (pixels do centro dos pés).
-const SEATS: Record<Role, Seat> = {
+const SEATS: Record<BaseRole, Seat> = {
   product_owner: { x: 230, y: 215 },
   scrum_master: { x: 790, y: 560 },
   tech_lead: { x: 1395, y: 235 },
@@ -37,11 +37,12 @@ export const hueFor = (variant: number): number =>
 
 // Bloco: agentes do mesmo papel ficam lado a lado; retorna % do mapa para posicionar via CSS.
 export function placeAgents(agents: readonly Agent[]): Placement[] {
-  const seen = new Map<Role, number>();
+  const seen = new Map<BaseRole, number>();
   return agents.map((agent) => {
-    const index = seen.get(agent.role) ?? 0;
-    seen.set(agent.role, index + 1);
-    const seat = SEATS[agent.role];
+    const base = BASE_ROLE[agent.role];
+    const index = seen.get(base) ?? 0;
+    seen.set(base, index + 1);
+    const seat = SEATS[base];
     return {
       agent,
       left: ((seat.x + index * SPREAD_PX) / MAP_WIDTH) * 100,

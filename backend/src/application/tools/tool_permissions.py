@@ -139,6 +139,221 @@ ROLE_TOOL_PERMISSIONS: dict[Role, frozenset[ToolName]] = {
             ToolName.RESEARCH,
         }
     ),
+    Role.DEV_MID: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.DATABASE_ADMINISTRATOR: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.DEVOPS_ENGINEER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.SITE_RELIABILITY_ENGINEER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.UX_UI_DESIGNER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.BUSINESS_ANALYST: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.SOFTWARE_ARCHITECT: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.SECURITY_ENGINEER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.DATA_ENGINEER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.AI_ENGINEER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.ML_ENGINEER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.SYSTEMS_ANALYST: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.PRODUCT_DESIGNER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.TECHNICAL_SUPPORT: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.INFRASTRUCTURE_ANALYST: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.DATA_QUALITY_ANALYST: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+        }
+    ),
+    Role.TEST_AUTOMATION_ENGINEER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.COMPLETE_TASK,
+            ToolName.SEND_MESSAGE,
+        }
+    ),
+    Role.ENGINEERING_MANAGER: frozenset(
+        {
+            ToolName.WRITE_ARTIFACT,
+            ToolName.READ_ARTIFACT,
+            ToolName.REVIEW_ARTIFACT,
+            ToolName.CREATE_TASK,
+            ToolName.ASSIGN_TASK,
+            ToolName.SEND_MESSAGE,
+            ToolName.WEB_SEARCH,
+            ToolName.RESEARCH,
+            ToolName.HIRE_AGENT,
+        }
+    ),
 }
 
 
