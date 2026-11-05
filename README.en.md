@@ -10,9 +10,9 @@
 
 <div align="center">
 
-▶️ **Watch the demo video:**
+![Agent Office in action](images/agent-office.gif)
 
-[![Watch the video](images/Agent_Office_2.png)](https://youtu.be/eq40fTZwJrc)
+*The office in action: AI agents collaborating, debating and delivering tasks.*
 
 </div>
 
