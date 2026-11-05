@@ -77,6 +77,26 @@ Anthropic (`GET /models`), nada fixo no código.*
 
 ---
 
+## Para quem é e como contratar
+
+**Para quem é:** equipes de produto e tecnologia, consultorias, software houses e empresas que
+querem automatizar rotinas de planejamento, pesquisa, documentação e entrega com um time de agentes
+de IA que **você supervisiona** (contratações, demissões e decisões passam pela sua aprovação).
+
+| Uso | Licença |
+|-----|---------|
+| Estudar, avaliar, uso interno e projetos que **abrem o código** das modificações | **Gratuito** ([AGPL-3.0](./LICENSE)) |
+| Produto ou serviço próprio **sem abrir o código** (inclusive SaaS) | **Licença comercial** ([modelo de contrato](./COMMERCIAL-LICENSE.pt-BR.md)) |
+| Instalação, integração com os seus sistemas, treinamento e suporte | **Serviços sob consulta** |
+
+**Valores:** licença comercial anual por empresa, a partir de **R$ [valor]/ano** (com ou sem
+suporte); implantação e suporte sob orçamento. [preencher a faixa de preço]
+
+**Contato:** SCRIPTSAVVY (GENIOZ Soluções em TI) — cristian.aob@gmail.com — WhatsApp
+(35) 99218-3238.
+
+---
+
 ## 💙 Antes de clonar ou fazer fork — ajude a manter este projeto vivo
 
 Este repositório é **open source e gratuito**, mas é mantido no tempo livre do autor. **Qualquer
