@@ -1168,7 +1168,17 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   `cargo | motivo`); sem rota HTTP para propor contratação (só ferramenta/ciclo); a migração
   precisa ser aplicada; o gateway/MQTT dos tópicos `office/hirings/*` não foi validado ponta a ponta.
 
-## Estado atual e ponto de retomada (após a Rodada 142)
+### Rodada 143 — time só com RH consegue andar
+
+- **Problema:** com apenas o RH contratado, a tarefa de contratação ficava parada no backlog:
+  só PO/SM planejam e só SM/TL/PO coordenam. **Correção:** `HR_MANAGER` e
+  `ENGINEERING_MANAGER` entram como reserva em `_PLANNERS`/`_COORDINATORS` (política
+  `task_workflow.py` e ciclo `work_loop_use_case.py`); PO/SM continuam com prioridade.
+- **Console do navegador:** o 404 de `/sessions/.../messages` é a sessão do chat com o RH
+  guardada no navegador após reset do banco (o front já recomeça a conversa); o 422 de
+  `POST /goals` ocorre quando o texto do objetivo passa de 4000 caracteres.
+
+## Estado atual e ponto de retomada (após a Rodada 143)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
