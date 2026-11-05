@@ -7,8 +7,18 @@ from src.domain.entities.task import TaskStatus
 from src.domain.services.task_routing import EXECUTOR_ROLES
 
 _DEVS = EXECUTOR_ROLES
-_COORDINATORS = frozenset({Role.SCRUM_MASTER, Role.TECH_LEAD, Role.PRODUCT_OWNER})
-_PLANNERS = frozenset({Role.PRODUCT_OWNER, Role.SCRUM_MASTER})
+_COORDINATORS = frozenset(
+    {
+        Role.SCRUM_MASTER,
+        Role.TECH_LEAD,
+        Role.PRODUCT_OWNER,
+        Role.ENGINEERING_MANAGER,
+        Role.HR_MANAGER,
+    }
+)
+_PLANNERS = frozenset(
+    {Role.PRODUCT_OWNER, Role.SCRUM_MASTER, Role.ENGINEERING_MANAGER, Role.HR_MANAGER}
+)
 _TESTERS = frozenset({Role.QA_ENGINEER, Role.TEST_AUTOMATION_ENGINEER})
 _REVIEWERS = frozenset({Role.QA_ENGINEER, Role.TECH_LEAD, Role.TEST_AUTOMATION_ENGINEER})
 

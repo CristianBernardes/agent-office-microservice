@@ -18,8 +18,8 @@ class _ActorMixin(BaseModel):
 
 
 class CreateTaskRequest(_ActorMixin):
-    title: str = Field(..., min_length=1, max_length=200)
-    description: str = Field(default="", max_length=8000)
+    title: str = Field(..., min_length=1, max_length=500)
+    description: str = Field(default="", max_length=50000)
     priority: Priority = Priority.MEDIUM
 
 
@@ -28,7 +28,7 @@ class AssignTaskRequest(_ActorMixin):
 
 
 class CompleteTaskRequest(_ActorMixin):
-    result: str = Field(..., min_length=1, max_length=8000)
+    result: str = Field(..., min_length=1, max_length=50000)
 
 
 class MoveTaskRequest(_ActorMixin):
