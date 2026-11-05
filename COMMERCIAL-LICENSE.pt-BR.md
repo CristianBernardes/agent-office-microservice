@@ -5,13 +5,14 @@
 > [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md); em caso de divergência, prevalece a versão
 > assinada pelas partes (indique qual na cláusula 14).
 
-**Licenciante:** Cristian Anderson Oliveira Bernardes, [CPF/CNPJ e endereço] ("Licenciante").
+**Licenciante:** SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, CNPJ 36.601.376/0001-07, com sede na Rua Doutor Aray Xexeo Duarte, 495, Alto da Figueira, Varginha/MG, CEP 37.004-772, representada por Cristian Anderson Oliveira Bernardes ("Licenciante").
 **Licenciada:** [razão social completa, CNPJ, endereço] ("Licenciada").
 **Data de início:** [data] ("Data de Início").
 
 ## 1. Objeto
 
-O Licenciante detém os direitos autorais do **Agent Office** (o "Software"), disponível
+Os direitos autorais do **Agent Office** (o "Software") pertencem a Cristian Anderson Oliveira
+Bernardes (o "Autor"), que autoriza o Licenciante a conceder licenças comerciais dele. O Software está disponível
 publicamente sob a licença GNU Affero General Public License v3.0 ("AGPL-3.0"). Este Contrato
 concede à Licenciada uma **licença comercial** para usar o Software **sem as obrigações da
 AGPL-3.0** (em especial, sem precisar divulgar o código-fonte das modificações ou dos sistemas que
@@ -38,7 +39,7 @@ empresas fora do seu grupo econômico [ou: fora das seguintes entidades: ...].
 
 ## 4. Titularidade
 
-O Software e todos os direitos sobre ele continuam pertencendo ao Licenciante. As modificações e
+O Software e todos os direitos sobre ele continuam pertencendo ao Autor. As modificações e
 integrações criadas pela Licenciada pertencem a ela, mas **não** lhe transferem qualquer direito
 sobre o Software original além desta licença. Não há licença de marca, exceto para informar que a
 Licenciada utiliza o Software.
@@ -50,7 +51,8 @@ b. **Pagamento:** [forma: Pix / transferência / PayPal / plataforma de pagament
    em [número] dias após a emissão da cobrança / em [data].
 c. O atraso sujeita a Licenciada a [multa] e [juros mensais], além de [correção monetária, se
    houver].
-d. Os valores não incluem tributos, de responsabilidade de cada parte conforme a lei aplicável.
+d. O Licenciante é optante pelo Simples Nacional; a nota fiscal (NFS-e) é emitida pelo município do
+   Licenciante (Varginha/MG). Os valores não incluem tributos, de responsabilidade de cada parte conforme a lei aplicável.
    [Indicar quem arca com retenções e quem emite a nota fiscal.]
 
 ## 6. Prazo e renovação
@@ -125,14 +127,14 @@ e. **Lei e foro:** aplica-se a lei **[brasileira / outra]**, e fica eleito o for
    estado/país]** [ou: os conflitos serão resolvidos por arbitragem conforme o regulamento de ...].
 f. **Notificações:** por escrito, para os contatos abaixo.
 
-**Contato do Licenciante:** cristian.aob@gmail.com
+**Contato do Licenciante:** cristian.aob@gmail.com — telefone (35) 3222-4881
 **Contato da Licenciada:** [e-mail / endereço]
 
 ## Assinaturas
 
 | Licenciante | Licenciada |
 |---|---|
-| Nome: Cristian Anderson Oliveira Bernardes | Nome: [representante legal] |
+| SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, por Cristian Anderson Oliveira Bernardes | Nome: [representante legal] |
 | Data: [data] | Data: [data] |
 | Assinatura: ______________________ | Assinatura: ______________________ |
 

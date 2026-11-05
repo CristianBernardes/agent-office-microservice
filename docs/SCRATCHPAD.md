@@ -1206,6 +1206,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   `[...]` (instalações, valor, prazo, suporte, foro etc.), referenciado nos READMEs e no
   `LICENSE.pt-BR.md`. É um modelo, **precisa de revisão jurídica** antes de usar.
 
+- **Dados do Licenciante:** os contratos usam a SCRIPTSAVVY (CNPJ 36.601.376/0001-07, Simples Nacional, Varginha/MG) como Licenciante, representada por Cristian, que é o Autor dos direitos autorais. Falta formalizar a autorização do Autor para a empresa licenciar (cláusula 1).
+
 ## Estado atual e ponto de retomada (após a Rodada 146)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)

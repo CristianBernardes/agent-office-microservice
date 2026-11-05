@@ -5,13 +5,13 @@
 > [COMMERCIAL-LICENSE.pt-BR.md](./COMMERCIAL-LICENSE.pt-BR.md); if the two differ, the version
 > signed by the parties prevails (state which one in clause 14).
 
-**Licensor:** Cristian Anderson Oliveira Bernardes, [tax ID / address] ("Licensor").
+**Licensor:** SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, CNPJ 36.601.376/0001-07, at Rua Doutor Aray Xexeo Duarte, 495, Alto da Figueira, Varginha/MG, CEP 37.004-772, represented by Cristian Anderson Oliveira Bernardes ("Licensor").
 **Licensee:** [full legal name, tax ID, address] ("Licensee").
 **Effective date:** [date] ("Effective Date").
 
 ## 1. Purpose
 
-The Licensor owns the copyright in **Agent Office** (the "Software"), which is publicly available
+The copyright in **Agent Office** is owned by Cristian Anderson Oliveira Bernardes (the "Author"), who authorizes the Licensor to grant commercial licenses of it. The Software (the "Software") is publicly available
 under the GNU Affero General Public License v3.0 ("AGPL-3.0"). This Agreement grants the Licensee a
 **commercial license** to use the Software **without the obligations of the AGPL-3.0** (in
 particular, without having to release the source code of modifications or of systems that
@@ -37,7 +37,7 @@ Licensee's corporate group [or: outside the following entities: ...].
 
 ## 4. Ownership
 
-The Software and all rights in it remain the property of the Licensor. Modifications and
+The Software and all rights in it remain the property of the Author. Modifications and
 integrations created by the Licensee belong to the Licensee, but **do not** transfer to it any
 right over the original Software beyond this license. No trademark license is granted, except to
 state that the Licensee uses the Software.
@@ -48,7 +48,8 @@ a. **License fee:** [amount and currency] per [year / installation / other].
 b. **Payment:** [method: Pix / bank transfer / PayPal / payment platform], due [number] days after
    the invoice date / by [date].
 c. Late payment is subject to [late fee] and [monthly interest], plus [indexation, if any].
-d. Fees do not include taxes, which are the responsibility of each party under the applicable law.
+d. The Licensor is a Simples Nacional taxpayer; the invoice (NFS-e) is issued by the Licensor's municipality (Varginha/MG).
+   Fees do not include taxes, which are the responsibility of each party under the applicable law.
    [Specify who bears withholding taxes and who issues the invoice.]
 
 ## 6. Term and renewal
@@ -123,14 +124,14 @@ e. **Governing law and venue:** the laws of **[Brazil / other]** apply, and the 
    the rules of ...].
 f. **Notices:** in writing, to the contacts below.
 
-**Licensor contact:** cristian.aob@gmail.com
+**Licensor contact:** cristian.aob@gmail.com — phone +55 (35) 3222-4881
 **Licensee contact:** [e-mail / address]
 
 ## Signatures
 
 | Licensor | Licensee |
 |---|---|
-| Name: Cristian Anderson Oliveira Bernardes | Name: [legal representative] |
+| SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, by Cristian Anderson Oliveira Bernardes | Name: [legal representative] |
 | Date: [date] | Date: [date] |
 | Signature: ______________________ | Signature: ______________________ |
 
