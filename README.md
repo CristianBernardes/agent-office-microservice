@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-green.svg)](./LICENSE) [![Doar](https://img.shields.io/badge/apoie-Pix%20%7C%20PayPal-ff69b4.svg)](#-antes-de-clonar-ou-fazer-fork--ajude-a-manter-este-projeto-vivo)
+[![Licença AGPL-3.0](https://img.shields.io/badge/licen%C3%A7a-AGPL--3.0%20%2B%20comercial-blue.svg)](./LICENSE) [![Doar](https://img.shields.io/badge/apoie-Pix%20%7C%20PayPal-ff69b4.svg)](#-antes-de-clonar-ou-fazer-fork--ajude-a-manter-este-projeto-vivo)
 
 </div>
 
@@ -712,4 +712,4 @@ deste README, ou na [versão em inglês](./README.en.md).
 
 ## 📄 Licença
 
-Projeto open source sob a [Licença MIT](./LICENSE) ([versão em português](./LICENSE.pt-BR.md)). Uso livre, inclusive comercial. As doações são **voluntárias** e nunca obrigatórias.
+Código aberto sob a [AGPL-3.0](./LICENSE) ([resumo em português](./LICENSE.pt-BR.md)), com **licença comercial paga** para quem não puder cumprir a AGPL (por exemplo, oferecer uma versão modificada como serviço sem abrir o código): cristian.aob@gmail.com. As doações são **voluntárias** e nunca obrigatórias.

@@ -3,7 +3,7 @@ name = "agent-office-backend"
 version = "0.1.0"
 description = "AgentOffice Pro backend — Clean Architecture Python/FastAPI service orchestrating AI agents."
 authors = ["Cristian Bernardes"]
-license = "MIT"
+license = "AGPL-3.0-or-later"
 readme = "README.md"
 packages = [{ include = "src" }]
 
