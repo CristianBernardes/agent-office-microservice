@@ -1178,6 +1178,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   guardada no navegador após reset do banco (o front já recomeça a conversa); o 422 de
   `POST /goals` ocorre quando o texto do objetivo passa de 4000 caracteres.
 
+- **Limite de texto:** objetivo (`POST /goals`) e mensagens de chat passam de 4000/8000 para 20000 caracteres (`chat_schemas.py`); a coluna já é `TEXT`.
+
 ## Estado atual e ponto de retomada (após a Rodada 143)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)

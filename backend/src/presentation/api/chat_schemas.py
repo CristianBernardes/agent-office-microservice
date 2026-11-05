@@ -11,7 +11,7 @@ from src.domain.entities.chat import ChatMessage, Goal, MessageKind
 
 
 class SubmitGoalRequest(BaseModel):
-    text: str = Field(..., min_length=1, max_length=4000)
+    text: str = Field(..., min_length=1, max_length=20000)
     session_id: UUID | None = None
 
 
@@ -33,7 +33,7 @@ class GoalResponse(BaseModel):
 
 class SendMessageRequest(BaseModel):
     session_id: UUID
-    content: str = Field(..., min_length=1, max_length=8000)
+    content: str = Field(..., min_length=1, max_length=20000)
     sender_id: UUID | None = None
     recipient_id: UUID | None = None
     task_id: UUID | None = None
@@ -63,7 +63,7 @@ class MessageResponse(BaseModel):
 
 
 class HrChatRequest(BaseModel):
-    content: str = Field(..., min_length=1, max_length=8000)
+    content: str = Field(..., min_length=1, max_length=20000)
     session_id: UUID | None = None
 
 
