@@ -14,6 +14,7 @@ from src.application.artifacts.write_artifact_use_case import (
     WriteArtifactInput,
     WriteArtifactUseCase,
 )
+from src.application.autonomy.ceremony_scheduler_use_case import CeremonySchedulerUseCase
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.common.agent_status_publisher import publish_agent_status
 from src.application.hiring.hiring_use_cases import ProposeHiringInput, ProposeHiringUseCase
@@ -133,6 +134,7 @@ class WorkLoopUseCase:
         sprint_max_days: int = 15,
         board_settings: GetBoardSettingsUseCase | None = None,
         propose_hiring: ProposeHiringUseCase | None = None,
+        ceremonies: CeremonySchedulerUseCase | None = None,
     ) -> None:
         self._agents = agent_repository
         self._tasks = task_repository
@@ -149,6 +151,7 @@ class WorkLoopUseCase:
         self._sprint_max_days = sprint_max_days
         self._board_settings = board_settings
         self._propose_hiring = propose_hiring
+        self._ceremonies = ceremonies
 
     @property
     def _language(self) -> Language:
@@ -157,12 +160,25 @@ class WorkLoopUseCase:
     async def tick(self) -> int:
         """Executa um passo por estágio; devolve quantas tarefas avançaram."""
         moved = 0
-        for step in (self._review, self._test, self._work, self._assign_todo, self._plan):
+        for step in (
+            self._review,
+            self._test,
+            self._work,
+            self._assign_todo,
+            self._plan,
+            self._hold_ceremonies,
+        ):
             try:
                 moved += await step()
             except Exception:
                 logger.exception("Falha em um passo do ciclo de trabalho")
         return moved
+
+    # Bloco: daily, refinamento, review e retrospectiva automáticos (ver CeremonySchedulerUseCase).
+    async def _hold_ceremonies(self) -> int:
+        if self._ceremonies is None:
+            return 0
+        return await self._ceremonies.tick(self._speak, self._language)
 
     async def _tasks_in(self, status: TaskStatus) -> list[Task]:
         return [t for t in await self._tasks.list_all() if t.status == status]

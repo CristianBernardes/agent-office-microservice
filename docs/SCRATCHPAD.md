@@ -1219,7 +1219,24 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   estiver `WORKING`; senão apenas limpa `current_task_id`. Teste de regressão adicionado; 484 unit.
 - **Observação:** o estado inconsistente (ocioso com tarefa atual) em si não foi rastreado.
 
-## Estado atual e ponto de retomada (após a Rodada 147)
+### Rodada 148 — cerimônias automáticas
+
+- **Pedido do dono do produto:** cerimônias com mais frequência (daily a cada 2 h; review e
+  retrospectiva ao fim de cada sprint; refinamento e planejamento).
+- **Implementação:** `CeremonySchedulerUseCase` (`application/autonomy`), chamado como último
+  passo do `tick` do ciclo de trabalho. **Daily** a cada `CEREMONY_DAILY_INTERVAL_MINUTES` (120)
+  quando há trabalho em andamento; **refinamento** a cada `CEREMONY_REFINEMENT_INTERVAL_MINUTES`
+  (240) quando há tarefas em backlog/todo; **review + retrospectiva** quando não resta tarefa
+  aberta e há entregas desde a última retrospectiva (fim da sprint). Quem conduz: SM, senão
+  Gerente de Engenharia, PO, TL, RH. Cada uma vira `Meeting` concluída (`list_all` novo no
+  repositório) e ata em `ceremonies/{tipo}/*.md`. `CEREMONIES_ENABLED=false` desliga tudo.
+  Variáveis em `settings.py`, `.env.example` e `.env` do backend.
+- **Planejamento:** já era automático (ao sair do backlog, `_hold_planning`); não foi alterado.
+- **Validação:** `ruff`, mypy limpo, 490 unit. **Limitações:** o fim da sprint é "nenhuma tarefa
+  aberta"; cada cerimônia custa uma chamada de LLM por participante; o estado (última execução)
+  vem das reuniões gravadas, então sobrevive a reinícios só com Postgres.
+
+## Estado atual e ponto de retomada (após a Rodada 148)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
