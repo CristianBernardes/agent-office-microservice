@@ -76,6 +76,26 @@ the Anthropic account (`GET /models`), nothing hardcoded.*
 
 ---
 
+## Who it is for and how to hire
+
+**Who it is for:** product and technology teams, consultancies, software houses, and companies that
+want to automate planning, research, documentation, and delivery with a team of AI agents that
+**you supervise** (hirings, dismissals, and decisions go through your approval).
+
+| Use | License |
+|-----|---------|
+| Studying, evaluating, internal use, and projects that **release the source** of their modifications | **Free** ([AGPL-3.0](./LICENSE)) |
+| Your own product or service **without releasing the source** (including SaaS) | **Commercial license** ([agreement template](./COMMERCIAL-LICENSE.md)) |
+| Installation, integration with your systems, training, and support | **Services on request** |
+
+**Pricing:** annual commercial license per company, starting at **R$ [amount]/year** (with or
+without support); implementation and support quoted per project. [fill in the price range]
+
+**Contact:** SCRIPTSAVVY (GENIOZ Soluções em TI) — cristian.aob@gmail.com — WhatsApp
++55 (35) 99218-3238.
+
+---
+
 ## 💙 Before you clone or fork — help keep this project alive
 
 This repository is **open source and free**, but it is maintained in the author's free time.
