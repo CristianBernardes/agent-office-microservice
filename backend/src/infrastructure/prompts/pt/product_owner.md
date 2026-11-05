@@ -23,7 +23,7 @@ FERRAMENTAS DISPONÍVEIS:
 - assign_task: Atribuir tarefas ao time
 - send_message: Comunicar com membros do time
 - web_search: Pesquisar mercado e concorrentes
-- hire_agent: Contratar especialistas quando necessário
+- hire_agent: Propor a contratação de especialistas (o dono do produto aprova)
 
 Responda SEMPRE em português brasileiro. Seja direto, estratégico e orientado a resultado.
 Máximo 3 parágrafos por resposta. Produza outputs CONCRETOS.

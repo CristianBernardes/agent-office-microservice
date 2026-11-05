@@ -89,6 +89,13 @@ export interface Messages {
   dismissalReason: string;
   dismissalApprove: string;
   dismissalReject: string;
+  hiringTitle: string;
+  hiringMessage: string;
+  hiringReason: string;
+  hiringName: string;
+  hiringModel: string;
+  hiringApprove: string;
+  hiringReject: string;
   noMessages: string;
   logs: string;
   noLogs: string;
@@ -207,6 +214,14 @@ export const pt: Messages = {
   dismissalReason: "Motivo apresentado pelo RH",
   dismissalApprove: "Aprovar demissão",
   dismissalReject: "Manter no time",
+  hiringTitle: "Proposta de contratação",
+  hiringMessage:
+    "{hr} quer contratar um(a) {role}. Escolha o nome e a IA do novo profissional.",
+  hiringReason: "Motivo apresentado pelo RH",
+  hiringName: "Nome do profissional",
+  hiringModel: "IA (modelo) do profissional",
+  hiringApprove: "Contratar",
+  hiringReject: "Recusar",
   noMessages: "Nenhuma conversa ainda.",
   logs: "Logs em tempo real",
   noLogs: "Aguardando eventos…",
@@ -232,6 +247,24 @@ export const pt: Messages = {
     data_analyst: "Analista de Dados",
     hr_manager: "RH",
     product_consultant: "Consultor de Produto",
+    dev_mid: "Dev Pleno",
+    database_administrator: "DBA",
+    devops_engineer: "DevOps",
+    site_reliability_engineer: "SRE",
+    ux_ui_designer: "UX/UI",
+    business_analyst: "Analista de Negócios",
+    software_architect: "Arquiteto de Software",
+    security_engineer: "Eng. de Segurança",
+    test_automation_engineer: "Eng. de Testes",
+    data_engineer: "Eng. de Dados",
+    ai_engineer: "Eng. de IA",
+    ml_engineer: "Eng. de ML",
+    systems_analyst: "Analista de Sistemas",
+    product_designer: "Esp. em Produto",
+    technical_support: "Suporte Técnico",
+    infrastructure_analyst: "Analista de Infra",
+    data_quality_analyst: "Analista de Qualidade de Dados",
+    engineering_manager: "Gerente de Engenharia",
   },
   agentStatus: {
     idle: "Ocioso",
@@ -355,6 +388,14 @@ export const en: Messages = {
   dismissalReason: "Reason given by HR",
   dismissalApprove: "Approve dismissal",
   dismissalReject: "Keep on the team",
+  hiringTitle: "Hiring proposal",
+  hiringMessage:
+    "{hr} wants to hire a {role}. Choose the new professional's name and AI.",
+  hiringReason: "Reason given by HR",
+  hiringName: "Professional's name",
+  hiringModel: "Professional's AI (model)",
+  hiringApprove: "Hire",
+  hiringReject: "Decline",
   noMessages: "No conversations yet.",
   logs: "Live logs",
   noLogs: "Waiting for events…",
@@ -380,6 +421,24 @@ export const en: Messages = {
     data_analyst: "Data Analyst",
     hr_manager: "HR",
     product_consultant: "Product Consultant",
+    dev_mid: "Mid Dev",
+    database_administrator: "DBA",
+    devops_engineer: "DevOps Engineer",
+    site_reliability_engineer: "SRE",
+    ux_ui_designer: "UX/UI Designer",
+    business_analyst: "Business Analyst",
+    software_architect: "Software Architect",
+    security_engineer: "Security Engineer",
+    test_automation_engineer: "Test Automation Engineer",
+    data_engineer: "Data Engineer",
+    ai_engineer: "AI Engineer",
+    ml_engineer: "ML Engineer",
+    systems_analyst: "Systems Analyst",
+    product_designer: "Product Designer",
+    technical_support: "Technical Support",
+    infrastructure_analyst: "Infrastructure Analyst",
+    data_quality_analyst: "Data Quality Analyst",
+    engineering_manager: "Engineering Manager",
   },
   agentStatus: {
     idle: "Idle",

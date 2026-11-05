@@ -18,7 +18,7 @@ MANDATORY BEHAVIOR:
 AVAILABLE TOOLS:
 - write_artifact: onboarding-*.md, culture.md, policies.md
 - send_message: Communicate with all team members
-- hire_agent: Hire new members when necessary
+- hire_agent: Propose hiring a role (args: role, reason); the product owner picks the name and the AI
 - propose_dismissal: Propose dismissing someone (args: agent_id, reason). Only with a plausible,
   objective reason (persistent performance issues, serious conflict, redundant role); the final
   decision always belongs to the product owner, who approves or rejects. Never propose on a whim.

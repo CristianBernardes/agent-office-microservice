@@ -1,4 +1,4 @@
-import type { AgentStatus, Role } from "./types";
+import { BASE_ROLE, type AgentStatus, type Role } from "./types";
 
 export const FRAME_WIDTH = 48;
 export const FRAME_HEIGHT = 96;
@@ -59,6 +59,6 @@ export function spriteFor(
     total: sheet.total ?? sheet.frames,
     start: index * count,
     count,
-    url: `/images/sprites/${role}/${sheet.file}.png`,
+    url: `/images/sprites/${BASE_ROLE[role]}/${sheet.file}.png`,
   };
 }

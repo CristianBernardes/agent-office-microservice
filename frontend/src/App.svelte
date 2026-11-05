@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import ChatPanel from './components/ChatPanel.svelte'
   import DismissalModal from './components/DismissalModal.svelte'
+  import HiringModal from './components/HiringModal.svelte'
   import DonationModal from './components/DonationModal.svelte'
   import HireForm from './components/HireForm.svelte'
   import FireButton from './components/FireButton.svelte'
@@ -19,7 +20,16 @@
   import { mergeLogs } from './lib/logs'
   import { OfficeStore } from './lib/office.svelte'
   import { connectRealtime } from './lib/realtime'
-  import type { Agent, ChatMessage, DismissalProposal, HireAgentInput, Priority, Task, TaskStatus } from './lib/types'
+  import type {
+    Agent,
+    ChatMessage,
+    DismissalProposal,
+    HireAgentInput,
+    HiringProposal,
+    Priority,
+    Task,
+    TaskStatus,
+  } from './lib/types'
 
   const config = loadConfig(import.meta.env)
   i18n.init(config.defaultLanguage, localStorage)
@@ -114,6 +124,19 @@
 
   async function decideDismissal(proposal: DismissalProposal, approved: boolean) {
     await api.decideDismissal(proposal.proposal_id, approved)
+    await store.load(api)
+  }
+
+  // Bloco: o RH propõe o cargo; o dono escolhe nome e IA. Uma proposta por vez, a mais antiga.
+  const pendingHiring = $derived(store.hirings[0])
+
+  async function approveHiring(proposal: HiringProposal, name: string, model: string) {
+    await api.approveHiring(proposal.proposal_id, name, model)
+    await store.load(api)
+  }
+
+  async function rejectHiring(proposal: HiringProposal) {
+    await api.rejectHiring(proposal.proposal_id)
     await store.load(api)
   }
 
@@ -254,6 +277,17 @@
     target={store.agents.find((a) => a.agent_id === pendingDismissal.agent_id)}
     proposer={store.agents.find((a) => a.agent_id === pendingDismissal.proposed_by)}
     ondecide={decideDismissal}
+  />
+{/if}
+
+{#if pendingHiring && !pendingDismissal}
+  <HiringModal
+    proposal={pendingHiring}
+    proposer={store.agents.find((a) => a.agent_id === pendingHiring.proposed_by)}
+    defaultModel={config.defaultLlmModel}
+    {models}
+    onapprove={approveHiring}
+    onreject={rejectHiring}
   />
 {/if}
 

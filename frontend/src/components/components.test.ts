@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ChatPanel from "./ChatPanel.svelte";
 import DismissalModal from "./DismissalModal.svelte";
+import HiringModal from "./HiringModal.svelte";
 import DonationModal from "./DonationModal.svelte";
 import TaskEditModal from "./TaskEditModal.svelte";
 import HireForm from "./HireForm.svelte";
@@ -11,7 +12,13 @@ import LanguageSwitcher from "./LanguageSwitcher.svelte";
 import TaskForm from "./TaskForm.svelte";
 import TeamBoard from "./TeamBoard.svelte";
 import { i18n } from "../lib/i18n.svelte";
-import type { Agent, ChatMessage, DismissalProposal, Task } from "../lib/types";
+import type {
+  Agent,
+  ChatMessage,
+  DismissalProposal,
+  HiringProposal,
+  Task,
+} from "../lib/types";
 
 const agent: Agent = {
   agent_id: "a1",
@@ -407,6 +414,95 @@ describe("poderes do dono do produto e demissões", () => {
     name: "Rita",
     role: "hr_manager",
   } as Agent;
+
+  const hiring: HiringProposal = {
+    proposal_id: "h1",
+    role: "dev_mid",
+    proposed_by: "hr",
+    reason: "Falta capacidade",
+    task_id: null,
+    status: "pending",
+    hired_agent_id: null,
+    created_at: "2026-01-01T00:00:00Z",
+    decided_at: null,
+  };
+
+  it("HiringModal mostra o cargo e contrata com o nome e a IA escolhidos", async () => {
+    i18n.set("pt");
+    const onapprove = vi.fn().mockResolvedValue(undefined);
+    render(HiringModal, {
+      props: {
+        proposal: hiring,
+        proposer: hr,
+        defaultModel: "m1",
+        models: ["m1", "m2"],
+        onapprove,
+        onreject: vi.fn(),
+      },
+    });
+    expect(document.body.textContent).toContain(
+      "Rita quer contratar um(a) Dev Pleno",
+    );
+    expect(screen.getByTestId("hiring-reason").textContent).toBe(
+      "Falta capacidade",
+    );
+    await fireEvent.input(screen.getByTestId("hiring-name"), {
+      target: { value: "Bruno" },
+    });
+    await fireEvent.change(screen.getByTestId("hiring-model"), {
+      target: { value: "m2" },
+    });
+    await fireEvent.click(screen.getByRole("button", { name: "Contratar" }));
+    await waitFor(() =>
+      expect(onapprove).toHaveBeenCalledWith(hiring, "Bruno", "m2"),
+    );
+  });
+
+  it("HiringModal fala inglês quando o idioma é en", async () => {
+    i18n.set("en");
+    const onapprove = vi.fn().mockResolvedValue(undefined);
+    render(HiringModal, {
+      props: {
+        proposal: hiring,
+        proposer: hr,
+        defaultModel: "m1",
+        onapprove,
+        onreject: vi.fn(),
+      },
+    });
+    expect(document.body.textContent).toContain("Rita wants to hire a Mid Dev");
+    expect((screen.getByTestId("hiring-name") as HTMLInputElement).value).toBe(
+      "Mid Dev",
+    );
+    await fireEvent.click(screen.getByRole("button", { name: "Hire" }));
+    await waitFor(() =>
+      expect(onapprove).toHaveBeenCalledWith(hiring, "Mid Dev", "m1"),
+    );
+    i18n.set("pt");
+  });
+
+  it("HiringModal recusa e bloqueia contratar sem nome", async () => {
+    i18n.set("pt");
+    const onreject = vi.fn().mockResolvedValue(undefined);
+    render(HiringModal, {
+      props: {
+        proposal: hiring,
+        proposer: hr,
+        defaultModel: "m1",
+        onapprove: vi.fn(),
+        onreject,
+      },
+    });
+    await fireEvent.input(screen.getByTestId("hiring-name"), {
+      target: { value: "  " },
+    });
+    expect(screen.getByRole("button", { name: "Contratar" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    await fireEvent.click(screen.getByRole("button", { name: "Recusar" }));
+    await waitFor(() => expect(onreject).toHaveBeenCalledWith(hiring));
+  });
 
   it("DismissalModal mostra o motivo do RH e aprova", async () => {
     const ondecide = vi.fn().mockResolvedValue(undefined);
