@@ -46,6 +46,11 @@ class Settings(BaseSettings):
     sprint_max_days: int = Field(default=15, ge=1, le=15)
     meeting_rounds: int = Field(default=1, ge=1, le=5)
 
+    # Cerimônias automáticas do ciclo de trabalho (daily, refinamento, review, retrospectiva)
+    ceremonies_enabled: bool = True
+    ceremony_daily_interval_minutes: float = Field(default=120, gt=0)
+    ceremony_refinement_interval_minutes: float = Field(default=240, gt=0)
+
     # Ollama — sempre externo ao Docker Compose deste projeto (ver ADR-009)
     ollama_base_url: str
     ollama_request_timeout_seconds: float = Field(default=600, gt=0)

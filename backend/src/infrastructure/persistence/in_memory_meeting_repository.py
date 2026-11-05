@@ -17,5 +17,8 @@ class InMemoryMeetingRepository(IMeetingRepository):
     async def get(self, meeting_id: MeetingId) -> Meeting | None:
         return self._items.get(meeting_id)
 
+    async def list_all(self) -> list[Meeting]:
+        return sorted(self._items.values(), key=lambda m: m.scheduled_at)
+
     async def list_by_goal(self, goal_id: GoalId) -> list[Meeting]:
         return [m for m in self._items.values() if m.goal_id == goal_id]

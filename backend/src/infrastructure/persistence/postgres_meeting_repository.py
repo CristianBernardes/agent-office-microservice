@@ -83,6 +83,10 @@ class PostgresMeetingRepository(IMeetingRepository):
         row = await self._pool.fetchrow(f"{_SELECT_SQL} WHERE m.meeting_id = $1", meeting_id.value)
         return _to_meeting(row) if row else None
 
+    async def list_all(self) -> list[Meeting]:
+        rows = await self._pool.fetch(f"{_SELECT_SQL} ORDER BY m.scheduled_at")
+        return [_to_meeting(row) for row in rows]
+
     async def list_by_goal(self, goal_id: GoalId) -> list[Meeting]:
         rows = await self._pool.fetch(
             f"{_SELECT_SQL} WHERE m.goal_id = $1 ORDER BY m.scheduled_at", goal_id.value

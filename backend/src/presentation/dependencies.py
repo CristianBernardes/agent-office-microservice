@@ -8,6 +8,7 @@ onde "quem implementa o quê" é decidido.
 
 from __future__ import annotations
 
+from datetime import timedelta
 from functools import lru_cache
 
 import asyncpg
@@ -20,6 +21,10 @@ from src.application.agents.hire_agent_use_case import HireAgentUseCase
 from src.application.artifacts.approve_artifact_use_case import ApproveArtifactUseCase
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import WriteArtifactUseCase
+from src.application.autonomy.ceremony_scheduler_use_case import (
+    CeremonyConfig,
+    CeremonySchedulerUseCase,
+)
 from src.application.autonomy.client_dialogue_use_case import ClientDialogueUseCase
 from src.application.autonomy.goal_meeting_use_case import GoalMeetingUseCase
 from src.application.autonomy.work_loop_use_case import WorkLoopUseCase
@@ -623,6 +628,22 @@ def get_office_language() -> OfficeLanguage:
     return OfficeLanguage(get_settings().language())
 
 
+def get_ceremony_scheduler_use_case() -> CeremonySchedulerUseCase | None:
+    settings = get_settings()
+    if not settings.ceremonies_enabled:
+        return None
+    return CeremonySchedulerUseCase(
+        agent_repository=get_agent_repository(),
+        task_repository=get_task_repository(),
+        meeting_repository=get_meeting_repository(),
+        write_artifact=get_write_artifact_use_case(),
+        config=CeremonyConfig(
+            daily_interval=timedelta(minutes=settings.ceremony_daily_interval_minutes),
+            refinement_interval=timedelta(minutes=settings.ceremony_refinement_interval_minutes),
+        ),
+    )
+
+
 def get_work_loop_use_case() -> WorkLoopUseCase:
     return WorkLoopUseCase(
         agent_repository=get_agent_repository(),
@@ -638,6 +659,7 @@ def get_work_loop_use_case() -> WorkLoopUseCase:
         sprint_max_days=get_settings().sprint_max_days,
         board_settings=get_get_board_settings_use_case(),
         propose_hiring=get_propose_hiring_use_case(),
+        ceremonies=get_ceremony_scheduler_use_case(),
     )
 
 
