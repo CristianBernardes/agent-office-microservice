@@ -92,8 +92,8 @@ want to automate planning, research, documentation, and delivery with a team of 
 
 | Offer | Price |
 |-------|-------|
-| Annual commercial license per company, without support | from **R$ 12,000/year** |
-| Annual commercial license with business-hours support | R$ 24,000 to R$ 36,000/year |
+| Annual commercial license per company, without support | from **R$ 24,000/year** |
+| Annual commercial license with business-hours support | R$ 36,000 to R$ 48,000/year |
 | Implementation and integration | R$ 8,000 to R$ 30,000 per project, quoted |
 | Ad hoc consulting/support | R$ 250 to R$ 400 per hour |
 

@@ -93,8 +93,8 @@ de IA que **você supervisiona** (contratações, demissões e decisões passam 
 
 | Oferta | Valor |
 |--------|-------|
-| Licença comercial anual por empresa, sem suporte | a partir de **R$ 12.000/ano** |
-| Licença comercial anual com suporte em horário comercial | R$ 24.000 a R$ 36.000/ano |
+| Licença comercial anual por empresa, sem suporte | a partir de **R$ 24.000/ano** |
+| Licença comercial anual com suporte em horário comercial | R$ 36.000 a R$ 48.000/ano |
 | Implantação e integração | R$ 8.000 a R$ 30.000 por projeto, sob orçamento |
 | Consultoria/suporte avulso | R$ 250 a R$ 400 por hora |
 
