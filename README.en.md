@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE) [![Donate](https://img.shields.io/badge/support-Pix%20%7C%20PayPal-ff69b4.svg)](#-before-you-clone-or-fork--help-keep-this-project-alive)
+[![AGPL-3.0 License](https://img.shields.io/badge/license-AGPL--3.0%20%2B%20commercial-blue.svg)](./LICENSE) [![Donate](https://img.shields.io/badge/support-Pix%20%7C%20PayPal-ff69b4.svg)](#-before-you-clone-or-fork--help-keep-this-project-alive)
 
 </div>
 
@@ -715,4 +715,4 @@ README, or in the [Portuguese version](./README.md).
 
 ## 📄 License
 
-Open source under the [MIT License](./LICENSE) ([Portuguese version](./LICENSE.pt-BR.md)). Free to use, including commercially. Donations are **voluntary** and never required.
+Open source under the [AGPL-3.0](./LICENSE) ([Portuguese summary](./LICENSE.pt-BR.md)), with a **paid commercial license** for those who cannot comply with the AGPL (for example, offering a modified version as a service without releasing the source): cristian.aob@gmail.com. Donations are **voluntary** and never required.

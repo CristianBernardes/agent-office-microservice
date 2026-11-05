@@ -1192,7 +1192,15 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   descrevem o fluxo de contratação com aprovação do dono e trazem `images/proposta_de_contratacao.png`.
 - **Validação:** 483 unit (backend), mypy limpo, vitest 87.
 
-## Estado atual e ponto de retomada (após a Rodada 144)
+### Rodada 145 — troca de licença: MIT → AGPL-3.0 + licença comercial
+
+- **Decisão do dono do produto:** licenciamento duplo. `LICENSE` agora é o texto oficial da
+  AGPL-3.0 (com cabeçalho de contato para licença comercial); `LICENSE.pt-BR.md` é um resumo de
+  cortesia; selos e seção de licença dos dois READMEs e `pyproject.toml` atualizados.
+- **Observações:** só vale para versões novas (cópias já baixadas continuam sob MIT); contribuições
+  de terceiros exigem aceite do licenciamento duplo; o texto comercial deve passar por revisão jurídica.
+
+## Estado atual e ponto de retomada (após a Rodada 145)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
