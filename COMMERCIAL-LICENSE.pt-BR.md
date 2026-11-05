@@ -7,7 +7,7 @@
 
 **Licenciante:** SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, CNPJ 36.601.376/0001-07 (nome fantasia GENIOZ SOLUCOES EM TI), com sede na Rua Doutor Aray Xexeo Duarte, 495, Parque Alto da Figueira, Varginha/MG, CEP 37.004-772, representada por Cristian Anderson Oliveira Bernardes ("Licenciante").
 **Licenciada:** [razão social completa, CNPJ, endereço] ("Licenciada").
-**Data de início:** [data] ("Data de Início").
+**Data de início:** a data da última assinatura deste Contrato, ou [outra data combinada] ("Data de Início").
 
 ## 1. Objeto
 

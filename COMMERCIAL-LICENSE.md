@@ -7,7 +7,7 @@
 
 **Licensor:** SCRIPTSAVVY - TECNOLOGIA E DESENVOLVIMENTO DE SISTEMAS LTDA, CNPJ 36.601.376/0001-07 (trade name GENIOZ SOLUCOES EM TI), at Rua Doutor Aray Xexeo Duarte, 495, Parque Alto da Figueira, Varginha/MG, CEP 37.004-772, represented by Cristian Anderson Oliveira Bernardes ("Licensor").
 **Licensee:** [full legal name, tax ID, address] ("Licensee").
-**Effective date:** [date] ("Effective Date").
+**Effective date:** the date of the last signature of this Agreement, or [another agreed date] ("Effective Date").
 
 ## 1. Purpose
 
