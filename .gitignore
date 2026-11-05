@@ -20,6 +20,9 @@ gateway/.env
 # Artefatos .md gerados pelos agentes em tempo de execução (ver ADR-004)
 workspace/*
 !workspace/.gitkeep
+!workspace/inputs/
+workspace/inputs/*
+!workspace/inputs/.gitkeep
 
 # Relatórios de pesquisa gerados em tempo de execução; a pasta é mantida via .gitkeep
 backend/workspace/projects/workspace/research/*

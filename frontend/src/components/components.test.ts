@@ -18,8 +18,10 @@ import type {
   ChatMessage,
   DismissalProposal,
   HiringProposal,
+  Role,
   Task,
 } from "../lib/types";
+import { ROLES } from "../lib/types";
 
 const agent: Agent = {
   agent_id: "a1",
@@ -259,13 +261,18 @@ describe("componentes", () => {
     expect(optionValues).toContain("qwen");
   });
 
-  it("HireForm contrata o time padrão", async () => {
+  it("HireForm contrata todos os cargos com nomes aleatórios distintos", async () => {
     const onsubmit = vi.fn().mockResolvedValue(undefined);
     render(HireForm, { defaultModel: "qwen", onsubmit });
     await fireEvent.click(
-      screen.getByRole("button", { name: "Contratar time padrão" }),
+      screen.getByRole("button", { name: "Contratar time completo" }),
     );
-    await waitFor(() => expect(onsubmit).toHaveBeenCalledTimes(6));
+    await waitFor(() => expect(onsubmit).toHaveBeenCalledTimes(ROLES.length));
+    const calls = onsubmit.mock.calls.map(([input]) => input);
+    expect(calls.map((c) => c.role)).toEqual([...ROLES]);
+    expect(new Set(calls.map((c) => c.name)).size).toBe(ROLES.length);
+    for (const c of calls)
+      expect(c.name).not.toBe(i18n.t.roles[c.role as Role]);
   });
 });
 

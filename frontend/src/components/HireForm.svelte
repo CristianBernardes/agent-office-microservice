@@ -1,5 +1,6 @@
 <script lang="ts">
   import { i18n } from '../lib/i18n.svelte'
+  import { randomNames } from '../lib/names'
   import { ROLES, type HireAgentInput, type Role } from '../lib/types'
 
   let {
@@ -15,13 +16,12 @@
   let done = $state(false)
   let failed = $state(false)
 
-  const defaultTeam: Role[] = ['product_owner', 'scrum_master', 'tech_lead', 'dev_senior', 'dev_junior', 'qa_engineer']
-
   async function hireTeam() {
     done = false
     failed = false
     try {
-      for (const r of defaultTeam) await onsubmit({ name: i18n.t.roles[r], role: r, llm_model: model.trim() })
+      const names = randomNames(ROLES.length)
+      for (const [i, r] of ROLES.entries()) await onsubmit({ name: names[i], role: r, llm_model: model.trim() })
       done = true
     } catch {
       failed = true

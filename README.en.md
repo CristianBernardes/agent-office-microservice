@@ -466,6 +466,13 @@ Every artifact is persisted as a real `.md` file under `workspace/projects/{spri
 frontmatter (author, type, status, dates), and every state transition publishes an MQTT event —
 see [RFC-002](docs/rfc/002-sistema-de-artefatos.md).
 
+### Reference material (`workspace/inputs`)
+
+Drop `.md`, `.json` or `.txt` files (briefing, requirements, data) into `workspace/inputs/` and the
+agents receive them as context when thinking about a goal, using them as the basis to decide and build
+the product. The folder is read-only for the agents, subfolders are read, hidden files are skipped, and
+size is capped (20k characters per file, 60k in total).
+
 ### Web search
 
 Some roles (Product Owner, Tech Lead, Developers, Data Analyst, Product Consultant) have access

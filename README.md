@@ -464,6 +464,13 @@ Cada artefato é persistido como um arquivo `.md` real em `workspace/projects/{s
 frontmatter YAML (autor, tipo, status, datas), e cada transição de estado publica um evento MQTT —
 ver [RFC-002](docs/rfc/002-sistema-de-artefatos.md).
 
+### Material de referência (`workspace/inputs`)
+
+Coloque em `workspace/inputs/` arquivos `.md`, `.json` ou `.txt` (briefing, requisitos, dados) e os
+agentes os recebem como contexto ao pensar sobre um objetivo, usando-os como base para decidir e criar
+o produto. A pasta é somente leitura para os agentes, lê subpastas, ignora arquivos ocultos e limita o
+tamanho (20 mil caracteres por arquivo, 60 mil no total).
+
 ### Busca web
 
 Alguns papéis (Product Owner, Tech Lead, Devs, Analista de Dados, Consultor de Produto) têm acesso à
