@@ -333,6 +333,7 @@ def get_decide_hiring_use_case() -> DecideHiringUseCase:
         hiring_repository=get_hiring_repository(),
         hire_agent=get_hire_agent_use_case(),
         message_bus=get_message_bus(),
+        agent_repository=get_agent_repository(),
     )
 
 

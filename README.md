@@ -142,7 +142,7 @@ viva — obrigado! 🙏
 
 ## O Time
 
-Nove papéis, cada um com um system prompt próprio, personalidade (Big Five) e conjunto de
+27 papéis (9 base e 18 especializados), cada um com um system prompt próprio, personalidade (Big Five) e conjunto de
 ferramentas permitidas:
 
 | Papel | Responsabilidade principal |
@@ -156,6 +156,28 @@ ferramentas permitidas:
 | **Analista de Dados** | Dados, SQL, métricas, KPIs, análises |
 | **Gerente de RH** | Contratações, onboarding, cultura; **propõe demissões** ao dono do produto |
 | **Consultor de Produto** | Validação de mercado, concorrência, preço, pesquisa |
+| **Desenvolvedor Pleno** (`dev_mid`) | Implementação de funcionalidades com autonomia |
+| **DBA** (`database_administrator`) | Modelagem, índices, queries, migrações e desempenho |
+| **DevOps Engineer** (`devops_engineer`) | CI/CD, Docker, infraestrutura e automação |
+| **SRE** (`site_reliability_engineer`) | Confiabilidade, observabilidade, incidentes e SLOs |
+| **UX/UI Designer** (`ux_ui_designer`) | Experiência do usuário, protótipos e interfaces |
+| **Analista de Negócios** (`business_analyst`) | Requisitos, processos e regras de negócio |
+| **Arquiteto de Software** (`software_architect`) | Arquitetura, integração, escalabilidade e decisões técnicas |
+| **Engenheiro de Segurança** (`security_engineer`) | Segurança de aplicações, vulnerabilidades e proteção de dados |
+| **Engenheiro de Testes** (`test_automation_engineer`) | Automação de testes, integração e regressão |
+| **Engenheiro de Dados** (`data_engineer`) | Pipelines, ETL/ELT, qualidade e processamento de dados |
+| **Engenheiro de IA** (`ai_engineer`) | LLMs, agentes, RAG, embeddings e integração de modelos |
+| **Engenheiro de ML** (`ml_engineer`) | Treinamento, avaliação e implantação de modelos |
+| **Analista de Sistemas** (`systems_analyst`) | Especificações técnicas, fluxos e integração entre sistemas |
+| **Especialista em Produto** (`product_designer`) | Descoberta, usabilidade e desenho de soluções |
+| **Suporte Técnico** (`technical_support`) | Atendimento, diagnóstico e resolução de problemas |
+| **Analista de Infraestrutura** (`infrastructure_analyst`) | Redes, servidores, ambientes e serviços internos |
+| **Analista de Qualidade de Dados** (`data_quality_analyst`) | Consistência, integridade e validação dos dados |
+| **Gerente de Engenharia** (`engineering_manager`) | Capacidade técnica, desenvolvimento da equipe e gestão de engenharia |
+
+Os 18 cargos especializados (a partir de **Desenvolvedor Pleno**) têm prompts em português e inglês,
+entram no roteamento de tarefas por palavras-chave e aparecem no formulário de contratação. Por ora
+reaproveitam o sprite e o assento de um cargo base no mapa.
 
 Cada papel só pode usar as ferramentas que lhe foram atribuídas (ex.: só Tech Lead e Product Owner
 podem `approve_artifact`; só Scrum Master pode `start_ceremony`) — a validação de permissão é
@@ -177,6 +199,18 @@ Scrum Master planejam e coordenam. Ver [ADR-054](docs/adr/054-responsabilidades-
 - **Conversa com o PO:** o time debate, e o PO leva a proposta a você como pergunta no chat; o time
   segue com um plano provisório e você responde pelo campo do chat
   ([ADR-055](docs/adr/055-dialogo-do-po-com-o-cliente.md)).
+- **Contratações:** o RH contrata de fato, via tarefa: ao executar uma tarefa de contratação ele
+  escolhe o cargo e **propõe** a vaga. Aparece um modal com o cargo e o motivo, e **você escolhe o
+  nome e a IA** do novo profissional; nada é contratado sem a sua decisão.
+
+<div align="center">
+
+![Proposta de contratação](images/proposta_de_contratacao.png)
+
+*Proposta de contratação: o RH sugere o cargo e você escolhe o nome e a IA.*
+
+</div>
+
 - **Demissões:** o botão **Demitir** (lista do time e mapa) pede confirmação e devolve as tarefas
   abertas ao fluxo. O RH também pode *propor* uma demissão com motivo: aparece um modal para você
   aprovar ou manter a pessoa no time — nada é demitido sem a sua decisão

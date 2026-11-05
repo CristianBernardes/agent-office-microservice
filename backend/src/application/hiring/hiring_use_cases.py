@@ -107,7 +107,9 @@ class DecideHiringUseCase:
         hiring_repository: IHiringRepository,
         hire_agent: HireAgentUseCase,
         message_bus: IMessageBus,
+        agent_repository: IAgentRepository,
     ) -> None:
+        self._agents = agent_repository
         self._hirings = hiring_repository
         self._hire = hire_agent
         self._bus = message_bus
@@ -121,6 +123,8 @@ class DecideHiringUseCase:
         if not model:
             raise InvalidValueError("hiring.model_required")
         proposal.ensure_pending()
+        if any(a.name.casefold() == name.casefold() for a in await self._agents.list_all()):
+            raise InvalidStateTransitionError("hiring.name_taken", name=name)
         agent = await self._hire.execute(
             HireAgentInput(
                 name=name, role=proposal.role, personality=_NEUTRAL_PERSONALITY, llm_model=model

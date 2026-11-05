@@ -1182,7 +1182,17 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - **Limite das tarefas:** título 200→500, descrição e resultado 8000→50000 caracteres (`task_schemas.py`).
 
-## Estado atual e ponto de retomada (após a Rodada 143)
+### Rodada 144 — bug do modal de contratação e READMEs
+
+- **Bug:** ao clicar em "Contratar" com um nome já existente (coluna `agents.name` é única), o
+  backend dava 500 e o modal não fechava, sem explicação. **Correção:** `DecideHiringUseCase`
+  valida o nome (sem diferenciar maiúsculas) e devolve 409 localizado pt/en
+  (`hiring.name_taken`); o `HiringModal` mostra o aviso `hiringNameTaken` e mantém os dados.
+- **Documentação:** `README.md` e `README.en.md` listam os 27 cargos (com identificadores),
+  descrevem o fluxo de contratação com aprovação do dono e trazem `images/proposta_de_contratacao.png`.
+- **Validação:** 483 unit (backend), mypy limpo, vitest 87.
+
+## Estado atual e ponto de retomada (após a Rodada 144)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 

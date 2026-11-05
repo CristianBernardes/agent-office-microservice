@@ -11,6 +11,7 @@ import KanbanBoard from "./KanbanBoard.svelte";
 import LanguageSwitcher from "./LanguageSwitcher.svelte";
 import TaskForm from "./TaskForm.svelte";
 import TeamBoard from "./TeamBoard.svelte";
+import { ApiError } from "../lib/api";
 import { i18n } from "../lib/i18n.svelte";
 import type {
   Agent,
@@ -479,6 +480,24 @@ describe("poderes do dono do produto e demissões", () => {
       expect(onapprove).toHaveBeenCalledWith(hiring, "Mid Dev", "m1"),
     );
     i18n.set("pt");
+  });
+
+  it("HiringModal avisa quando o nome já existe", async () => {
+    i18n.set("pt");
+    const onapprove = vi.fn().mockRejectedValue(new ApiError(409, "x"));
+    render(HiringModal, {
+      props: {
+        proposal: hiring,
+        proposer: hr,
+        defaultModel: "m1",
+        onapprove,
+        onreject: vi.fn(),
+      },
+    });
+    await fireEvent.click(screen.getByRole("button", { name: "Contratar" }));
+    await waitFor(() =>
+      expect(screen.getByRole("alert").textContent).toContain("Já existe"),
+    );
   });
 
   it("HiringModal recusa e bloqueia contratar sem nome", async () => {

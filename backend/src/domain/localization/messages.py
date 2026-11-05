@@ -131,6 +131,10 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "Choose the AI model for the new hire.",
         Language.PT: "Escolha a IA do novo profissional.",
     },
+    "hiring.name_taken": {
+        Language.EN: "There is already a professional named '{name}' — choose another name.",
+        Language.PT: "Já existe um profissional chamado '{name}' — escolha outro nome.",
+    },
     "hiring.already_pending": {
         Language.EN: "There is already a pending hiring proposal for this task.",
         Language.PT: "Já existe uma proposta de contratação pendente para esta tarefa.",
