@@ -1180,6 +1180,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - **Limite de texto:** objetivo (`POST /goals`) e mensagens de chat passam de 4000/8000 para 20000 caracteres (`chat_schemas.py`); a coluna já é `TEXT`.
 
+- **Limite das tarefas:** título 200→500, descrição e resultado 8000→50000 caracteres (`task_schemas.py`).
+
 ## Estado atual e ponto de retomada (após a Rodada 143)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
