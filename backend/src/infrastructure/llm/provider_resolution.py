@@ -14,3 +14,11 @@ _ANTHROPIC_MODEL_PREFIX = "claude-"
 def is_anthropic_model(model: str) -> bool:
     """Indica se o nome do modelo deve ser resolvido pela Anthropic, não pelo Ollama."""
     return model.startswith(_ANTHROPIC_MODEL_PREFIX)
+
+
+_CLOUD_MODEL_PREFIX = "us.anthropic."
+
+
+def is_cloud_gateway_model(model: str) -> bool:
+    """Indica se o modelo deve ser resolvido pelo gateway em nuvem compatível com OpenAI."""
+    return model.startswith(_CLOUD_MODEL_PREFIX)

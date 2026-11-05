@@ -76,7 +76,11 @@ from src.domain.localization.language import OfficeLanguage
 from src.infrastructure.config.settings import Settings, get_settings
 from src.infrastructure.llm.anthropic_adapter import AnthropicAdapter
 from src.infrastructure.llm.ollama_adapter import OllamaAdapter
-from src.infrastructure.llm.provider_resolution import is_anthropic_model
+from src.infrastructure.llm.openai_compatible_adapter import OpenAICompatibleAdapter
+from src.infrastructure.llm.provider_resolution import (
+    is_anthropic_model,
+    is_cloud_gateway_model,
+)
 from src.infrastructure.llm.role_based_llm_adapter_resolver import RoleBasedLlmAdapterResolver
 from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
 from src.infrastructure.messaging.mqtt_message_bus import MqttMessageBus
@@ -366,6 +370,13 @@ def get_llm_adapter_resolver() -> ILlmAdapterResolver:
                 model=model,
                 base_url=settings.anthropic_base_url,
                 request_timeout_seconds=settings.anthropic_request_timeout_seconds,
+            )
+        if is_cloud_gateway_model(model):
+            return OpenAICompatibleAdapter(
+                base_url=settings.cloud_llm_base_url,
+                model=model,
+                api_key=settings.cloud_llm_api_key,
+                request_timeout_seconds=settings.cloud_llm_request_timeout_seconds,
             )
         return OllamaAdapter(
             base_url=settings.ollama_base_url,

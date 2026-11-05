@@ -59,6 +59,12 @@ class Settings(BaseSettings):
     anthropic_base_url: str = "https://api.anthropic.com"
     anthropic_request_timeout_seconds: float = Field(default=120, gt=0)
 
+    # Gateway em nuvem compatível com a API OpenAI (/v1/chat/completions) — opcional.
+    # Vazio = desabilitado. Modelos "us.anthropic.*" são roteados para ele.
+    cloud_llm_base_url: str = ""
+    cloud_llm_api_key: str = ""
+    cloud_llm_request_timeout_seconds: float = Field(default=300, gt=0)
+
     # Idioma do escritório (prompts dos agentes e fallback de erros): pt | en (ADR-012)
     office_language: str = "en"
 
