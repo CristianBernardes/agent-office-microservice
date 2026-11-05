@@ -10,9 +10,9 @@
 
 <div align="center">
 
-▶️ **Assista ao vídeo de demonstração:**
+![Agent Office em ação](images/agent-office.gif)
 
-[![Assista ao vídeo](images/Agent_Office_2.png)](https://youtu.be/eq40fTZwJrc)
+*O escritório em ação: agentes de IA colaborando, debatendo e entregando tarefas.*
 
 </div>
 
