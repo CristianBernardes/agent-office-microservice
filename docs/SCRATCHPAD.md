@@ -1238,7 +1238,34 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - **READMEs:** o vídeo do YouTube do topo foi substituído pelo GIF `images/agent-office.gif` (pt e en).
 
-## Estado atual e ponto de retomada (após a Rodada 148)
+### Rodada 149 — licenciamento, Makefile, entrypoint, contratação e material de referência
+
+- **READMEs (pt/en):** o projeto deixou de ser descrito como "open source"; agora é "código
+  disponível, licenciamento duplo" (AGPL-3.0 + licença comercial). Textos de doação, diagrama,
+  "Contribuindo" e "Licença" ajustados.
+- **`make format-frontend`:** o `node_modules` só existe dentro do container do frontend, então o
+  alvo roda `prettier` num container `node:24-alpine` descartável (copia o frontend para `/tmp`,
+  instala, formata e devolve só `src/`). Os demais alvos de frontend (`lint`, `test`, `build`) ainda
+  usam `npm` no host. `make format` do backend exige `make install` antes (venv vazio).
+- **`frontend/entrypoint.sh`:** com CRLF (`core.autocrlf=true`) o shebang quebrava no container
+  ("no such file or directory"). Criado `.gitattributes` com `*.sh text eol=lf`.
+- **Contratação:** o botão agora é "Contratar time completo" (todos os `ROLES`), com nomes
+  aleatórios e distintos (`frontend/src/lib/names.ts`) em vez do nome do cargo. O README ainda cita
+  "time padrão de 11 agentes" (linha ~608) — desatualizado.
+- **Material de referência:** `workspace/inputs/` (com `.gitkeep`; conteúdo ignorado pelo git).
+  `WorkspaceInputsReader` (`infrastructure/filesystem`) lê `.md/.json/.txt` (subpastas, sem
+  ocultos, 20 mil caracteres por arquivo e 60 mil no total, sem links simbólicos para fora) através
+  da porta `IReferenceMaterialProvider`; o `AgentThinkUseCase` anexa o conteúdo ao contexto. Foi
+  injetado no contexto porque o resultado de uma ferramenta não volta ao LLM; `read_artifact`
+  continua sem handler.
+- **Exemplo:** `workspace/inputs/task_lotomania.md` (lei do deslocamento de dezenas; entregável =
+  última task com 50 dezenas) lendo `lotomania.json`, que deve ser mantido atualizado.
+- **Validação:** ruff format/mypy limpos; 15 testes novos/afetados passam. 3 falhas no conjunto
+  unit do container (`test_settings_language`, `test_role_based_llm_adapter_resolver`,
+  `test_memory_router`), não investigadas (provável ambiente do container).
+- **Regra do dono:** sempre atualizar este SCRATCHPAD.
+
+## Estado atual e ponto de retomada (após a Rodada 149)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 

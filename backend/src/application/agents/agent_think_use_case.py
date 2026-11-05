@@ -19,6 +19,7 @@ from src.domain.interfaces.llm_adapter import LlmThoughtResponse
 from src.domain.interfaces.llm_adapter_resolver import ILlmAdapterResolver
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.prompt_provider import IPromptProvider
+from src.domain.interfaces.reference_material_provider import IReferenceMaterialProvider
 from src.domain.localization.language import Language
 
 # Bloco: templates de tópico por tipo de evento, conforme a RFC-001.
@@ -38,12 +39,14 @@ class AgentThinkUseCase:
         prompt_provider: IPromptProvider,
         tool_registry: ToolRegistry,
         language: Language,
+        reference_material: IReferenceMaterialProvider | None = None,
     ) -> None:
         self._llm_adapter_resolver = llm_adapter_resolver
         self._message_bus = message_bus
         self._prompt_provider = prompt_provider
         self._tool_registry = tool_registry
         self._language = language
+        self._reference_material = reference_material
 
     async def execute(
         self, agent: Agent, context: str, language: Language | None = None
@@ -56,7 +59,9 @@ class AgentThinkUseCase:
             agent.role, agent.name, language or self._language
         )
         llm_adapter = self._llm_adapter_resolver.resolve(agent.role, agent.llm_model)
-        response = await llm_adapter.think(system_prompt=system_prompt, context=context)
+        response = await llm_adapter.think(
+            system_prompt=system_prompt, context=self._with_reference_material(context)
+        )
 
         await self._publish_thought(agent, response)
         await self._publish_action(agent, response)
@@ -65,6 +70,18 @@ class AgentThinkUseCase:
             await self._execute_tool_call(agent, response)
 
         return response
+
+    def _with_reference_material(self, context: str) -> str:
+        """Anexa ao contexto os arquivos que o usuário deixou para os agentes consultarem."""
+        material = self._reference_material.read_all() if self._reference_material else ""
+        if not material:
+            return context
+        header = (
+            "MATERIAL DE REFERÊNCIA FORNECIDO PELO USUÁRIO (use como base para suas decisões):"
+            if self._language is Language.PT
+            else "USER-PROVIDED REFERENCE MATERIAL (use it as the basis for your decisions):"
+        )
+        return f"{context}\n\n{header}\n{material}"
 
     async def _publish_thought(self, agent: Agent, response: LlmThoughtResponse) -> None:
         envelope = build_message_envelope(
