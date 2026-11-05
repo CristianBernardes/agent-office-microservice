@@ -141,7 +141,7 @@ alive — thank you! 🙏
 
 ## The Team
 
-Nine roles, each with its own system prompt, personality (Big Five traits), and set of allowed
+27 roles (9 base and 18 specialized), each with its own system prompt, personality (Big Five traits), and set of allowed
 tools:
 
 | Role | Main responsibility |
@@ -155,6 +155,28 @@ tools:
 | **Data Analyst** | Data, SQL, metrics, KPIs, analyses |
 | **HR Manager** | Hiring, onboarding, culture; **proposes dismissals** to the product owner |
 | **Product Consultant** | Market validation, competitors, pricing, research |
+| **Mid-level Developer** (`dev_mid`) | Implementing features autonomously |
+| **DBA** (`database_administrator`) | Modeling, indexes, queries, migrations and performance |
+| **DevOps Engineer** (`devops_engineer`) | CI/CD, Docker, infrastructure and automation |
+| **SRE** (`site_reliability_engineer`) | Reliability, observability, incidents and SLOs |
+| **UX/UI Designer** (`ux_ui_designer`) | User experience, prototypes and interfaces |
+| **Business Analyst** (`business_analyst`) | Requirements, processes and business rules |
+| **Software Architect** (`software_architect`) | Architecture, integration, scalability and technical decisions |
+| **Security Engineer** (`security_engineer`) | Application security, vulnerabilities and data protection |
+| **Test Automation Engineer** (`test_automation_engineer`) | Test automation, integration and regression |
+| **Data Engineer** (`data_engineer`) | Pipelines, ETL/ELT, data quality and processing |
+| **AI Engineer** (`ai_engineer`) | LLMs, agents, RAG, embeddings and model integration |
+| **ML Engineer** (`ml_engineer`) | Model training, evaluation and deployment |
+| **Systems Analyst** (`systems_analyst`) | Technical specifications, flows and system integration |
+| **Product Designer** (`product_designer`) | Discovery, usability and solution design |
+| **Technical Support** (`technical_support`) | Support, diagnosis and problem solving |
+| **Infrastructure Analyst** (`infrastructure_analyst`) | Networks, servers, environments and internal services |
+| **Data Quality Analyst** (`data_quality_analyst`) | Consistency, integrity and data validation |
+| **Engineering Manager** (`engineering_manager`) | Technical capacity, team development and engineering management |
+
+The 18 specialized roles (from **Mid-level Developer** on) have prompts in Portuguese and English,
+take part in keyword-based task routing and appear in the hiring form. For now they reuse the sprite
+and map seat of a base role.
 
 Each role can only use the tools assigned to it (e.g. only Tech Lead and Product Owner can
 `approve_artifact`; only Scrum Master can `start_ceremony`) — permission validation is
@@ -177,6 +199,18 @@ and Scrum Master plan and coordinate. See
 - **Talking to the PO:** the team debates, and the PO brings the proposal to you as a chat question; the
   team proceeds with a provisional plan and you answer in the chat box
   ([ADR-055](docs/adr/055-dialogo-do-po-com-o-cliente.md)).
+- **Hirings:** HR really hires, via a task: when it runs a hiring task it picks the role and
+  **proposes** the position. A modal shows the role and the reason, and **you choose the new
+  professional's name and AI**; nobody is hired without your decision.
+
+<div align="center">
+
+![Hiring proposal](images/proposta_de_contratacao.png)
+
+*Hiring proposal: HR suggests the role and you choose the name and the AI.*
+
+</div>
+
 - **Dismissals:** the **Fire** button (team list and map) asks for confirmation and returns the open
   tasks to the flow. HR can also *propose* a dismissal with a reason: a modal asks you to approve it or
   keep the person on the team — nobody is dismissed without your decision

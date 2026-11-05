@@ -1,5 +1,6 @@
 <script lang="ts">
   import { i18n } from '../lib/i18n.svelte'
+  import { ApiError } from '../lib/api'
   import type { Agent, HiringProposal } from '../lib/types'
 
   let {
@@ -24,6 +25,7 @@
   let model = $state(defaultModel)
   let busy = $state(false)
   let failed = $state(false)
+  let nameTaken = $state(false)
 
   const message = $derived(
     i18n.t.hiringMessage
@@ -36,10 +38,12 @@
   async function run(action: () => Promise<void>) {
     busy = true
     failed = false
+    nameTaken = false
     try {
       await action()
-    } catch {
-      failed = true
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) nameTaken = true
+      else failed = true
     } finally {
       busy = false
     }
@@ -75,6 +79,7 @@
         <input bind:value={model} data-testid="hiring-model" />
       {/if}
     </label>
+    {#if nameTaken}<p role="alert" class="error">{i18n.t.hiringNameTaken}</p>{/if}
     {#if failed}<p role="alert" class="error">{i18n.t.loadError}</p>{/if}
     <div class="actions">
       <button type="button" class="ghost" disabled={busy} onclick={() => run(() => onreject(proposal))}

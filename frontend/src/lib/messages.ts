@@ -96,6 +96,7 @@ export interface Messages {
   hiringModel: string;
   hiringApprove: string;
   hiringReject: string;
+  hiringNameTaken: string;
   noMessages: string;
   logs: string;
   noLogs: string;
@@ -222,6 +223,7 @@ export const pt: Messages = {
   hiringModel: "IA (modelo) do profissional",
   hiringApprove: "Contratar",
   hiringReject: "Recusar",
+  hiringNameTaken: "Já existe um profissional com esse nome. Escolha outro.",
   noMessages: "Nenhuma conversa ainda.",
   logs: "Logs em tempo real",
   noLogs: "Aguardando eventos…",
@@ -396,6 +398,8 @@ export const en: Messages = {
   hiringModel: "Professional's AI (model)",
   hiringApprove: "Hire",
   hiringReject: "Decline",
+  hiringNameTaken:
+    "A professional with this name already exists. Choose another.",
   noMessages: "No conversations yet.",
   logs: "Live logs",
   noLogs: "Waiting for events…",

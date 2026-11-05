@@ -100,3 +100,14 @@ class TestHiringsRoutes:
         assert "name" in blank.json()["detail"].lower()
         missing = client.post(f"/hirings/{uuid4()}/reject", headers={"Accept-Language": "en"})
         assert "was not found" in missing.json()["detail"]
+
+    def test_duplicate_name_is_a_localized_conflict(self) -> None:
+        hr = _hire("hr_manager")
+        proposal_id = _propose(hr)
+        taken = client.post(
+            f"/hirings/{proposal_id}/approve",
+            json={"name": "HR_MANAGER", "llm_model": "m"},
+            headers={"Accept-Language": "pt"},
+        )
+        assert taken.status_code == 409
+        assert "Já existe" in taken.json()["detail"]
