@@ -22,7 +22,9 @@ pytestmark = pytest.mark.unit
         (Role.DEV_SENIOR, TaskStatus.TESTING, TaskStatus.IN_REVIEW, False),
         (Role.QA_ENGINEER, TaskStatus.IN_REVIEW, TaskStatus.DONE, True),
         (Role.DEV_JUNIOR, TaskStatus.IN_REVIEW, TaskStatus.DONE, False),
-        (Role.HR_MANAGER, TaskStatus.TODO, TaskStatus.BLOCKED, False),
+        (Role.HR_MANAGER, TaskStatus.TODO, TaskStatus.BLOCKED, True),
+        (Role.HR_MANAGER, TaskStatus.BACKLOG, TaskStatus.TODO, True),
+        (Role.DEV_SENIOR, TaskStatus.BACKLOG, TaskStatus.TODO, False),
         (Role.SCRUM_MASTER, TaskStatus.TODO, TaskStatus.BLOCKED, True),
     ],
 )

@@ -38,8 +38,15 @@ from src.domain.value_objects.identifiers import SessionId, TaskId
 
 logger = logging.getLogger(__name__)
 
-_PLANNERS = (Role.PRODUCT_OWNER, Role.SCRUM_MASTER)
-_COORDINATORS = (Role.SCRUM_MASTER, Role.TECH_LEAD, Role.PRODUCT_OWNER)
+# Bloco: o RH e o Gerente de Engenharia são reserva, para um time recém-criado sem PO/SM andar.
+_PLANNERS = (Role.PRODUCT_OWNER, Role.SCRUM_MASTER, Role.ENGINEERING_MANAGER, Role.HR_MANAGER)
+_COORDINATORS = (
+    Role.SCRUM_MASTER,
+    Role.TECH_LEAD,
+    Role.PRODUCT_OWNER,
+    Role.ENGINEERING_MANAGER,
+    Role.HR_MANAGER,
+)
 _TESTERS = (Role.QA_ENGINEER, Role.TEST_AUTOMATION_ENGINEER)
 _REVIEWERS = (Role.TECH_LEAD, Role.QA_ENGINEER)
 
