@@ -1236,6 +1236,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   aberta"; cada cerimônia custa uma chamada de LLM por participante; o estado (última execução)
   vem das reuniões gravadas, então sobrevive a reinícios só com Postgres.
 
+- **READMEs:** o vídeo do YouTube do topo foi substituído pelo GIF `images/agent-office.gif` (pt e en).
+
 ## Estado atual e ponto de retomada (após a Rodada 148)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)

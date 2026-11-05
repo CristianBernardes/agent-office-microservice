@@ -10,9 +10,9 @@
 
 <div align="center">
 
-▶️ **Watch the demo video:**
+![Agent Office in action](images/agent-office.gif)
 
-[![Watch the video](images/Agent_Office_2.png)](https://youtu.be/eq40fTZwJrc)
+*The office in action: AI agents collaborating, debating and delivering tasks.*
 
 </div>
 
@@ -25,7 +25,7 @@ Give the team a product goal (e.g. *"build a niche SaaS to sell 5 units/day at $
 agents think, research the market, debate with each other, and produce real artifacts — ADRs,
 backlogs, test plans, market analyses — as versionable Markdown files, not just ephemeral logs.
 
-**Open source** project, built from scratch following **Clean Architecture**, **SOLID**
+**Source-available, dual-licensed** project (AGPL-3.0 + commercial license — not fully open source), built from scratch following **Clean Architecture**, **SOLID**
 principles, **Clean Code**, **DRY**, **YAGNI**, dependency injection, automated testing, and
 rigorous architectural documentation (ADRs, RFCs, Design Docs).
 
@@ -104,11 +104,11 @@ want to automate planning, research, documentation, and delivery with a team of 
 
 ## 💙 Before you clone or fork — help keep this project alive
 
-This repository is **open source and free**, but it is maintained in the author's free time.
+This repository is **source-available** (free under the AGPL-3.0 for permitted uses; commercial use without releasing the source requires a paid license), but it is maintained in the author's free time.
 **Any donation amount is welcome**.
 
 **I want to be upfront:** I take care of my daughter's health — she has several allergies — and
-these costs have put me in **debt**. I genuinely need help, even though this is an open source
+these costs have put me in **debt**. I genuinely need help, even though this is a source-available
 project. I would rather say this openly than use my daughter as an emotional hook: the project
 stands on its own, donating is entirely voluntary, and nothing here depends on it. Donations help
 pay off these debts and keep the time and energy available to continue developing AgentOffice.
@@ -432,7 +432,7 @@ interface, allowing the implementation to be swapped without touching business r
 │      backend: routes MQTT ⇄ Kafka, with     │
 │      idempotency (Redis) and per-agent      │
 │      ordering                                │
-│  (no authentication — open source project,   │
+│  (no authentication — source-available project,   │
 │   funded by donations, no sensitive data)    │
 └───────────────────┬─────────────────────────┘
                     │
@@ -726,7 +726,7 @@ More details about the backend structure in [`backend/README.md`](backend/README
 
 ## Contributing
 
-This project is open source and welcomes contributions. Before opening a PR, read
+This project is source-available (dual-licensed) and welcomes contributions. Before opening a PR, read
 [`docs/SCRATCHPAD.md`](docs/SCRATCHPAD.md) — it defines the mandatory quality standards (SOLID,
 Clean Code, tests, ADRs) every contribution must follow, plus a detailed history of decisions and
 the current implementation state of every phase of the project (written in Portuguese).
@@ -735,10 +735,9 @@ the current implementation state of every phase of the project (written in Portu
 
 ## 💙 Liked the project?
 
-Any donation amount is welcome and helps cover my family's health costs and keep this open
-source project alive and growing. See the donation options (PayPal and Pix) at the top of this
+Any donation amount is welcome and helps cover my family's health costs and keep this project alive and growing. See the donation options (PayPal and Pix) at the top of this
 README, or in the [Portuguese version](./README.md).
 
 ## 📄 License
 
-Open source under the [AGPL-3.0](./LICENSE) ([Portuguese summary](./LICENSE.pt-BR.md)), with a **paid commercial license** for those who cannot comply with the AGPL (for example, offering a modified version as a service without releasing the source): cristian.aob@gmail.com. Agreement template: [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) ([Portuguese](./COMMERCIAL-LICENSE.pt-BR.md)). Donations are **voluntary** and never required.
+Not fully open source: dual-licensed. Source available under the [AGPL-3.0](./LICENSE) ([Portuguese summary](./LICENSE.pt-BR.md)), with a **paid commercial license** for those who cannot comply with the AGPL (for example, offering a modified version as a service without releasing the source): cristian.aob@gmail.com. Agreement template: [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) ([Portuguese](./COMMERCIAL-LICENSE.pt-BR.md)). Donations are **voluntary** and never required.
