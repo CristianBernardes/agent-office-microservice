@@ -1210,7 +1210,16 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - **Venda:** seção "Para quem é e como contratar" nos dois READMEs (público, tabela de licenças, contato). Preços de referência preenchidos: licença a partir de R$ 24.000/ano (decisão do dono), com suporte R$ 36–48 mil/ano, implantação R$ 8–30 mil, hora R$ 250–400 (revisar após as primeiras conversas com clientes).
 
-## Estado atual e ponto de retomada (após a Rodada 146)
+### Rodada 147 — bug: 409 ao mover tarefa de um agente ocioso
+
+- **Sintoma:** `POST /tasks/{id}/move` (dono do produto) devolvia 409 "Agente 'Homero' está
+  'idle' e não possui uma tarefa em andamento para concluir".
+- **Causa:** `MoveTaskUseCase._release_owner` chamava `agent.complete_task()` sempre que o agente
+  ainda tinha `current_task_id`, mesmo ocioso (estado inconsistente). **Correção:** só conclui se
+  estiver `WORKING`; senão apenas limpa `current_task_id`. Teste de regressão adicionado; 484 unit.
+- **Observação:** o estado inconsistente (ocioso com tarefa atual) em si não foi rastreado.
+
+## Estado atual e ponto de retomada (após a Rodada 147)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 

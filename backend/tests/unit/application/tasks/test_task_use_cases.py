@@ -304,6 +304,23 @@ class TestAreaRoutingAndOwnerOverride:
         assert refreshed is not None
         assert refreshed.status == AgentStatus.IDLE
 
+    async def test_override_releases_an_idle_owner_with_a_stale_current_task(self, world) -> None:  # type: ignore[no-untyped-def]
+        tasks, agents, bus = world
+        dev, task_id = await _agent(agents), await _create(tasks, bus)
+        await AssignTaskUseCase(tasks, agents, bus).execute(
+            task_id, dev.agent_id, PO, Role.PRODUCT_OWNER
+        )
+        stale = await agents.find_by_id(dev.agent_id)
+        assert stale is not None
+        stale.status = AgentStatus.IDLE  # ocioso, mas ainda com a tarefa atual
+        await agents.save(stale)
+        moved = await MoveTaskUseCase(tasks, bus, agents).execute(
+            task_id, TaskStatus.TODO, PO, Role.PRODUCT_OWNER, owner_override=True
+        )
+        assert moved.status == TaskStatus.TODO
+        refreshed = await agents.find_by_id(dev.agent_id)
+        assert refreshed is not None and refreshed.current_task_id is None
+
     async def test_set_owner_keeps_the_stage(self, world) -> None:  # type: ignore[no-untyped-def]
         tasks, agents, bus = world
         analyst = await _specialist(agents, Role.DATA_ANALYST)

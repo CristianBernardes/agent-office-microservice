@@ -207,7 +207,11 @@ class MoveTaskUseCase:
             return
         agent = await self._agent_repository.find_by_id(task.assigned_to)
         if agent is not None and agent.current_task_id == task.task_id:
-            agent.complete_task()
+            if agent.status == AgentStatus.WORKING:
+                agent.complete_task()
+            else:
+                # Estado inconsistente (ocioso com tarefa atual): só limpa o vínculo.
+                agent.current_task_id = None
             await self._agent_repository.save(agent)
 
     async def execute(
