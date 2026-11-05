@@ -1,0 +1,3 @@
+# Scripts executados dentro de containers Linux precisam de LF; com CRLF o
+# shebang quebra ("exec /entrypoint.sh: no such file or directory").
+*.sh text eol=lf
