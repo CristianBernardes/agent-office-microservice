@@ -21,6 +21,10 @@ gateway/.env
 workspace/*
 !workspace/.gitkeep
 
+# Relatórios de pesquisa gerados em tempo de execução; a pasta é mantida via .gitkeep
+backend/workspace/projects/workspace/research/*
+!backend/workspace/projects/workspace/research/.gitkeep
+
 # Variáveis do docker-compose
 .env
 !.env.example

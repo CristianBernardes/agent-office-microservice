@@ -53,6 +53,20 @@ async def _list_anthropic_models(api_key: str, base_url: str) -> list[str]:
         return []
 
 
+async def _list_cloud_gateway_models(base_url: str, api_key: str) -> list[str]:
+    """Lista os modelos do gateway em nuvem (/v1/models); vazio se não configurado ou fora do ar."""
+    if not base_url:
+        return []
+    headers = {"authorization": f"Bearer {api_key}"} if api_key else {}
+    try:
+        async with httpx.AsyncClient(timeout=_REQUEST_TIMEOUT_SECONDS) as client:
+            response = await client.get(f"{base_url.rstrip('/')}/v1/models", headers=headers)
+            response.raise_for_status()
+            return [item["id"] for item in response.json().get("data", [])]
+    except (httpx.HTTPError, KeyError, ValueError):
+        return []
+
+
 @router.get("")
 async def list_models() -> list[str]:
     """Lista os modelos de LLM disponíveis: locais (Ollama) e, se configurada, Claude."""
@@ -61,4 +75,7 @@ async def list_models() -> list[str]:
     anthropic_models = await _list_anthropic_models(
         settings.anthropic_api_key, settings.anthropic_base_url
     )
-    return sorted(ollama_models + anthropic_models)
+    cloud_models = await _list_cloud_gateway_models(
+        settings.cloud_llm_base_url, settings.cloud_llm_api_key
+    )
+    return sorted(ollama_models + anthropic_models + cloud_models)

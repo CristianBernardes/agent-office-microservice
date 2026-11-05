@@ -1106,7 +1106,24 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - **Limitações:** sem streaming; detecção por palavras-chave; respostas de conversa não
   validadas contra um LLM real.
 
-## Estado atual e ponto de retomada (após a Rodada 139)
+### Rodada 140 — Gateway de LLM em nuvem compatível com OpenAI
+
+- **Pedido do dono do produto:** trazer para o backend modelos de nuvem expostos por um proxy
+  (`https://ollama.scriptsavvy.com.br`) que fala apenas o formato OpenAI (`/v1/models` e
+  `/v1/chat/completions`); `/api/chat` e `/api/tags` do Ollama não existem nele.
+- **Backend:** `OpenAICompatibleAdapter` (`openai_compatible_adapter.py`) chama
+  `/v1/chat/completions` e reaproveita o parser tolerante do `AnthropicAdapter`; embeddings
+  continuam em outro provedor. `provider_resolution.is_cloud_gateway_model` roteia modelos
+  `us.anthropic.*` para ele (o resto segue no Ollama; `claude-*` segue na Anthropic).
+  `GET /models` também lista `/v1/models` do gateway (vazio se não configurado ou fora do ar).
+- **Configuração:** `CLOUD_LLM_BASE_URL`, `CLOUD_LLM_API_KEY` (opcional) e
+  `CLOUD_LLM_REQUEST_TIMEOUT_SECONDS` (padrão 300). Vazias no `.env.example`; a URL real fica
+  só no `.env` local (ignorado pelo git).
+- **Validação:** 453 unit passando; `GET /v1/models` real retornou 20 modelos.
+- **Limitações:** chamada de chat de ponta a ponta não validada; sem testes dedicados do
+  adaptador/roteamento; a lista traz todos os modelos do gateway, sem filtro.
+
+## Estado atual e ponto de retomada (após a Rodada 140)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 
@@ -1233,7 +1250,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 | 136 | `c4e9b27` | `WorkLoopUseCase` passa a respeitar a configuração `agents_can_create_tasks` do quadro: a divisão de tarefas (que poderia criar novas) é evitada quando a criação está bloqueada | ajuste de comportamento, sem teste novo dedicado | `backend/src/application/autonomy/work_loop_use_case.py`, `backend/src/presentation/dependencies.py` |
 | 137 | `dc99ffc` | Atualização de `backend/.env.example` com variáveis adicionadas nas rodadas recentes | documentação de configuração | `backend/.env.example` |
 | 138 | `84c5bf9` | Anthropic (Claude) como provedor de LLM por agente (ADR-058); correção do modelo do agente ignorado na resolução do LLM (ADR-059); `GET /models` lista Claude no `HireForm` | 442 unit (backend); 82 (frontend); validação end-to-end real contra a API da Anthropic | `backend/src/infrastructure/llm/anthropic_*.py`, `backend/src/infrastructure/llm/provider_resolution.py`, `backend/src/infrastructure/llm/role_based_llm_adapter_resolver.py`, `backend/src/domain/interfaces/llm_adapter_resolver.py`, `backend/src/application/agents/agent_think_use_case.py`, `backend/src/application/research/research_use_case.py`, `backend/src/presentation/api/models_router.py`, `backend/src/presentation/dependencies.py`, `frontend/src/lib/messages.ts`, `docs/adr/058*`, `docs/adr/059*` |
-| 139 | (este commit) | Chat direto do dono com o RH (ADR-060): `POST /hr/chat`, segundo `ChatPanel`, prompts do RH reforçados | 453 unit (backend); 83 (frontend) | `backend/src/application/chat/hr_chat_use_case.py`, `backend/src/presentation/api/hr_chat_router.py`, `frontend/src/App.svelte`, `frontend/src/components/ChatPanel.svelte`, `docs/adr/060*` |
+| 139 | `62426d4` | Chat direto do dono com o RH (ADR-060): `POST /hr/chat`, segundo `ChatPanel`, prompts do RH reforçados | 453 unit (backend); 83 (frontend) | `backend/src/application/chat/hr_chat_use_case.py`, `backend/src/presentation/api/hr_chat_router.py`, `frontend/src/App.svelte`, `frontend/src/components/ChatPanel.svelte`, `docs/adr/060*` |
+| 140 | (este commit) | Gateway de LLM em nuvem compatível com OpenAI: `OpenAICompatibleAdapter`, roteamento de `us.anthropic.*`, `GET /models` lista o gateway, variáveis `CLOUD_LLM_*` | 453 unit (backend); listagem real validada | `backend/src/infrastructure/llm/openai_compatible_adapter.py`, `backend/src/infrastructure/llm/provider_resolution.py`, `backend/src/infrastructure/config/settings.py`, `backend/src/presentation/api/models_router.py`, `backend/src/presentation/dependencies.py`, `backend/.env.example` |
 
 ### O que funciona
 
