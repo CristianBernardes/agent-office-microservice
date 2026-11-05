@@ -1208,7 +1208,7 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 
 - **Dados do Licenciante:** os contratos usam a SCRIPTSAVVY (CNPJ 36.601.376/0001-07, Simples Nacional, Varginha/MG) como Licenciante, representada por Cristian, que é o Autor dos direitos autorais. Falta formalizar a autorização do Autor para a empresa licenciar (cláusula 1).
 
-- **Venda:** seção "Para quem é e como contratar" nos dois READMEs (público, tabela de licenças, contato). **Pendente:** preencher a faixa de preço (`R$ [valor]/ano`).
+- **Venda:** seção "Para quem é e como contratar" nos dois READMEs (público, tabela de licenças, contato). Preços de referência preenchidos: licença a partir de R$ 24.000/ano (decisão do dono), com suporte R$ 36–48 mil/ano, implantação R$ 8–30 mil, hora R$ 250–400 (revisar após as primeiras conversas com clientes).
 
 ## Estado atual e ponto de retomada (após a Rodada 146)
 
