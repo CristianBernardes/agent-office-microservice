@@ -26,7 +26,7 @@ R$39,90"*) e observe os agentes pensarem, pesquisarem o mercado, debaterem entre
 artefatos reais — ADRs, backlogs, planos de teste, análises de mercado — em arquivos Markdown
 versionáveis, não apenas em logs efêmeros.
 
-Projeto **open source**, construído do zero seguindo **Clean Architecture**, princípios **SOLID**,
+Projeto com **código disponível e licenciamento duplo** (AGPL-3.0 + licença comercial — não é totalmente open source), construído do zero seguindo **Clean Architecture**, princípios **SOLID**,
 **Clean Code**, **DRY**, **YAGNI**, injeção de dependência, testes automatizados e documentação
 arquitetural rigorosa (ADRs, RFCs, Design Docs).
 
@@ -105,12 +105,12 @@ de IA que **você supervisiona** (contratações, demissões e decisões passam 
 
 ## 💙 Antes de clonar ou fazer fork — ajude a manter este projeto vivo
 
-Este repositório é **open source e gratuito**, mas é mantido no tempo livre do autor. **Qualquer
+Este repositório tem o **código disponível** (gratuito sob a AGPL-3.0 para os usos permitidos; uso comercial sem abrir o código exige licença paga), mas é mantido no tempo livre do autor. **Qualquer
 valor de doação é bem-vindo**.
 
 **Quero ser transparente:** cuido da saúde da minha filha, que tem várias alergias, e acabei me
-**endividando** por causa desses custos. Preciso de ajuda de verdade, mesmo sendo um projeto open
-source. Prefiro dizer isso abertamente a usar minha filha como gatilho emocional: o projeto vale
+**endividando** por causa desses custos. Preciso de ajuda de verdade, mesmo sendo um projeto de código
+código disponível. Prefiro dizer isso abertamente a usar minha filha como gatilho emocional: o projeto vale
 por si só, a doação é totalmente voluntária e nada aqui depende dela. As doações ajudam a quitar
 essas dívidas e a manter tempo e energia para continuar desenvolvendo o AgentOffice.
 
@@ -430,7 +430,7 @@ interface de domínio, permitindo troca de implementação sem alterar regra de 
 │  └── PONTE entre MQTT e o Backend Python:   │
 │      roteia MQTT ⇄ Kafka, com idempotência  │
 │      (Redis) e ordenação por agente         │
-│  (sem autenticação — projeto open source,    │
+│  (sem autenticação — código disponível,      │
 │   mantido por doações, sem dados sensíveis)  │
 └───────────────────┬─────────────────────────┘
                     │
@@ -723,7 +723,7 @@ Mais detalhes sobre a estrutura do backend em [`backend/README.md`](backend/READ
 
 ## Contribuindo
 
-Este projeto é open source e aceita contribuições. Antes de abrir um PR, leia
+Este projeto tem código disponível (licenciamento duplo) e aceita contribuições. Antes de abrir um PR, leia
 [`docs/SCRATCHPAD.md`](docs/SCRATCHPAD.md) — ele define os padrões de qualidade obrigatórios
 (SOLID, Clean Code, testes, ADRs) que toda contribuição deve seguir, além do histórico detalhado de
 decisões e do estado atual de implementação de cada fase do projeto.
@@ -733,9 +733,9 @@ decisões e do estado atual de implementação de cada fase do projeto.
 ## 💙 Gostou do projeto?
 
 Qualquer valor de doação é bem-vindo e ajuda a cobrir os custos de saúde da minha família e a
-manter este projeto open source vivo e crescendo. Veja as formas de doar (Pix e PayPal) no topo
+manter este projeto vivo e crescendo. Veja as formas de doar (Pix e PayPal) no topo
 deste README, ou na [versão em inglês](./README.en.md).
 
 ## 📄 Licença
 
-Código aberto sob a [AGPL-3.0](./LICENSE) ([resumo em português](./LICENSE.pt-BR.md)), com **licença comercial paga** para quem não puder cumprir a AGPL (por exemplo, oferecer uma versão modificada como serviço sem abrir o código): cristian.aob@gmail.com. Modelo de contrato: [COMMERCIAL-LICENSE.pt-BR.md](./COMMERCIAL-LICENSE.pt-BR.md) ([inglês](./COMMERCIAL-LICENSE.md)). As doações são **voluntárias** e nunca obrigatórias.
+Projeto **não totalmente open source**: licenciamento duplo. Código disponível sob a [AGPL-3.0](./LICENSE) ([resumo em português](./LICENSE.pt-BR.md)), com **licença comercial paga** para quem não puder cumprir a AGPL (por exemplo, oferecer uma versão modificada como serviço sem abrir o código): cristian.aob@gmail.com. Modelo de contrato: [COMMERCIAL-LICENSE.pt-BR.md](./COMMERCIAL-LICENSE.pt-BR.md) ([inglês](./COMMERCIAL-LICENSE.md)). As doações são **voluntárias** e nunca obrigatórias.
