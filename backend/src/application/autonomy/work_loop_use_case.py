@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+import re
 from collections.abc import Callable
 from uuid import NAMESPACE_URL, uuid4, uuid5
 
@@ -15,6 +16,7 @@ from src.application.artifacts.write_artifact_use_case import (
 )
 from src.application.chat.chat_use_cases import SendMessageInput, SendMessageUseCase
 from src.application.common.agent_status_publisher import publish_agent_status
+from src.application.hiring.hiring_use_cases import ProposeHiringInput, ProposeHiringUseCase
 from src.application.settings.board_settings_use_cases import GetBoardSettingsUseCase
 from src.application.tasks.task_use_cases import AssignTaskUseCase, MoveTaskUseCase, open_load
 from src.domain.entities.agent import Agent, AgentStatus, Role
@@ -26,7 +28,7 @@ from src.domain.interfaces.chat_repository import IChatRepository
 from src.domain.interfaces.message_bus import IMessageBus
 from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.localization.language import Language, OfficeLanguage
-from src.domain.services.task_routing import EXECUTOR_ROLES, select_owner
+from src.domain.services.task_routing import EXECUTOR_ROLES, is_hiring_task, select_owner
 from src.domain.services.task_splitter import (
     distribute_extra_parts,
     parse_subtasks,
@@ -38,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 _PLANNERS = (Role.PRODUCT_OWNER, Role.SCRUM_MASTER)
 _COORDINATORS = (Role.SCRUM_MASTER, Role.TECH_LEAD, Role.PRODUCT_OWNER)
-_TESTERS = (Role.QA_ENGINEER,)
+_TESTERS = (Role.QA_ENGINEER, Role.TEST_AUTOMATION_ENGINEER)
 _REVIEWERS = (Role.TECH_LEAD, Role.QA_ENGINEER)
 
 # Bloco: sessão fixa do "chão do escritório", onde o ciclo registra as falas.
@@ -63,6 +65,10 @@ _PROMPTS = {
         "test": "Você é o testador da tarefa «{title}».\nResultado entregue: {result}\n"
         "Escreva em poucas linhas o plano de testes e o resultado dos testes (markdown).",
         "test_title": "Testes",
+        "hiring": "A tarefa «{title}» pede uma contratação.\nDetalhes: {description}\n"
+        "Cargos disponíveis: {roles}.\n"
+        "Escolha o cargo mais adequado e responda SOMENTE com uma linha no formato: "
+        "identificador_do_cargo | Motivo da contratação.",
     },
     Language.EN: {
         "planning": "You lead the team's sprint planning ceremony.\n"
@@ -82,8 +88,26 @@ _PROMPTS = {
         "test": "You are the tester for the task «{title}».\nDelivered result: {result}\n"
         "Write the test plan and the test results in a few lines (markdown).",
         "test_title": "Tests",
+        "hiring": "The task «{title}» calls for a hire.\nDetails: {description}\n"
+        "Available roles: {roles}.\n"
+        "Pick the most suitable role and answer ONLY with one line in the format: "
+        "role_identifier | Reason for hiring.",
     },
 }
+
+
+_ROLE_TOKEN = re.compile(
+    r"\b(" + "|".join(sorted((r.value for r in Role), key=len, reverse=True)) + r")\b"
+)
+
+
+def _parse_hiring_answer(answer: str) -> tuple[Role, str] | None:
+    """Extrai o primeiro identificador de cargo da resposta e o motivo (texto após ``|``)."""
+    match = _ROLE_TOKEN.search(answer)
+    if match is None:
+        return None
+    reason = answer.split("|", 1)[1].strip() if "|" in answer else answer.strip()
+    return Role(match.group(1)), reason
 
 
 class WorkLoopUseCase:
@@ -101,6 +125,7 @@ class WorkLoopUseCase:
         chat_repository: IChatRepository,
         sprint_max_days: int = 15,
         board_settings: GetBoardSettingsUseCase | None = None,
+        propose_hiring: ProposeHiringUseCase | None = None,
     ) -> None:
         self._agents = agent_repository
         self._tasks = task_repository
@@ -116,6 +141,7 @@ class WorkLoopUseCase:
         self._chat = chat_repository
         self._sprint_max_days = sprint_max_days
         self._board_settings = board_settings
+        self._propose_hiring = propose_hiring
 
     @property
     def _language(self) -> Language:
@@ -275,9 +301,32 @@ class WorkLoopUseCase:
             )
             task.result = result
             await self._tasks.save(task)
+            if worker.role == Role.HR_MANAGER and is_hiring_task(task):
+                await self._request_hiring(worker, task)
             await self._move.execute(task.task_id, TaskStatus.TESTING, worker.agent_id, worker.role)
             return 1
         return 0
+
+    # Bloco: o RH escolhe o cargo; a contratação só acontece quando o dono decide nome e IA.
+    async def _request_hiring(self, hr: Agent, task: Task) -> None:
+        if self._propose_hiring is None:
+            return
+        prompt = _PROMPTS[self._language]["hiring"].format(
+            title=task.title,
+            description=task.description,
+            roles=", ".join(role.value for role in Role),
+        )
+        answer = await self._speak(hr, prompt, task.task_id)
+        parsed = _parse_hiring_answer(answer)
+        if parsed is None:
+            logger.warning("O RH não indicou um cargo válido para a tarefa %s", task.task_id)
+            return
+        role, reason = parsed
+        await self._propose_hiring.execute(
+            ProposeHiringInput(
+                proposer_id=hr.agent_id, role=role, reason=reason, task_id=task.task_id
+            )
+        )
 
     # Bloco: o QA pega a entrega e a testa; só depois ela segue para a revisão (ADR-050).
     async def _test(self) -> int:

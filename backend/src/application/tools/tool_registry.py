@@ -13,7 +13,6 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from uuid import UUID
 
-from src.application.agents.hire_agent_use_case import HireAgentInput, HireAgentUseCase
 from src.application.artifacts.approve_artifact_use_case import ApproveArtifactUseCase
 from src.application.artifacts.review_artifact_use_case import ReviewArtifactUseCase
 from src.application.artifacts.write_artifact_use_case import (
@@ -25,6 +24,7 @@ from src.application.dismissals.dismissal_use_cases import (
     ProposeDismissalInput,
     ProposeDismissalUseCase,
 )
+from src.application.hiring.hiring_use_cases import ProposeHiringInput, ProposeHiringUseCase
 from src.application.meetings.meeting_use_cases import (
     StartCeremonyInput,
     StartCeremonyUseCase,
@@ -37,7 +37,7 @@ from src.application.tasks.task_use_cases import (
     CreateTaskUseCase,
 )
 from src.application.tools.tool_permissions import ToolName, role_can_use_tool
-from src.domain.entities.agent import Personality, Role
+from src.domain.entities.agent import Role
 from src.domain.entities.artifact import Artifact, ArtifactType
 from src.domain.entities.chat import ChatMessage, MessageKind
 from src.domain.entities.meeting import MeetingKind
@@ -88,8 +88,7 @@ class ToolRegistry:
         assign_task_use_case: AssignTaskUseCase,
         complete_task_use_case: CompleteTaskUseCase,
         send_message_use_case: SendMessageUseCase,
-        hire_agent_use_case: HireAgentUseCase | None = None,
-        default_llm_model: str = "",
+        propose_hiring_use_case: ProposeHiringUseCase | None = None,
         start_ceremony_use_case: StartCeremonyUseCase | None = None,
         research_use_case: ResearchTopicUseCase | None = None,
         propose_dismissal_use_case: ProposeDismissalUseCase | None = None,
@@ -106,9 +105,9 @@ class ToolRegistry:
             ToolName.COMPLETE_TASK: self._make_complete_task_handler(complete_task_use_case),
             ToolName.SEND_MESSAGE: self._make_send_message_handler(send_message_use_case),
         }
-        if hire_agent_use_case is not None:
+        if propose_hiring_use_case is not None:
             self._handlers[ToolName.HIRE_AGENT] = self._make_hire_agent_handler(
-                hire_agent_use_case, default_llm_model
+                propose_hiring_use_case
             )
         if start_ceremony_use_case is not None:
             self._handlers[ToolName.START_CEREMONY] = self._make_start_ceremony_handler(
@@ -261,16 +260,18 @@ class ToolRegistry:
         return handler
 
     @staticmethod
-    def _make_hire_agent_handler(use_case: HireAgentUseCase, default_model: str) -> ToolHandler:
+    def _make_hire_agent_handler(use_case: ProposeHiringUseCase) -> ToolHandler:
+        # A ferramenta só propõe o cargo; nome e IA são escolhidos pelo dono do produto.
         async def handler(
             requester_id: AgentId, requester_role: Role, arguments: dict[str, object]
         ) -> object:
+            task = arguments.get("task_id")
             return await use_case.execute(
-                HireAgentInput(
-                    name=str(arguments["name"]),
+                ProposeHiringInput(
+                    proposer_id=requester_id,
                     role=Role(str(arguments["role"])),
-                    personality=Personality(0.5, 0.5, 0.5, 0.5, 0.5),
-                    llm_model=str(arguments.get("llm_model") or default_model),
+                    reason=str(arguments.get("reason", "")),
+                    task_id=TaskId(value=UUID(str(task))) if task else None,
                 )
             )
 

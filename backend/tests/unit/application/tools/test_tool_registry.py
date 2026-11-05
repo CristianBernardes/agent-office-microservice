@@ -138,27 +138,38 @@ class TestToolRegistry:
                 arguments={"session_id": str(uuid4()), "content": "oi"},
             )
 
-    async def test_hr_can_hire_agent_when_use_case_injected(self, tmp_path: Path) -> None:
-        from src.application.agents.hire_agent_use_case import HireAgentUseCase
+    async def test_hr_hire_agent_tool_only_files_a_proposal(self, tmp_path: Path) -> None:
+        from src.application.hiring.hiring_use_cases import ProposeHiringUseCase
+        from src.domain.entities.agent import Agent, Personality
+        from src.domain.entities.hiring import HiringStatus
+        from src.infrastructure.messaging.in_memory_message_bus import InMemoryMessageBus
         from src.infrastructure.persistence.in_memory_agent_repository import (
             InMemoryAgentRepository,
         )
+        from src.infrastructure.persistence.in_memory_hiring_repository import (
+            InMemoryHiringRepository,
+        )
 
-        repo = InMemoryAgentRepository()
+        agents, hirings = InMemoryAgentRepository(), InMemoryHiringRepository()
+        hr = Agent(
+            AgentId.generate(), "Rita", Role.HR_MANAGER, Personality(0.5, 0.5, 0.5, 0.5, 0.5), "m"
+        )
+        await agents.save(hr)
         registry = _build_registry(tmp_path, MockSearchAdapter())
         registry._handlers[ToolName.HIRE_AGENT] = registry._make_hire_agent_handler(
-            HireAgentUseCase(repo), "m1"
+            ProposeHiringUseCase(agents, hirings, InMemoryMessageBus())
         )
 
-        agent = await registry.execute(
+        proposal = await registry.execute(
             ToolName.HIRE_AGENT,
-            AgentId.generate(),
+            hr.agent_id,
             Role.HR_MANAGER,
-            {"name": "Ana", "role": "dev_junior"},
+            {"role": "dev_mid", "reason": "Falta mão de obra"},
         )
 
-        assert agent.llm_model == "m1"  # type: ignore[attr-defined]
-        assert len(await repo.list_all()) == 1
+        assert proposal.role == Role.DEV_MID  # type: ignore[attr-defined]
+        assert proposal.status == HiringStatus.PENDING  # type: ignore[attr-defined]
+        assert len(await agents.list_all()) == 1
 
 
 async def test_scrum_master_can_start_ceremony(tmp_path: Path) -> None:

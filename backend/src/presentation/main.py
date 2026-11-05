@@ -24,6 +24,7 @@ from src.presentation.api.agents_router import router as agents_router
 from src.presentation.api.chat_router import router as chat_router
 from src.presentation.api.dismissals_router import router as dismissals_router
 from src.presentation.api.health_router import router as health_router
+from src.presentation.api.hirings_router import router as hirings_router
 from src.presentation.api.hr_chat_router import router as hr_chat_router
 from src.presentation.api.layout_router import router as layout_router
 from src.presentation.api.memory_router import router as memory_router
@@ -110,6 +111,7 @@ app.include_router(agents_router)
 app.include_router(tasks_router)
 app.include_router(chat_router)
 app.include_router(dismissals_router)
+app.include_router(hirings_router)
 app.include_router(hr_chat_router)
 app.include_router(memory_router)
 app.include_router(social_router)

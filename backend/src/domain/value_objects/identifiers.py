@@ -140,3 +140,17 @@ class DismissalId:
 
     def __str__(self) -> str:
         return str(self.value)
+
+
+# Bloco: identificador tipado de proposta de contratação.
+@dataclass(frozen=True, slots=True)
+class HiringId:
+    value: UUID
+
+    @staticmethod
+    def generate() -> HiringId:
+        """Cria um novo identificador de proposta de contratação, aleatório."""
+        return HiringId(value=uuid4())
+
+    def __str__(self) -> str:
+        return str(self.value)

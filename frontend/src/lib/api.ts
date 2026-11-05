@@ -4,6 +4,7 @@ import type {
   Agent,
   ChatMessage,
   DismissalProposal,
+  HiringProposal,
   Goal,
   HireAgentInput,
   HrChatReply,
@@ -65,6 +66,13 @@ export interface ApiClient {
     proposalId: string,
     approved: boolean,
   ): Promise<DismissalProposal>;
+  listPendingHirings(): Promise<HiringProposal[]>;
+  approveHiring(
+    proposalId: string,
+    name: string,
+    llmModel: string,
+  ): Promise<HiringProposal>;
+  rejectHiring(proposalId: string): Promise<HiringProposal>;
   sendMessage(sessionId: string, content: string): Promise<ChatMessage>;
   sendHrMessage(
     content: string,
@@ -151,6 +159,15 @@ export function createApiClient(
         `/dismissals/${proposalId}/${approved ? "approve" : "reject"}`,
         {},
       ),
+    listPendingHirings: () =>
+      request<HiringProposal[]>("/hirings?pending_only=true"),
+    approveHiring: (proposalId, name, llmModel) =>
+      post<HiringProposal>(`/hirings/${proposalId}/approve`, {
+        name,
+        llm_model: llmModel,
+      }),
+    rejectHiring: (proposalId) =>
+      post<HiringProposal>(`/hirings/${proposalId}/reject`, {}),
     fireAgent: (agentId) => post<Agent>(`/agents/${agentId}/fire`, {}),
     sendHrMessage: (content, sessionId) =>
       post<HrChatReply>("/hr/chat", { content, session_id: sessionId }),

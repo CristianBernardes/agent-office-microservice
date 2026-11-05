@@ -139,6 +139,9 @@ describe("createApiClient", () => {
     await api.listPendingDismissals();
     await api.decideDismissal("p1", true);
     await api.decideDismissal("p2", false);
+    await api.listPendingHirings();
+    await api.approveHiring("h1", "Bruno", "m2");
+    await api.rejectHiring("h2");
     const urls = fetchMock.mock.calls.map((c: unknown[]) => c[0]);
     expect(urls).toEqual([
       "http://api/agents/a1/fire",
@@ -147,6 +150,9 @@ describe("createApiClient", () => {
       "http://api/dismissals?pending_only=true",
       "http://api/dismissals/p1/approve",
       "http://api/dismissals/p2/reject",
+      "http://api/hirings?pending_only=true",
+      "http://api/hirings/h1/approve",
+      "http://api/hirings/h2/reject",
     ]);
     expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({
       session_id: "s1",

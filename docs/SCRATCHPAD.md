@@ -1123,7 +1123,52 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
 - **Limitações:** chamada de chat de ponta a ponta não validada; sem testes dedicados do
   adaptador/roteamento; a lista traz todos os modelos do gateway, sem filtro.
 
-## Estado atual e ponto de retomada (após a Rodada 140)
+### Rodada 141 — 18 novos cargos disponíveis para contratação
+
+- **Pedido do dono do produto:** ampliar os profissionais do sistema com `dev_mid`,
+  `database_administrator`, `devops_engineer`, `site_reliability_engineer`, `ux_ui_designer`,
+  `business_analyst`, `software_architect`, `security_engineer`, `test_automation_engineer`,
+  `data_engineer`, `ai_engineer`, `ml_engineer`, `systems_analyst`, `product_designer`,
+  `technical_support`, `infrastructure_analyst`, `data_quality_analyst` e `engineering_manager`.
+- **Backend:** novos valores em `Role`; prompts `pt/` e `en/` por cargo; mapa de arquivos em
+  `file_prompt_provider.py`; permissões de ferramentas (`tool_permissions.py`: técnicos como o
+  Dev Sênior, Engenheiro de Testes como QA, Gerente de Engenharia pode contratar mas não propor
+  desligamento — só o RH); nomes na ata da reunião; `EXECUTOR_ROLES` + palavras-chave pt/en
+  para o roteamento de tarefas (`task_routing.py`), `dev_mid` entra nos cargos-reserva;
+  `test_automation_engineer` passa a testar/revisar como o QA (`task_workflow.py` e
+  `work_loop_use_case.py`). Migração `2026_11_05_000013_expand_agent_roles` amplia o domínio
+  `agent_role` (a `down` remove agentes dos novos cargos).
+- **Frontend:** `Role`/`ROLES` e rótulos pt/en; os novos cargos reaproveitam sprites e assento
+  de um cargo base (`BASE_ROLE` em `types.ts`), pois ainda não há arte própria.
+- **Validação:** `ruff format`; 474 unit/integração passando (falha só o teste MQTT que exige
+  broker; o `ruff check` aponta um I001 antigo em `openai_compatible_adapter.py`);
+  vitest 83 passando.
+- **Limitações:** sem sprites/assentos próprios; sem variável `AGENT_*_MODEL` por novo cargo
+  (usam o modelo informado na contratação); palavras-chave de roteamento são heurísticas;
+  a migração precisa ser aplicada no banco existente.
+
+### Rodada 142 — RH contrata via tarefa, com aprovação do dono (modal)
+
+- **Pedido do dono do produto:** o RH deve contratar de fato, via tarefa; antes de contratar,
+  um modal mostra o profissional (cargo + motivo) e o dono escolhe o nome e a IA.
+- **Backend:** entidade `HiringProposal` (`hiring_proposals`, migração `2026_11_05_000014`),
+  `IHiringRepository` (memória/Postgres), `ProposeHiringUseCase`/`DecideHiringUseCase`
+  (`application/hiring`) e rotas `GET /hirings?pending_only=`, `POST /hirings/{id}/approve`
+  (`name`, `llm_model`) e `POST /hirings/{id}/reject`. A ferramenta `hire_agent` agora só
+  **propõe** (args `role`, `reason`, `task_id`), nunca contrata sozinha; erros localizados pt/en.
+  O ciclo de trabalho (`work_loop_use_case.py`): quando o RH executa uma tarefa de contratação
+  (`is_hiring_task`: contrat/recrut/vaga/hire/recruit), pergunta ao LLM qual cargo e registra a
+  proposta (uma pendente por tarefa); resposta sem cargo válido é ignorada com aviso no log.
+- **Frontend:** `HiringModal.svelte` (cargo, motivo, nome pré-preenchido com o cargo, seletor de
+  IA com os modelos do `/models`), `api.listPendingHirings/approveHiring/rejectHiring`,
+  `store.hirings`; o modal aparece uma proposta por vez, depois das demissões pendentes. Os
+  novos cargos da Rodada 141 já aparecem no formulário de contratação manual.
+- **Validação:** `ruff format`; 479 unit passando; mypy limpo; vitest 85 passando.
+- **Limitações:** a escolha do cargo pelo RH depende da resposta do LLM (formato
+  `cargo | motivo`); sem rota HTTP para propor contratação (só ferramenta/ciclo); a migração
+  precisa ser aplicada; o gateway/MQTT dos tópicos `office/hirings/*` não foi validado ponta a ponta.
+
+## Estado atual e ponto de retomada (após a Rodada 142)
 
 ### Commits por rodada (branch `develop`, tudo no remoto)
 

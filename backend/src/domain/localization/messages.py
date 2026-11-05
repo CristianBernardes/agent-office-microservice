@@ -115,6 +115,34 @@ MESSAGES: dict[str, dict[Language, str]] = {
         Language.EN: "Dismissal proposal with ID '{proposal_id}' was not found.",
         Language.PT: "Proposta de demissão com ID '{proposal_id}' não foi encontrada.",
     },
+    "hiring.propose_forbidden": {
+        Language.EN: "Role '{role}' cannot propose hirings.",
+        Language.PT: "O papel '{role}' não pode propor contratações.",
+    },
+    "hiring.reason_required": {
+        Language.EN: "A hiring proposal needs a reason.",
+        Language.PT: "Uma proposta de contratação precisa de um motivo.",
+    },
+    "hiring.name_required": {
+        Language.EN: "Choose a name for the new hire.",
+        Language.PT: "Escolha um nome para o novo profissional.",
+    },
+    "hiring.model_required": {
+        Language.EN: "Choose the AI model for the new hire.",
+        Language.PT: "Escolha a IA do novo profissional.",
+    },
+    "hiring.already_pending": {
+        Language.EN: "There is already a pending hiring proposal for this task.",
+        Language.PT: "Já existe uma proposta de contratação pendente para esta tarefa.",
+    },
+    "hiring.already_decided": {
+        Language.EN: "Hiring proposal '{proposal_id}' was already decided ('{status}').",
+        Language.PT: "A proposta de contratação '{proposal_id}' já foi decidida ('{status}').",
+    },
+    "hiring.not_found": {
+        Language.EN: "Hiring proposal with ID '{proposal_id}' was not found.",
+        Language.PT: "Proposta de contratação com ID '{proposal_id}' não foi encontrada.",
+    },
     "agent.offline_cannot_own": {
         Language.EN: "Agent '{name}' is OFFLINE and cannot own tasks.",
         Language.PT: "Agente '{name}' está OFFLINE e não pode ser responsável por tarefas.",
