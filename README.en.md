@@ -88,8 +88,14 @@ want to automate planning, research, documentation, and delivery with a team of 
 | Your own product or service **without releasing the source** (including SaaS) | **Commercial license** ([agreement template](./COMMERCIAL-LICENSE.md)) |
 | Installation, integration with your systems, training, and support | **Services on request** |
 
-**Pricing:** annual commercial license per company, starting at **R$ [amount]/year** (with or
-without support); implementation and support quoted per project. [fill in the price range]
+**Pricing** (reference, subject to negotiation, in Brazilian reais):
+
+| Offer | Price |
+|-------|-------|
+| Annual commercial license per company, without support | from **R$ 12,000/year** |
+| Annual commercial license with business-hours support | R$ 24,000 to R$ 36,000/year |
+| Implementation and integration | R$ 8,000 to R$ 30,000 per project, quoted |
+| Ad hoc consulting/support | R$ 250 to R$ 400 per hour |
 
 **Contact:** SCRIPTSAVVY (GENIOZ Soluções em TI) — cristian.aob@gmail.com — WhatsApp
 +55 (35) 99218-3238.

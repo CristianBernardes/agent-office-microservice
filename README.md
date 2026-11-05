@@ -89,8 +89,14 @@ de IA que **você supervisiona** (contratações, demissões e decisões passam 
 | Produto ou serviço próprio **sem abrir o código** (inclusive SaaS) | **Licença comercial** ([modelo de contrato](./COMMERCIAL-LICENSE.pt-BR.md)) |
 | Instalação, integração com os seus sistemas, treinamento e suporte | **Serviços sob consulta** |
 
-**Valores:** licença comercial anual por empresa, a partir de **R$ [valor]/ano** (com ou sem
-suporte); implantação e suporte sob orçamento. [preencher a faixa de preço]
+**Valores** (referência, sujeitos a negociação):
+
+| Oferta | Valor |
+|--------|-------|
+| Licença comercial anual por empresa, sem suporte | a partir de **R$ 12.000/ano** |
+| Licença comercial anual com suporte em horário comercial | R$ 24.000 a R$ 36.000/ano |
+| Implantação e integração | R$ 8.000 a R$ 30.000 por projeto, sob orçamento |
+| Consultoria/suporte avulso | R$ 250 a R$ 400 por hora |
 
 **Contato:** SCRIPTSAVVY (GENIOZ Soluções em TI) — cristian.aob@gmail.com — WhatsApp
 (35) 99218-3238.
