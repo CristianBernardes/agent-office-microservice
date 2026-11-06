@@ -1020,6 +1020,10 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   (`CODE_OF_CONDUCT.en.md`, `CONTRIBUTING.en.md`, `SECURITY.en.md`,
   `ISSUE_TEMPLATE/*.en.md`) e links cruzados pt↔en no topo de cada arquivo (commit `f3759bd`).
   Apenas documentação de comunidade; sem testes aplicáveis.
+- Correção: o botão de idioma dava 404 quando o arquivo era aberto por
+  `/community/code-of-conduct` (link relativo resolvia para `/community/...`). Os links
+  cruzados pt↔en de `CODE_OF_CONDUCT`, `CONTRIBUTING` e `SECURITY` agora são URLs absolutas
+  (`blob/master/.github/...`).
 
 ### Rodada 136 — `WorkLoopUseCase` respeita o bloqueio de criação de tarefas
 
