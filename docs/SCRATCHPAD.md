@@ -1024,6 +1024,8 @@ Makefile: `format-go` (gofmt), `format-frontend` (prettier) e `format-all`.
   `/community/code-of-conduct` (link relativo resolvia para `/community/...`). Os links
   cruzados pt↔en de `CODE_OF_CONDUCT`, `CONTRIBUTING` e `SECURITY` agora são URLs absolutas
   (`blob/master/.github/...`).
+- Adicionado o diagrama Mermaid de componentes (gerado via gitdiagram) na seção
+  Arquitetura de `README.md` e `README.en.md`.
 
 ### Rodada 136 — `WorkLoopUseCase` respeita o bloqueio de criação de tarefas
 
