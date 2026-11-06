@@ -1,4 +1,4 @@
-[Versão em português](CONTRIBUTING.md)
+[Versão em português](https://github.com/CristianBernardes/agent-office-microservice/blob/master/.github/CONTRIBUTING.md)
 
 # How to contribute
 
