@@ -157,9 +157,15 @@ check-all: check lint-go test-go lint-frontend test-frontend
 format-go:
 	cd $(GATEWAY_DIR) && gofmt -w .
 
-## format-frontend: Formata o código do frontend (prettier).
+## format-frontend: Formata o código do frontend (prettier) em um container Node descartável.
+# O node_modules só existe dentro do container do frontend (ver frontend/Dockerfile),
+# então as dependências são instaladas numa cópia em /tmp e apenas src/ volta para o host.
 format-frontend:
-	cd $(FRONTEND_DIR) && npx --yes prettier --write "src/**/*.{ts,svelte,css}"
+	docker run --rm -v "$(CURDIR)/$(FRONTEND_DIR):/host" node:24-alpine sh -c '\
+		mkdir /tmp/app && cd /host && tar cf - --exclude=node_modules --exclude=dist . | tar xf - -C /tmp/app && \
+		cd /tmp/app && npm install --no-audit --no-fund --silent && \
+		npx prettier --write "src/**/*.{ts,svelte,css}" && \
+		cp -r /tmp/app/src/. /host/src/'
 
 ## format-all: Formata backend, gateway e frontend.
 format-all: format format-go format-frontend

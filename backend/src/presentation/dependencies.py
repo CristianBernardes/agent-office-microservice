@@ -81,6 +81,7 @@ from src.domain.interfaces.task_repository import ITaskRepository
 from src.domain.interfaces.web_search_adapter import IWebSearchAdapter
 from src.domain.localization.language import OfficeLanguage
 from src.infrastructure.config.settings import Settings, get_settings
+from src.infrastructure.filesystem.workspace_inputs_reader import WorkspaceInputsReader
 from src.infrastructure.llm.anthropic_adapter import AnthropicAdapter
 from src.infrastructure.llm.ollama_adapter import OllamaAdapter
 from src.infrastructure.llm.openai_compatible_adapter import OpenAICompatibleAdapter
@@ -600,6 +601,7 @@ def get_agent_think_use_case() -> AgentThinkUseCase:
         prompt_provider=get_prompt_provider(),
         tool_registry=get_tool_registry(),
         language=get_settings().language(),
+        reference_material=WorkspaceInputsReader(),
     )
 
 

@@ -14,6 +14,7 @@ from src.application.tools.tool_registry import ToolRegistry
 from src.domain.entities.agent import Agent, AgentStatus, Personality, Role
 from src.domain.exceptions.domain_exceptions import InvalidStateTransitionError
 from src.domain.interfaces.llm_adapter import LlmThoughtResponse
+from src.domain.interfaces.reference_material_provider import IReferenceMaterialProvider
 from src.domain.localization.language import Language
 from src.domain.value_objects.identifiers import AgentId
 from src.infrastructure.filesystem.markdown_artifact_writer import MarkdownArtifactWriter
@@ -60,7 +61,61 @@ def _build_tool_registry(tmp_path: Path, message_bus: InMemoryMessageBus) -> Too
     )
 
 
+class _RecordingLlm(MockLlmAdapter):
+    def __init__(self) -> None:
+        super().__init__()
+        self.contexts: list[str] = []
+
+    async def think(
+        self, system_prompt: str, context: str, temperature: float = 0.7
+    ) -> LlmThoughtResponse:
+        self.contexts.append(context)
+        return await super().think(system_prompt, context, temperature)
+
+
+class _FakeMaterial(IReferenceMaterialProvider):
+    def __init__(self, text: str) -> None:
+        self._text = text
+
+    def read_all(self) -> str:
+        return self._text
+
+
 class TestAgentThinkUseCase:
+    @pytest.mark.parametrize(
+        ("material", "expect_in_context"), [("### briefing.md\nProduto X", True), ("", False)]
+    )
+    async def test_appends_reference_material_to_context(
+        self,
+        tmp_path: Path,
+        neutral_personality: Personality,
+        material: str,
+        expect_in_context: bool,
+    ) -> None:
+        agent = Agent(
+            agent_id=AgentId.generate(),
+            name="Dora",
+            role=Role.PRODUCT_OWNER,
+            personality=neutral_personality,
+            llm_model="mock-model",
+        )
+        message_bus = InMemoryMessageBus()
+        llm = _RecordingLlm()
+        use_case = AgentThinkUseCase(
+            llm_adapter_resolver=_resolver_for(llm),
+            message_bus=message_bus,
+            prompt_provider=FilePromptProvider(),
+            language=Language.PT,
+            tool_registry=_build_tool_registry(tmp_path, message_bus),
+            reference_material=_FakeMaterial(material),
+        )
+
+        await use_case.execute(agent, context="Crie um produto.")
+
+        assert llm.contexts[0].startswith("Crie um produto.")
+        assert ("MATERIAL DE REFERÊNCIA" in llm.contexts[0]) is expect_in_context
+        assert ("Produto X" in llm.contexts[0]) is expect_in_context
+
     async def test_moves_agent_to_thinking_status(
         self, tmp_path: Path, neutral_personality: Personality
     ) -> None:

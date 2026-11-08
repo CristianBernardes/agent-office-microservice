@@ -1,4 +1,4 @@
-[Versão em português](SECURITY.md)
+[Versão em português](https://github.com/CristianBernardes/agent-office-microservice/blob/master/.github/SECURITY.md)
 
 # Security Policy
 

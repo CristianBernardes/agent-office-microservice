@@ -1,4 +1,4 @@
-[Versão em português](CODE_OF_CONDUCT.md)
+[Versão em português](https://github.com/CristianBernardes/agent-office-microservice/blob/master/.github/CODE_OF_CONDUCT.md)
 
 # Code of Conduct
 
